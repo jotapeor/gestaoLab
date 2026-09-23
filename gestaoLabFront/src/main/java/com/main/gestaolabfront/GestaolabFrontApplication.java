@@ -1,4 +1,4 @@
-package com.main.gestaolab_front;
+package com.main.gestaolabfront;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
