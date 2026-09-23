@@ -1,4 +1,4 @@
-package com.main.gestaolab_front;
+package com.main.gestaolabfront;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

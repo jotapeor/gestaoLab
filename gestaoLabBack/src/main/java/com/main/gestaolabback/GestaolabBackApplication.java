@@ -1,4 +1,4 @@
-package com.main.gestaolab_back;
+package com.main.gestaolabback;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
