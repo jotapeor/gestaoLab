@@ -94,11 +94,6 @@
     </div>
 </header>
 
-<footer th:fragment="footer" class="gl-footer">
-    <span>&copy; 2026 <strong>GestãoLab</strong></span>
-    <span>v1.0.0</span>
-</footer>
-
 <th:block th:fragment="scripts">
     <input type="hidden" id="toast-success-message" th:if="${mensagemSucesso != null}" th:value="${mensagemSucesso}"/>
     <input type="hidden" id="toast-error-message" th:if="${errorMessage != null}" th:value="${errorMessage}"/>

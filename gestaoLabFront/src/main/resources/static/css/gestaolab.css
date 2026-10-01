@@ -670,21 +670,6 @@ a:hover { color: var(--gl-primary-hover); }
 
 .gl-login-box .btn-primary:disabled { background: rgba(15,118,110,.5); }
 
-/* ─────────────────────────────────────────────
-   RODAPÉ
-   ───────────────────────────────────────────── */
-.gl-footer {
-    padding: 12px 24px;
-    background: var(--gl-surface);
-    border-top: 1px solid var(--gl-border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: .78rem;
-    color: var(--gl-text-muted);
-}
-
-.gl-footer strong { color: var(--gl-text-secondary); }
 
 /* ─────────────────────────────────────────────
    GRID UTILITÁRIO
