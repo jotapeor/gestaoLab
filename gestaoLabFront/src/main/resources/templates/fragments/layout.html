@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <th:block th:fragment="head-content">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..700;1,14..32,400&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        <link th:href="@{/css/gestaolab.css}" rel="stylesheet">
+    </th:block>
+</head>
+<body>
+<aside th:fragment="sidebar" class="gl-sidebar" id="glSidebar" aria-label="Menu de navegação">
+    <a th:href="@{/dashboard}" class="gl-sidebar-brand">
+        <span class="gl-sidebar-brand-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M9 3h6M10 3v7.5L4.5 18A2 2 0 0 0 6.3 21h11.4a2 2 0 0 0 1.8-3L14 10.5V3" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="9.5" cy="17.5" r="1" fill="currentColor"/>
+                <circle cx="14" cy="16" r=".75" fill="currentColor"/>
+            </svg>
+        </span>
+        <span class="gl-sidebar-brand-text">Gestão<span>Lab</span></span>
+    </a>
+    <nav class="gl-sidebar-nav">
+        <ul style="list-style:none;padding:0;margin:0;">
+            <li class="gl-nav-item">
+                <a th:href="@{/dashboard}"
+                   class="gl-nav-link"
+                   th:classappend="${menuAtivo == 'dashboard'} ? ' active' : ''">
+                    <i class="bi bi-grid-1x2" aria-hidden="true"></i><span>Dashboard</span>
+                </a>
+            </li>
+            <li><p class="gl-nav-label">Gestão</p></li>
+            <li class="gl-nav-item">
+                <a th:href="@{/usuarios}"
+                   class="gl-nav-link"
+                   th:classappend="${menuAtivo == 'usuarios'} ? ' active' : ''">
+                    <i class="bi bi-people" aria-hidden="true"></i><span>Usuários</span>
+                </a>
+            </li>
+            <li class="gl-nav-item">
+                <a th:href="@{/uso-laboratorio}"
+                   class="gl-nav-link"
+                   th:classappend="${menuAtivo == 'uso-laboratorio'} ? ' active' : ''">
+                    <i class="bi bi-clipboard2-pulse" aria-hidden="true"></i><span>Uso do Laboratório</span>
+                </a>
+            </li>
+            <li class="gl-nav-item">
+                <a th:href="@{/materiais}"
+                   class="gl-nav-link"
+                   th:classappend="${menuAtivo == 'materiais'} ? ' active' : ''">
+                    <i class="bi bi-eyedropper" aria-hidden="true"></i><span>Materiais</span>
+                </a>
+            </li>
+            <li class="gl-nav-item">
+                <a th:href="@{/equipamentos}"
+                   class="gl-nav-link"
+                   th:classappend="${menuAtivo == 'equipamentos'} ? ' active' : ''">
+                    <i class="bi bi-thermometer" aria-hidden="true"></i><span>Equipamentos</span>
+                </a>
+            </li>
+            <li class="gl-nav-item">
+                <a th:href="@{/relatorios}"
+                   class="gl-nav-link"
+                   th:classappend="${menuAtivo == 'relatorios'} ? ' active' : ''">
+                    <i class="bi bi-activity" aria-hidden="true"></i><span>Relatórios</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <div class="gl-sidebar-footer">
+        <div class="gl-sidebar-user-name" th:text="${session.nome ?: 'Usuário'}">Usuário</div>
+        <div class="gl-sidebar-user-role"
+             th:text="${session.perfil == 'COORDENADOR' ? 'Coordenador' : (session.perfil == 'PROFESSOR' ? 'Professor' : 'Usuário')}">
+            Usuário
+        </div>
+    </div>
+</aside>
+
+<header th:fragment="topbar(pageTitle)" class="gl-topbar">
+    <button class="gl-topbar-toggle" id="sidebarToggle" aria-label="Abrir menu"><i class="bi bi-list"></i></button>
+    <span class="gl-topbar-title" th:text="${pageTitle}">GestãoLab</span>
+    <div class="gl-topbar-spacer"></div>
+    <div class="gl-topbar-user">
+        <i class="bi bi-person-circle" aria-hidden="true"></i>
+        <span th:text="${session.nome ?: 'Usuário'}">Usuário</span>
+        <span class="gl-topbar-role"
+              th:text="${'(' + (session.perfil == 'COORDENADOR' ? 'Coordenador' : (session.perfil == 'PROFESSOR' ? 'Professor' : 'Usuário')) + ')'}">
+            (Usuário)
+        </span>
+        <a th:href="@{/logout}" class="gl-topbar-logout" title="Sair"><i class="bi bi-box-arrow-right" aria-hidden="true"></i></a>
+    </div>
+</header>
+
+<th:block th:fragment="scripts">
+    <input type="hidden" id="toast-success-message" th:if="${mensagemSucesso != null}" th:value="${mensagemSucesso}"/>
+    <input type="hidden" id="toast-error-message" th:if="${errorMessage != null}" th:value="${errorMessage}"/>
+    <script th:src="@{/js/gestaolab.js}"></script>
+</th:block>
+</body>
+</html>

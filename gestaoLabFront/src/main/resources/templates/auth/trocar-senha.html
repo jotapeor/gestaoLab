@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>GestãoLab — Trocar Senha</title>
+    <th:block th:replace="~{fragments/layout :: head-content}"></th:block>
+</head>
+<body>
+<div class="gl-login-page">
+
+    <!-- Painel esquerdo: mesmo padrão do login -->
+    <div class="gl-login-visual">
+        <svg class="gl-login-pattern" viewBox="0 0 400 700" preserveAspectRatio="xMidYMid slice"
+             xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+                <polygon id="hx" points="40,0 80,23 80,69 40,92 0,69 0,23"/>
+            </defs>
+            <g fill="none" stroke="rgba(255,255,255,0.09)" stroke-width="1.5">
+                <use href="#hx" transform="translate(0,0)"/>
+                <use href="#hx" transform="translate(80,0)"/>
+                <use href="#hx" transform="translate(160,0)"/>
+                <use href="#hx" transform="translate(240,0)"/>
+                <use href="#hx" transform="translate(320,0)"/>
+                <use href="#hx" transform="translate(-40,69)"/>
+                <use href="#hx" transform="translate(40,69)"/>
+                <use href="#hx" transform="translate(120,69)"/>
+                <use href="#hx" transform="translate(200,69)"/>
+                <use href="#hx" transform="translate(280,69)"/>
+                <use href="#hx" transform="translate(360,69)"/>
+                <use href="#hx" transform="translate(0,138)"/>
+                <use href="#hx" transform="translate(80,138)"/>
+                <use href="#hx" transform="translate(160,138)"/>
+                <use href="#hx" transform="translate(240,138)"/>
+                <use href="#hx" transform="translate(320,138)"/>
+                <use href="#hx" transform="translate(-40,207)"/>
+                <use href="#hx" transform="translate(40,207)"/>
+                <use href="#hx" transform="translate(120,207)"/>
+                <use href="#hx" transform="translate(200,207)"/>
+                <use href="#hx" transform="translate(280,207)"/>
+                <use href="#hx" transform="translate(360,207)"/>
+                <use href="#hx" transform="translate(0,276)"/>
+                <use href="#hx" transform="translate(80,276)"/>
+                <use href="#hx" transform="translate(160,276)"/>
+                <use href="#hx" transform="translate(240,276)"/>
+                <use href="#hx" transform="translate(320,276)"/>
+                <use href="#hx" transform="translate(-40,345)"/>
+                <use href="#hx" transform="translate(40,345)"/>
+                <use href="#hx" transform="translate(120,345)"/>
+                <use href="#hx" transform="translate(200,345)"/>
+                <use href="#hx" transform="translate(280,345)"/>
+                <use href="#hx" transform="translate(360,345)"/>
+                <use href="#hx" transform="translate(0,414)"/>
+                <use href="#hx" transform="translate(80,414)"/>
+                <use href="#hx" transform="translate(160,414)"/>
+                <use href="#hx" transform="translate(240,414)"/>
+                <use href="#hx" transform="translate(320,414)"/>
+                <use href="#hx" transform="translate(-40,483)"/>
+                <use href="#hx" transform="translate(40,483)"/>
+                <use href="#hx" transform="translate(120,483)"/>
+                <use href="#hx" transform="translate(200,483)"/>
+                <use href="#hx" transform="translate(280,483)"/>
+                <use href="#hx" transform="translate(360,483)"/>
+                <use href="#hx" transform="translate(0,552)"/>
+                <use href="#hx" transform="translate(80,552)"/>
+                <use href="#hx" transform="translate(160,552)"/>
+                <use href="#hx" transform="translate(240,552)"/>
+                <use href="#hx" transform="translate(320,552)"/>
+                <use href="#hx" transform="translate(-40,621)"/>
+                <use href="#hx" transform="translate(40,621)"/>
+                <use href="#hx" transform="translate(120,621)"/>
+                <use href="#hx" transform="translate(200,621)"/>
+                <use href="#hx" transform="translate(280,621)"/>
+                <use href="#hx" transform="translate(360,621)"/>
+            </g>
+        </svg>
+
+        <div class="login-visual-content">
+            <div class="gl-login-logo">
+                <span class="gl-login-logo-icon">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M9 3h6M10 3v7.5L4.5 18A2 2 0 0 0 6.3 21h11.4a2 2 0 0 0 1.8-3L14 10.5V3"
+                              stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="9.5" cy="17.5" r="1" fill="currentColor"/>
+                        <circle cx="14" cy="16" r=".75" fill="currentColor"/>
+                    </svg>
+                </span>
+                <span class="gl-login-logo-text">Gestão<span>Lab</span></span>
+            </div>
+            <p class="gl-login-tagline">
+                Por segurança, defina uma nova senha antes de continuar.
+            </p>
+        </div>
+    </div>
+
+    <!-- Painel direito: formulário de troca de senha -->
+    <div class="gl-login-panel">
+        <div class="gl-login-box">
+            <h1 class="gl-login-title">Trocar Senha</h1>
+            <p class="gl-login-subtitle">Escolha uma senha com no mínimo 8 caracteres</p>
+
+            <div th:if="${errorMessage}" class="gl-alert gl-alert-danger" role="alert">
+                <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+                <span th:text="${errorMessage}">Erro.</span>
+            </div>
+
+            <form action="/fazer-trocar-senha" method="post" id="formTrocarSenha" novalidate>
+                <div class="gl-form-group">
+                    <label class="gl-form-label" for="senhaAtual">Senha atual <span class="required" aria-hidden="true">*</span></label>
+                    <div class="gl-input-wrapper">
+                        <i class="bi bi-lock gl-input-icon" aria-hidden="true"></i>
+                        <input type="password" id="senhaAtual" name="senhaAtual" class="gl-form-control"
+                               placeholder="••••••••" required/>
+                        <button type="button" class="gl-input-action" onclick="toggleSenha(this)"
+                                aria-label="Mostrar senha atual">
+                            <i class="bi bi-eye" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="gl-form-group">
+                    <label class="gl-form-label" for="novaSenha">Nova senha <span class="required" aria-hidden="true">*</span></label>
+                    <div class="gl-input-wrapper">
+                        <i class="bi bi-lock-fill gl-input-icon" aria-hidden="true"></i>
+                        <input type="password" id="novaSenha" name="novaSenha" class="gl-form-control"
+                               placeholder="Mínimo 8 caracteres" minlength="8" required/>
+                        <button type="button" class="gl-input-action" onclick="toggleSenha(this)"
+                                aria-label="Mostrar nova senha">
+                            <i class="bi bi-eye" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <span class="gl-form-hint" id="nova-senha-hint">Mínimo 8 caracteres.</span>
+                    <span class="gl-form-error" id="nova-senha-error" style="display:none;"></span>
+                </div>
+                <div class="gl-form-group">
+                    <label class="gl-form-label" for="confirmacaoSenha">Confirmar nova senha <span class="required" aria-hidden="true">*</span></label>
+                    <div class="gl-input-wrapper">
+                        <i class="bi bi-lock-fill gl-input-icon" aria-hidden="true"></i>
+                        <input type="password" id="confirmacaoSenha" name="confirmacaoSenha" class="gl-form-control"
+                               placeholder="Repita a nova senha" required/>
+                        <button type="button" class="gl-input-action" onclick="toggleSenha(this)"
+                                aria-label="Mostrar confirmação">
+                            <i class="bi bi-eye" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <span class="gl-form-hint" id="confirmacao-hint">Repita a senha digitada.</span>
+                    <span class="gl-form-error" id="confirmacao-error" style="display:none;"></span>
+                    <span class="gl-form-success" id="confirmacao-success" style="display:none;"></span>
+                </div>
+                <button type="submit" id="btn-trocar" class="btn btn-primary btn-block btn-lg" disabled>
+                    <i class="bi bi-check-lg" aria-hidden="true"></i> Confirmar Nova Senha
+                </button>
+            </form>
+        </div>
+    </div>
+
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
