@@ -3,25 +3,24 @@ package com.main.gestaolabback;
 import com.main.gestaolabback.helper.TestDataFactory;
 import com.main.gestaolabback.model.*;
 import com.main.gestaolabback.repository.*;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
+import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
+@DataJpaTest
 @ActiveProfiles("test")
-@Transactional
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class EntidadesRepositoriosTest {
 
-    @PersistenceContext private EntityManager em;
+    @Autowired private TestEntityManager em;
     @Autowired private UsuarioRepository usuarioRepository;
     @Autowired private CursoSetorRepository cursoSetorRepository;
     @Autowired private ProjetoRepository projetoRepository;
