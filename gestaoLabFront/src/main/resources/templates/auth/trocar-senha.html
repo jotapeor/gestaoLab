@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>GestãoLab — Trocar Senha</title>
+    <th:block th:replace="~{fragments/layout :: head-content}"></th:block>
+</head>
+<body>
+<div class="gl-login-page">
+    <div class="gl-login-visual">
+        <div class="login-visual-content">
+            <span class="gl-login-logo-text">Gestão<span>Lab</span></span>
+            <p class="gl-login-tagline">Por segurança, defina uma nova senha antes de continuar.</p>
+        </div>
+    </div>
+    <div class="gl-login-panel">
+        <div class="gl-login-box">
+            <h1 class="gl-login-title">Trocar Senha</h1>
+            <p class="gl-login-subtitle">Escolha uma senha com no mínimo 8 caracteres</p>
+
+            <div th:if="${errorMessage}" class="gl-alert gl-alert-danger" role="alert" style="margin-bottom:16px;">
+                <i class="bi bi-exclamation-circle"></i>
+                <span th:text="${errorMessage}">Erro.</span>
+            </div>
+
+            <form action="/fazer-trocar-senha" method="post" id="formTrocarSenha" novalidate>
+                <div class="gl-form-group">
+                    <label class="gl-form-label" for="senhaAtual">Senha atual <span class="required">*</span></label>
+                    <div class="gl-input-wrapper">
+                        <i class="bi bi-lock gl-input-icon"></i>
+                        <input type="password" id="senhaAtual" name="senhaAtual" class="gl-form-control"
+                               placeholder="••••••••" required/>
+                        <button type="button" class="gl-input-action" onclick="toggleSenha(this)"
+                                aria-label="Mostrar senha atual">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="gl-form-group">
+                    <label class="gl-form-label" for="novaSenha">Nova senha <span class="required">*</span></label>
+                    <div class="gl-input-wrapper">
+                        <i class="bi bi-lock-fill gl-input-icon"></i>
+                        <input type="password" id="novaSenha" name="novaSenha" class="gl-form-control"
+                               placeholder="Mínimo 8 caracteres" minlength="8" required/>
+                        <button type="button" class="gl-input-action" onclick="toggleSenha(this)"
+                                aria-label="Mostrar nova senha">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                    <span class="gl-form-hint" id="nova-senha-hint">Mínimo 8 caracteres.</span>
+                    <span class="gl-form-error" id="nova-senha-error" style="display:none;"></span>
+                </div>
+                <div class="gl-form-group">
+                    <label class="gl-form-label" for="confirmacaoSenha">Confirmar nova senha <span class="required">*</span></label>
+                    <div class="gl-input-wrapper">
+                        <i class="bi bi-lock-fill gl-input-icon"></i>
+                        <input type="password" id="confirmacaoSenha" name="confirmacaoSenha" class="gl-form-control"
+                               placeholder="Repita a nova senha" required/>
+                        <button type="button" class="gl-input-action" onclick="toggleSenha(this)"
+                                aria-label="Mostrar confirmação">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                    <span class="gl-form-hint" id="confirmacao-hint">Repita a senha digitada.</span>
+                    <span class="gl-form-error" id="confirmacao-error" style="display:none;"></span>
+                    <span class="gl-form-success" id="confirmacao-success" style="display:none;"></span>
+                </div>
+                <button type="submit" id="btn-trocar" class="btn btn-primary btn-block btn-lg" disabled>
+                    <i class="bi bi-check-lg"></i> Confirmar Nova Senha
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

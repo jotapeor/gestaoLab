@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>GestãoLab — Dashboard</title>
+    <th:block th:replace="~{fragments/layout :: head-content}"></th:block>
+</head>
+<body>
+<div class="gl-sidebar-overlay" id="sidebarOverlay"></div>
+<div class="gl-wrapper">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+    <div class="gl-main">
+        <div th:replace="~{fragments/layout :: topbar('Dashboard')}"></div>
+        <main class="gl-content" id="main-content">
+            <div class="gl-page-header fade-in">
+                <h1 class="gl-page-title">Dashboard</h1>
+                <p class="gl-page-subtitle">
+                    Bem-vindo(a), <strong th:text="${nome}">Usuário</strong>.
+                </p>
+            </div>
+
+            <div th:if="${errorMessage}" class="gl-alert gl-alert-danger" role="alert">
+                <i class="bi bi-exclamation-circle"></i>
+                <span th:text="${errorMessage}">Erro.</span>
+            </div>
+
+            <div class="gl-grid gl-grid-3 fade-in delay-1" style="margin-bottom:24px;">
+                <div class="gl-card">
+                    <div class="gl-card-body" style="display:flex;align-items:center;gap:16px;">
+                        <div class="gl-stat-icon"><i class="bi bi-calendar-check"></i></div>
+                        <div class="gl-stat-info">
+                            <div class="gl-stat-label">Uso do Laboratório</div>
+                            <div class="gl-stat-trend info">Reservas e agendamentos</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="gl-card">
+                    <div class="gl-card-body" style="display:flex;align-items:center;gap:16px;">
+                        <div class="gl-stat-icon"><i class="bi bi-boxes"></i></div>
+                        <div class="gl-stat-info">
+                            <div class="gl-stat-label">Materiais</div>
+                            <div class="gl-stat-trend info">Controle de estoque</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="gl-card">
+                    <div class="gl-card-body" style="display:flex;align-items:center;gap:16px;">
+                        <div class="gl-stat-icon"><i class="bi bi-tools"></i></div>
+                        <div class="gl-stat-info">
+                            <div class="gl-stat-label">Equipamentos</div>
+                            <div class="gl-stat-trend info">Manutenção e disponibilidade</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <div th:replace="~{fragments/layout :: footer}"></div>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

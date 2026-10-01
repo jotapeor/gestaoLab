@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>GestãoLab — Login</title>
+    <th:block th:replace="~{fragments/layout :: head-content}"></th:block>
+</head>
+<body>
+<div class="gl-login-page">
+    <div class="gl-login-visual">
+        <div class="login-visual-content">
+            <span class="gl-login-logo-text">Gestão<span>Lab</span></span>
+            <p class="gl-login-tagline">Sistema de gestão de laboratório — controle de uso, materiais e equipamentos em um só lugar.</p>
+        </div>
+    </div>
+    <div class="gl-login-panel">
+        <div class="gl-login-box">
+            <h1 class="gl-login-title">Bem-vindo(a)</h1>
+            <p class="gl-login-subtitle">Acesse o painel com suas credenciais</p>
+            <div th:if="${errorMessage}" class="gl-alert gl-alert-danger" role="alert">
+                <i class="bi bi-exclamation-circle"></i>
+                <span th:text="${errorMessage}">Credenciais inválidas.</span>
+            </div>
+            <form action="/logar" method="post" id="formLogin" novalidate>
+                <div class="gl-form-group">
+                    <label class="gl-form-label" for="email">E-mail <span class="required">*</span></label>
+                    <div class="gl-input-wrapper">
+                        <i class="bi bi-envelope gl-input-icon"></i>
+                        <input type="email" id="email" name="email" class="gl-form-control"
+                               placeholder="usuario@instituicao.edu.br" autocomplete="email" required/>
+                    </div>
+                </div>
+                <div class="gl-form-group">
+                    <label class="gl-form-label" for="senha">Senha <span class="required">*</span></label>
+                    <div class="gl-input-wrapper">
+                        <i class="bi bi-lock gl-input-icon"></i>
+                        <input type="password" id="senha" name="senha" class="gl-form-control"
+                               placeholder="••••••••" autocomplete="current-password" required/>
+                        <button type="button" class="gl-input-action" onclick="toggleSenha(this)"
+                                aria-label="Mostrar ou ocultar senha">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" id="btn-logar" class="btn btn-primary btn-block btn-lg" disabled>
+                    Entrar no Sistema
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
