@@ -38,16 +38,6 @@ function initSidebar() {
     }
 }
 
-function initActiveNav() {
-    const currentPath = window.location.pathname;
-    document.querySelectorAll('.gl-nav-link').forEach(link => {
-        const href = link.getAttribute('href');
-        if (href && (href === currentPath || (currentPath.startsWith(href) && href !== '/'))) {
-            link.classList.add('active');
-        }
-    });
-}
-
 function initSubmitLoading() {
     document.querySelectorAll('form').forEach(form => {
         form.addEventListener('submit', function () {
@@ -144,7 +134,6 @@ function initToasts() {
 
 document.addEventListener('DOMContentLoaded', function () {
     initSidebar();
-    initActiveNav();
     initSubmitLoading();
     initTrocarSenhaValidation();
     initToasts();

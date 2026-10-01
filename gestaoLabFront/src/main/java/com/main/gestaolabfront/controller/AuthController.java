@@ -56,6 +56,7 @@ public class AuthController {
     public String dashboard(HttpSession session, Model model) {
         model.addAttribute("nome", session.getAttribute("nome"));
         model.addAttribute("perfil", session.getAttribute("perfil"));
+        model.addAttribute("menuAtivo", "dashboard");
         return "comum/dashboard";
     }
 
@@ -86,11 +87,6 @@ public class AuthController {
             model.addAttribute("errorMessage", msg);
             return "auth/trocar-senha";
         }
-    }
-
-    @GetMapping("/em-construcao")
-    public String emConstrucao() {
-        return "comum/em-construcao";
     }
 
     @GetMapping("/logout")
