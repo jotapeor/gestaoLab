@@ -34,6 +34,7 @@ NOTAS TÉCNICAS (Spring Boot 4.1.1)
 - TestEntityManager: org.springframework.boot.jpa.test.autoconfigure.TestEntityManager
 - @AutoConfigureTestDatabase: org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase
 - Antes de concluir que uma classe/anotação "não existe" no Boot 4, procure o pacote novo no jar dentro do .m2.
+- Jackson 3.x: Spring Boot 4 usa tools.jackson.core:jackson-databind. O pacote mudou de com.fasterxml.jackson.* para tools.jackson.* (ex.: tools.jackson.databind.ObjectMapper). Nunca importar com.fasterxml.*.
 - Mockito: NUNCA usar mock-maker-subclass nem arquivos em mockito-extensions. O agente do Mockito é carregado via -javaagent no argLine do maven-surefire-plugin (o caminho do usuário tem espaço e acento, o que quebra a anexação dinâmica). Mantenha esse argLine igual nos dois projetos.
 
 IDENTIDADE VISUAL
