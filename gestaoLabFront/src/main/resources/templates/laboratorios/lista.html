@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>GestãoLab — Laboratórios</title>
+    <th:block th:replace="~{fragments/layout :: head-content}"></th:block>
+</head>
+<body>
+<div class="gl-sidebar-overlay" id="sidebarOverlay"></div>
+<div class="gl-wrapper">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+    <div class="gl-main">
+        <div th:replace="~{fragments/layout :: topbar('Laboratórios')}"></div>
+        <main class="gl-content" id="main-content">
+            <div class="gl-page-header fade-in">
+                <h1 class="gl-page-title">Laboratórios</h1>
+                <p class="gl-page-subtitle">Gerencie os laboratórios disponíveis.</p>
+            </div>
+
+            <div class="gl-card fade-in" style="margin-bottom:20px;">
+                <div class="gl-card-body">
+                    <form method="get" th:action="@{/laboratorios}" style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+                        <div class="gl-form-group" style="flex:1;min-width:160px;margin-bottom:0;">
+                            <label class="gl-form-label">Buscar por nome</label>
+                            <input type="text" name="nome" class="gl-form-control" placeholder="Nome..."
+                                   th:value="${filtroBusca}">
+                        </div>
+                        <div class="gl-form-group" style="min-width:130px;margin-bottom:0;">
+                            <label class="gl-form-label">Situação</label>
+                            <select name="ativo" class="gl-form-control">
+                                <option value="">Todos</option>
+                                <option value="true" th:selected="${filtroAtivo == true}">Ativo</option>
+                                <option value="false" th:selected="${filtroAtivo == false}">Inativo</option>
+                            </select>
+                        </div>
+                        <div style="display:flex;gap:8px;">
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <i class="bi bi-search" aria-hidden="true"></i> Filtrar
+                            </button>
+                            <a th:href="@{/laboratorios}" class="btn btn-outline btn-sm">Limpar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="gl-card fade-in delay-1">
+                <div class="gl-card-header">
+                    <span class="gl-card-title">
+                        <i class="bi bi-door-open" aria-hidden="true"></i> Lista
+                    </span>
+                    <a th:href="@{/laboratorios/novo}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-plus-lg" aria-hidden="true"></i> Novo
+                    </a>
+                </div>
+                <div class="gl-card-body" style="padding:0;">
+                    <div th:if="${laboratorios.isEmpty()}" style="padding:32px;text-align:center;color:var(--gl-text-muted);">
+                        <i class="bi bi-inbox" aria-hidden="true" style="font-size:2rem;display:block;margin-bottom:8px;"></i>
+                        Nenhum registro encontrado.
+                    </div>
+                    <div th:unless="${laboratorios.isEmpty()}" style="overflow-x:auto;">
+                        <table class="gl-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Localização</th>
+                                    <th>Capacidade</th>
+                                    <th>Situação</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="lab : ${laboratorios}">
+                                    <td th:text="${lab.nome}">-</td>
+                                    <td th:text="${lab.localizacao ?: '—'}">-</td>
+                                    <td class="gl-mono" th:text="${lab.capacidade ?: '—'}">-</td>
+                                    <td>
+                                        <span class="gl-badge"
+                                              th:classappend="${lab.ativo} ? ' gl-badge-success' : ' gl-badge-danger'"
+                                              th:text="${lab.ativo} ? 'Ativo' : 'Inativo'">-</span>
+                                    </td>
+                                    <td>
+                                        <div style="display:flex;gap:6px;">
+                                            <a th:href="@{/laboratorios/editar/{id}(id=${lab.id})}"
+                                               class="btn btn-outline btn-sm" title="Editar">
+                                                <i class="bi bi-pencil" aria-hidden="true"></i>
+                                            </a>
+                                            <form th:if="${lab.ativo}"
+                                                  th:action="@{/laboratorios/{id}/inativar(id=${lab.id})}"
+                                                  method="post" style="display:inline;"
+                                                  onsubmit="return confirm('Confirma a inativação deste laboratório?');">
+                                                <button type="submit" class="btn btn-sm"
+                                                        style="background:var(--gl-danger-bg);color:var(--gl-danger);"
+                                                        title="Inativar">
+                                                    <i class="bi bi-slash-circle" aria-hidden="true"></i>
+                                                </button>
+                                            </form>
+                                            <form th:unless="${lab.ativo}"
+                                                  th:action="@{/laboratorios/{id}/reativar(id=${lab.id})}"
+                                                  method="post" style="display:inline;">
+                                                <button type="submit" class="btn btn-sm"
+                                                        style="background:var(--gl-success-bg);color:var(--gl-success);"
+                                                        title="Reativar">
+                                                    <i class="bi bi-check-circle" aria-hidden="true"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

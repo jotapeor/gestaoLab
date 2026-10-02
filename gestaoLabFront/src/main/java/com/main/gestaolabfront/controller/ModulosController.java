@@ -41,4 +41,10 @@ public class ModulosController {
         model.addAttribute("tituloModulo", "Relatórios");
         return "comum/em-construcao";
     }
+
+    @GetMapping("/acesso-negado")
+    public String acessoNegado(Model model) {
+        model.addAttribute("menuAtivo", "");
+        return "comum/acesso-negado";
+    }
 }

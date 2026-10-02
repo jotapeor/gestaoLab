@@ -12,6 +12,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.HttpClientErrorException;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -112,5 +113,18 @@ class AuthControllerTest {
                         .sessionAttr("primeiroAcesso", "false"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/login"));
+    }
+
+    @Test
+    void login_sucesso_redirecionamento_naoContemJsessionid() throws Exception {
+        when(authApiService.logar(anyString(), anyString()))
+                .thenReturn(new LoginResponse("jwt-token", "Ana Lima", "COORDENADOR", false));
+
+        mockMvc.perform(post("/logar")
+                        .param("email", "ana@test.com")
+                        .param("senha", "senha123"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(result -> assertThat(result.getResponse().getHeader("Location"))
+                        .doesNotContainIgnoringCase("jsessionid"));
     }
 }

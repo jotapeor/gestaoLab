@@ -68,6 +68,21 @@
                     <i class="bi bi-activity" aria-hidden="true"></i><span>Relatórios</span>
                 </a>
             </li>
+            <li th:if="${session.perfil == 'COORDENADOR'}"><p class="gl-nav-label">Configurações</p></li>
+            <li class="gl-nav-item" th:if="${session.perfil == 'COORDENADOR'}">
+                <a th:href="@{/cursos-setores}"
+                   class="gl-nav-link"
+                   th:classappend="${menuAtivo == 'cursos-setores'} ? ' active' : ''">
+                    <i class="bi bi-journal-bookmark" aria-hidden="true"></i><span>Cursos e Setores</span>
+                </a>
+            </li>
+            <li class="gl-nav-item" th:if="${session.perfil == 'COORDENADOR'}">
+                <a th:href="@{/laboratorios}"
+                   class="gl-nav-link"
+                   th:classappend="${menuAtivo == 'laboratorios'} ? ' active' : ''">
+                    <i class="bi bi-door-open" aria-hidden="true"></i><span>Laboratórios</span>
+                </a>
+            </li>
         </ul>
     </nav>
     <div class="gl-sidebar-footer">

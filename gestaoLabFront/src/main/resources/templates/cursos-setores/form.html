@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${edicao} ? 'GestãoLab — Editar Curso/Setor' : 'GestãoLab — Novo Curso/Setor'">GestãoLab</title>
+    <th:block th:replace="~{fragments/layout :: head-content}"></th:block>
+</head>
+<body>
+<div class="gl-sidebar-overlay" id="sidebarOverlay"></div>
+<div class="gl-wrapper">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+    <div class="gl-main">
+        <div th:replace="~{fragments/layout :: topbar(${edicao} ? 'Editar Curso/Setor' : 'Novo Curso/Setor')}"></div>
+        <main class="gl-content" id="main-content">
+            <div class="gl-page-header fade-in">
+                <h1 class="gl-page-title"
+                    th:text="${edicao} ? 'Editar Curso/Setor' : 'Novo Curso/Setor'">Curso/Setor</h1>
+            </div>
+
+            <div th:if="${formError}" class="gl-alert gl-alert-danger" role="alert">
+                <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+                <span th:text="${formError}">Erro.</span>
+            </div>
+
+            <div class="gl-card fade-in" style="max-width:520px;">
+                <div class="gl-card-body">
+                    <form th:action="${edicao} ? @{/cursos-setores/editar/{id}(id=${cursoSetor.id})} : @{/cursos-setores/salvar}"
+                          method="post">
+                        <div class="gl-form-group">
+                            <label class="gl-form-label" for="nome">
+                                Nome <span class="required">*</span>
+                            </label>
+                            <input type="text" id="nome" name="nome" class="gl-form-control"
+                                   th:value="${formNome ?: cursoSetor?.nome}"
+                                   maxlength="150" required placeholder="Nome do curso ou setor">
+                        </div>
+                        <div class="gl-form-group">
+                            <label class="gl-form-label" for="tipo">Tipo</label>
+                            <select id="tipo" name="tipo" class="gl-form-control">
+                                <option value="CURSO"
+                                        th:selected="${formTipo != null ? formTipo == 'CURSO' : (cursoSetor == null or cursoSetor.tipo == 'CURSO')}">
+                                    Curso
+                                </option>
+                                <option value="SETOR"
+                                        th:selected="${formTipo != null ? formTipo == 'SETOR' : cursoSetor?.tipo == 'SETOR'}">
+                                    Setor
+                                </option>
+                            </select>
+                        </div>
+                        <div style="display:flex;gap:10px;margin-top:8px;">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg" aria-hidden="true"></i>
+                                <span th:text="${edicao} ? 'Salvar alterações' : 'Cadastrar'">Salvar</span>
+                            </button>
+                            <a th:href="@{/cursos-setores}" class="btn btn-outline">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
