@@ -1,5 +1,6 @@
 package com.main.gestaolabfront.controller;
 
+import tools.jackson.databind.ObjectMapper;
 import com.main.gestaolabfront.service.LaboratorioApiService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -16,9 +17,11 @@ import java.util.Map;
 public class LaboratorioController {
 
     private final LaboratorioApiService laboratorioApiService;
+    private final ObjectMapper objectMapper;
 
-    public LaboratorioController(LaboratorioApiService laboratorioApiService) {
+    public LaboratorioController(LaboratorioApiService laboratorioApiService, ObjectMapper objectMapper) {
         this.laboratorioApiService = laboratorioApiService;
+        this.objectMapper = objectMapper;
     }
 
     @GetMapping
@@ -143,12 +146,15 @@ public class LaboratorioController {
         try { return Integer.parseInt(capacidadeStr.trim()); } catch (NumberFormatException e) { return null; }
     }
 
+    @SuppressWarnings("unchecked")
     private String extrairMensagem(String responseBody, String fallback) {
         if (responseBody == null || responseBody.isBlank()) return fallback;
-        int idx = responseBody.indexOf("\"message\":\"");
-        if (idx == -1) return fallback;
-        int start = idx + "\"message\":\"".length();
-        int end = responseBody.indexOf("\"", start);
-        return end == -1 ? fallback : responseBody.substring(start, end);
+        try {
+            Map<String, Object> map = objectMapper.readValue(responseBody, Map.class);
+            Object msg = map.get("message");
+            return msg != null ? msg.toString() : fallback;
+        } catch (Exception e) {
+            return fallback;
+        }
     }
 }
