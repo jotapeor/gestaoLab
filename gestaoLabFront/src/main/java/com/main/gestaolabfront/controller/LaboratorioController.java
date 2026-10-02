@@ -65,9 +65,15 @@ public class LaboratorioController {
         } catch (HttpClientErrorException ex) {
             redirectAttributes.addFlashAttribute("formError",
                     extrairMensagem(ex.getResponseBodyAsString(), "Erro ao cadastrar."));
+            redirectAttributes.addFlashAttribute("formNome", nome);
+            redirectAttributes.addFlashAttribute("formLocalizacao", localizacao);
+            redirectAttributes.addFlashAttribute("formCapacidade", capacidadeStr);
             return "redirect:/laboratorios/novo";
         } catch (Exception ex) {
             redirectAttributes.addFlashAttribute("formError", "Erro inesperado ao cadastrar.");
+            redirectAttributes.addFlashAttribute("formNome", nome);
+            redirectAttributes.addFlashAttribute("formLocalizacao", localizacao);
+            redirectAttributes.addFlashAttribute("formCapacidade", capacidadeStr);
             return "redirect:/laboratorios/novo";
         }
     }
@@ -104,9 +110,15 @@ public class LaboratorioController {
         } catch (HttpClientErrorException ex) {
             redirectAttributes.addFlashAttribute("formError",
                     extrairMensagem(ex.getResponseBodyAsString(), "Erro ao atualizar."));
+            redirectAttributes.addFlashAttribute("formNome", nome);
+            redirectAttributes.addFlashAttribute("formLocalizacao", localizacao);
+            redirectAttributes.addFlashAttribute("formCapacidade", capacidadeStr);
             return "redirect:/laboratorios/editar/" + id;
         } catch (Exception ex) {
             redirectAttributes.addFlashAttribute("formError", "Erro inesperado ao atualizar.");
+            redirectAttributes.addFlashAttribute("formNome", nome);
+            redirectAttributes.addFlashAttribute("formLocalizacao", localizacao);
+            redirectAttributes.addFlashAttribute("formCapacidade", capacidadeStr);
             return "redirect:/laboratorios/editar/" + id;
         }
     }

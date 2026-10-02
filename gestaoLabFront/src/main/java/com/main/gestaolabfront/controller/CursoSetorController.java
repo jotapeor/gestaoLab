@@ -65,9 +65,13 @@ public class CursoSetorController {
         } catch (HttpClientErrorException ex) {
             redirectAttributes.addFlashAttribute("formError",
                     extrairMensagem(ex.getResponseBodyAsString(), "Erro ao cadastrar."));
+            redirectAttributes.addFlashAttribute("formNome", nome);
+            redirectAttributes.addFlashAttribute("formTipo", tipo);
             return "redirect:/cursos-setores/novo";
         } catch (Exception ex) {
             redirectAttributes.addFlashAttribute("formError", "Erro inesperado ao cadastrar.");
+            redirectAttributes.addFlashAttribute("formNome", nome);
+            redirectAttributes.addFlashAttribute("formTipo", tipo);
             return "redirect:/cursos-setores/novo";
         }
     }
@@ -102,9 +106,13 @@ public class CursoSetorController {
         } catch (HttpClientErrorException ex) {
             redirectAttributes.addFlashAttribute("formError",
                     extrairMensagem(ex.getResponseBodyAsString(), "Erro ao atualizar."));
+            redirectAttributes.addFlashAttribute("formNome", nome);
+            redirectAttributes.addFlashAttribute("formTipo", tipo);
             return "redirect:/cursos-setores/editar/" + id;
         } catch (Exception ex) {
             redirectAttributes.addFlashAttribute("formError", "Erro inesperado ao atualizar.");
+            redirectAttributes.addFlashAttribute("formNome", nome);
+            redirectAttributes.addFlashAttribute("formTipo", tipo);
             return "redirect:/cursos-setores/editar/" + id;
         }
     }

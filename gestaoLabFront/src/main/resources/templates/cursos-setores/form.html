@@ -31,18 +31,18 @@
                                 Nome <span class="required">*</span>
                             </label>
                             <input type="text" id="nome" name="nome" class="gl-form-control"
-                                   th:value="${cursoSetor?.nome}"
+                                   th:value="${formNome ?: cursoSetor?.nome}"
                                    maxlength="150" required placeholder="Nome do curso ou setor">
                         </div>
                         <div class="gl-form-group">
                             <label class="gl-form-label" for="tipo">Tipo</label>
                             <select id="tipo" name="tipo" class="gl-form-control">
                                 <option value="CURSO"
-                                        th:selected="${cursoSetor == null or cursoSetor.tipo == 'CURSO'}">
+                                        th:selected="${formTipo != null ? formTipo == 'CURSO' : (cursoSetor == null or cursoSetor.tipo == 'CURSO')}">
                                     Curso
                                 </option>
                                 <option value="SETOR"
-                                        th:selected="${cursoSetor?.tipo == 'SETOR'}">
+                                        th:selected="${formTipo != null ? formTipo == 'SETOR' : cursoSetor?.tipo == 'SETOR'}">
                                     Setor
                                 </option>
                             </select>

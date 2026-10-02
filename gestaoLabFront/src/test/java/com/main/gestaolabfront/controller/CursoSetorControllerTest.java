@@ -103,14 +103,32 @@ class CursoSetorControllerTest {
                 .when(cursoSetorApiService).criar(any(), any());
         mockMvc.perform(post("/cursos-setores/salvar")
                         .param("nome", "Biologia")
-                        .param("tipo", "CURSO")
+                        .param("tipo", "SETOR")
                         .sessionAttr("token", "jwt-valido")
                         .sessionAttr("perfil", "COORDENADOR")
                         .sessionAttr("primeiroAcesso", "false"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/cursos-setores/novo"))
                 .andExpect(flash().attribute("formError",
-                        "Já existe um curso/setor com o nome \"Biologia\"."));
+                        "Já existe um curso/setor com o nome \"Biologia\"."))
+                .andExpect(flash().attribute("formNome", "Biologia"))
+                .andExpect(flash().attribute("formTipo", "SETOR"));
+    }
+
+    @Test
+    void novoForm_comFlashError_mantemValoresNoFormulario() throws Exception {
+        mockMvc.perform(get("/cursos-setores/novo")
+                        .sessionAttr("token", "jwt-valido")
+                        .sessionAttr("perfil", "COORDENADOR")
+                        .sessionAttr("primeiroAcesso", "false")
+                        .flashAttr("formNome", "Biologia")
+                        .flashAttr("formTipo", "SETOR")
+                        .flashAttr("formError", "Já existe um curso/setor com o nome \"Biologia\"."))
+                .andExpect(status().isOk())
+                .andExpect(view().name("cursos-setores/form"))
+                .andExpect(model().attribute("formNome", "Biologia"))
+                .andExpect(model().attribute("formTipo", "SETOR"))
+                .andExpect(model().attribute("formError", "Já existe um curso/setor com o nome \"Biologia\"."));
     }
 
     @Test

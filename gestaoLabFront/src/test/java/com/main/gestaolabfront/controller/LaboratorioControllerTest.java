@@ -107,13 +107,36 @@ class LaboratorioControllerTest {
                 .when(laboratorioApiService).criar(any(), any(), any());
         mockMvc.perform(post("/laboratorios/salvar")
                         .param("nome", "Lab A")
+                        .param("localizacao", "Bloco 2")
+                        .param("capacidadeStr", "20")
                         .sessionAttr("token", "jwt-valido")
                         .sessionAttr("perfil", "COORDENADOR")
                         .sessionAttr("primeiroAcesso", "false"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/laboratorios/novo"))
                 .andExpect(flash().attribute("formError",
-                        "Já existe um laboratório com o nome \"Lab A\"."));
+                        "Já existe um laboratório com o nome \"Lab A\"."))
+                .andExpect(flash().attribute("formNome", "Lab A"))
+                .andExpect(flash().attribute("formLocalizacao", "Bloco 2"))
+                .andExpect(flash().attribute("formCapacidade", "20"));
+    }
+
+    @Test
+    void novoForm_comFlashError_mantemValoresNoFormulario() throws Exception {
+        mockMvc.perform(get("/laboratorios/novo")
+                        .sessionAttr("token", "jwt-valido")
+                        .sessionAttr("perfil", "COORDENADOR")
+                        .sessionAttr("primeiroAcesso", "false")
+                        .flashAttr("formNome", "Lab A")
+                        .flashAttr("formLocalizacao", "Bloco 2")
+                        .flashAttr("formCapacidade", "20")
+                        .flashAttr("formError", "Já existe um laboratório com o nome \"Lab A\"."))
+                .andExpect(status().isOk())
+                .andExpect(view().name("laboratorios/form"))
+                .andExpect(model().attribute("formNome", "Lab A"))
+                .andExpect(model().attribute("formLocalizacao", "Bloco 2"))
+                .andExpect(model().attribute("formCapacidade", "20"))
+                .andExpect(model().attribute("formError", "Já existe um laboratório com o nome \"Lab A\"."));
     }
 
     @Test
