@@ -17,9 +17,9 @@
                     th:text="${edicao} ? 'Editar Laboratório' : 'Novo Laboratório'">Laboratório</h1>
             </div>
 
-            <div th:if="${errorMessage}" class="gl-alert gl-alert-danger" role="alert">
+            <div th:if="${formError}" class="gl-alert gl-alert-danger" role="alert">
                 <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
-                <span th:text="${errorMessage}">Erro.</span>
+                <span th:text="${formError}">Erro.</span>
             </div>
 
             <div class="gl-card fade-in" style="max-width:520px;">

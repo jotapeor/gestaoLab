@@ -91,7 +91,26 @@ class CursoSetorControllerTest {
                         .sessionAttr("primeiroAcesso", "false"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/cursos-setores/novo"))
-                .andExpect(flash().attributeExists("errorMessage"));
+                .andExpect(flash().attributeExists("formError"));
+    }
+
+    @Test
+    void salvar_nomeDuplicadoComAspas_exibeMensagemCompleta() throws Exception {
+        doThrow(HttpClientErrorException.Conflict.create(
+                HttpStatus.CONFLICT, "Conflict", HttpHeaders.EMPTY,
+                "{\"message\":\"Já existe um curso/setor com o nome \\\"Biologia\\\".\"}".getBytes(StandardCharsets.UTF_8),
+                StandardCharsets.UTF_8))
+                .when(cursoSetorApiService).criar(any(), any());
+        mockMvc.perform(post("/cursos-setores/salvar")
+                        .param("nome", "Biologia")
+                        .param("tipo", "CURSO")
+                        .sessionAttr("token", "jwt-valido")
+                        .sessionAttr("perfil", "COORDENADOR")
+                        .sessionAttr("primeiroAcesso", "false"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/cursos-setores/novo"))
+                .andExpect(flash().attribute("formError",
+                        "Já existe um curso/setor com o nome \"Biologia\"."));
     }
 
     @Test

@@ -63,11 +63,11 @@ public class LaboratorioController {
             redirectAttributes.addFlashAttribute("mensagemSucesso", "Laboratório cadastrado com sucesso!");
             return "redirect:/laboratorios";
         } catch (HttpClientErrorException ex) {
-            redirectAttributes.addFlashAttribute("errorMessage",
+            redirectAttributes.addFlashAttribute("formError",
                     extrairMensagem(ex.getResponseBodyAsString(), "Erro ao cadastrar."));
             return "redirect:/laboratorios/novo";
         } catch (Exception ex) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Erro inesperado ao cadastrar.");
+            redirectAttributes.addFlashAttribute("formError", "Erro inesperado ao cadastrar.");
             return "redirect:/laboratorios/novo";
         }
     }
@@ -102,11 +102,11 @@ public class LaboratorioController {
             redirectAttributes.addFlashAttribute("mensagemSucesso", "Laboratório atualizado com sucesso!");
             return "redirect:/laboratorios";
         } catch (HttpClientErrorException ex) {
-            redirectAttributes.addFlashAttribute("errorMessage",
+            redirectAttributes.addFlashAttribute("formError",
                     extrairMensagem(ex.getResponseBodyAsString(), "Erro ao atualizar."));
             return "redirect:/laboratorios/editar/" + id;
         } catch (Exception ex) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Erro inesperado ao atualizar.");
+            redirectAttributes.addFlashAttribute("formError", "Erro inesperado ao atualizar.");
             return "redirect:/laboratorios/editar/" + id;
         }
     }

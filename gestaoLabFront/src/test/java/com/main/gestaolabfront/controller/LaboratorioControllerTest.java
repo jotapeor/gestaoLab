@@ -95,7 +95,25 @@ class LaboratorioControllerTest {
                         .sessionAttr("primeiroAcesso", "false"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/laboratorios/novo"))
-                .andExpect(flash().attributeExists("errorMessage"));
+                .andExpect(flash().attributeExists("formError"));
+    }
+
+    @Test
+    void salvar_nomeDuplicadoComAspas_exibeMensagemCompleta() throws Exception {
+        doThrow(HttpClientErrorException.Conflict.create(
+                HttpStatus.CONFLICT, "Conflict", HttpHeaders.EMPTY,
+                "{\"message\":\"Já existe um laboratório com o nome \\\"Lab A\\\".\"}".getBytes(StandardCharsets.UTF_8),
+                StandardCharsets.UTF_8))
+                .when(laboratorioApiService).criar(any(), any(), any());
+        mockMvc.perform(post("/laboratorios/salvar")
+                        .param("nome", "Lab A")
+                        .sessionAttr("token", "jwt-valido")
+                        .sessionAttr("perfil", "COORDENADOR")
+                        .sessionAttr("primeiroAcesso", "false"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/laboratorios/novo"))
+                .andExpect(flash().attribute("formError",
+                        "Já existe um laboratório com o nome \"Lab A\"."));
     }
 
     @Test
