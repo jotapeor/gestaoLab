@@ -15,10 +15,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
+import com.main.gestaolabfront.dto.UsuarioDto;
+
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.hamcrest.Matchers.containsString;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -237,7 +241,7 @@ class UsuarioControllerTest {
 
     @Test
     void detalhe_professor_retornaOk() throws Exception {
-        when(usuarioApiService.buscarPorId(1L)).thenReturn(USUARIO_MAP);
+        when(usuarioApiService.buscarPorId(1L)).thenReturn(usuarioDtoSimples());
         mockMvc.perform(get("/usuarios/1")
                         .sessionAttr("token", "tok")
                         .sessionAttr("perfil", "PROFESSOR")
@@ -260,19 +264,20 @@ class UsuarioControllerTest {
 
     @Test
     void detalhe_renderizaComDataCriacao_semErro() throws Exception {
-        when(usuarioApiService.buscarPorId(1L)).thenReturn(usuarioMapComData());
+        when(usuarioApiService.buscarPorId(1L)).thenReturn(usuarioDtoComData());
         mockMvc.perform(get("/usuarios/1")
                         .sessionAttr("token", "tok")
                         .sessionAttr("perfil", "COORDENADOR")
                         .sessionAttr("primeiroAcesso", "false"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("usuarios/detalhe"));
+                .andExpect(view().name("usuarios/detalhe"))
+                .andExpect(content().string(containsString("04/10/2026 22:25")));
     }
 
     @Test
     void listar_renderizaListagemCompleta_semErro() throws Exception {
         Map<String, Object> pagina = new HashMap<>();
-        pagina.put("content", List.of(usuarioMapComData()));
+        pagina.put("content", List.of(usuarioDtoComData()));
         pagina.put("totalPages", 1);
         pagina.put("number", 0);
         when(usuarioApiService.listar(any(), any(), any(), any(), anyInt())).thenReturn(pagina);
@@ -299,7 +304,7 @@ class UsuarioControllerTest {
 
     @Test
     void editarForm_renderizaFormularioEdicao() throws Exception {
-        when(usuarioApiService.buscarPorId(1L)).thenReturn(usuarioMapComData());
+        when(usuarioApiService.buscarPorId(1L)).thenReturn(usuarioDtoComData());
         when(cursoSetorApiService.listar(any(), any(), any())).thenReturn(List.of());
         when(usuarioApiService.listarResponsaveis()).thenReturn(List.of());
         mockMvc.perform(get("/usuarios/editar/1")
@@ -310,21 +315,12 @@ class UsuarioControllerTest {
                 .andExpect(view().name("usuarios/form"));
     }
 
-    private static Map<String, Object> usuarioMapComData() {
-        List<Integer> data = new ArrayList<>();
-        data.add(2026); data.add(9); data.add(22);
-        data.add(21); data.add(53); data.add(22);
-        Map<String, Object> m = new HashMap<>();
-        m.put("id", 2);
-        m.put("nome", "Prof. Silva");
-        m.put("email", "silva@lab.com");
-        m.put("perfil", "PROFESSOR");
-        m.put("ativo", true);
-        m.put("matricula", null);
-        m.put("cursoSetor", null);
-        m.put("responsavel", null);
-        m.put("dataCriacao", data);
-        m.put("primeiroAcesso", false);
-        return m;
+    private static UsuarioDto usuarioDtoSimples() {
+        return new UsuarioDto(1L, "Ana", "MAT001", "ana@lab.com", "USUARIO", true, false, null, null, null);
+    }
+
+    private static UsuarioDto usuarioDtoComData() {
+        return new UsuarioDto(1L, "Prof. Silva", null, "silva@lab.com", "PROFESSOR", true, false,
+                LocalDateTime.of(2026, 10, 4, 22, 25, 51), null, null);
     }
 }

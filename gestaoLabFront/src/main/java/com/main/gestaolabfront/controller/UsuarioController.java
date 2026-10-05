@@ -1,6 +1,7 @@
 package com.main.gestaolabfront.controller;
 
 import tools.jackson.databind.ObjectMapper;
+import com.main.gestaolabfront.dto.UsuarioDto;
 import com.main.gestaolabfront.service.UsuarioApiService;
 import com.main.gestaolabfront.service.CursoSetorApiService;
 import jakarta.servlet.http.HttpSession;
@@ -106,7 +107,7 @@ public class UsuarioController {
                              RedirectAttributes redirectAttributes) {
         if (!isCoordenador(session)) return "redirect:/acesso-negado";
         try {
-            Map<String, Object> usuario = usuarioApiService.buscarPorId(id);
+            UsuarioDto usuario = usuarioApiService.buscarPorId(id);
             model.addAttribute("usuario", usuario);
             model.addAttribute("edicao", true);
         } catch (Exception e) {
@@ -209,8 +210,7 @@ public class UsuarioController {
                           RedirectAttributes redirectAttributes) {
         if (!isCoordenadorOuProfessor(session)) return "redirect:/acesso-negado";
         try {
-            Map<String, Object> usuario = usuarioApiService.buscarPorId(id);
-            normalizarDatas(usuario);
+            UsuarioDto usuario = usuarioApiService.buscarPorId(id);
             model.addAttribute("usuario", usuario);
         } catch (HttpClientErrorException.Forbidden e) {
             return "redirect:/acesso-negado";
@@ -275,20 +275,6 @@ public class UsuarioController {
         redirectAttributes.addFlashAttribute("formPerfil", perfil);
         redirectAttributes.addFlashAttribute("formCursoSetorId", cursoSetorId);
         redirectAttributes.addFlashAttribute("formResponsavelId", responsavelId);
-    }
-
-    @SuppressWarnings("unchecked")
-    private void normalizarDatas(Map<String, Object> usuario) {
-        Object dc = usuario.get("dataCriacao");
-        if (dc instanceof java.util.List<?> lista && lista.size() >= 5) {
-            String formatted = String.format("%02d/%02d/%04d %02d:%02d",
-                ((Number) lista.get(2)).intValue(),
-                ((Number) lista.get(1)).intValue(),
-                ((Number) lista.get(0)).intValue(),
-                ((Number) lista.get(3)).intValue(),
-                ((Number) lista.get(4)).intValue());
-            usuario.put("dataCriacao", formatted);
-        }
     }
 
     @SuppressWarnings("unchecked")

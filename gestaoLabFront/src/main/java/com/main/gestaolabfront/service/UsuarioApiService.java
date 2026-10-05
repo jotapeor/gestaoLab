@@ -1,5 +1,6 @@
 package com.main.gestaolabfront.service;
 
+import com.main.gestaolabfront.dto.UsuarioDto;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -33,12 +34,11 @@ public class UsuarioApiService {
                 .body(Map.class);
     }
 
-    @SuppressWarnings("unchecked")
-    public Map<String, Object> buscarPorId(Long id) {
+    public UsuarioDto buscarPorId(Long id) {
         return restClient.get()
                 .uri("/usuarios/{id}", id)
                 .retrieve()
-                .body(Map.class);
+                .body(UsuarioDto.class);
     }
 
     public void criar(Map<String, Object> body) {
@@ -92,21 +92,19 @@ public class UsuarioApiService {
                 .body(List.class);
     }
 
-    @SuppressWarnings("unchecked")
-    public Map<String, Object> me() {
+    public UsuarioDto me() {
         return restClient.get()
                 .uri("/usuarios/me")
                 .retrieve()
-                .body(Map.class);
+                .body(UsuarioDto.class);
     }
 
-    @SuppressWarnings("unchecked")
-    public Map<String, Object> atualizarMe(String nome) {
+    public UsuarioDto atualizarMe(String nome) {
         return restClient.put()
                 .uri("/usuarios/me")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Map.of("nome", nome))
                 .retrieve()
-                .body(Map.class);
+                .body(UsuarioDto.class);
     }
 }

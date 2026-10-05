@@ -1,6 +1,7 @@
 package com.main.gestaolabfront.controller;
 
 import com.main.gestaolabfront.dto.LoginResponse;
+import com.main.gestaolabfront.dto.UsuarioDto;
 import com.main.gestaolabfront.service.AuthApiService;
 import com.main.gestaolabfront.service.UsuarioApiService;
 import jakarta.servlet.http.HttpSession;
@@ -11,8 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.util.Map;
 
 @Controller
 public class AuthController {
@@ -103,10 +102,10 @@ public class AuthController {
     @GetMapping("/meu-perfil")
     public String meuPerfil(HttpSession session, Model model) {
         try {
-            Map<String, Object> usuario = usuarioApiService.me();
+            UsuarioDto usuario = usuarioApiService.me();
             model.addAttribute("usuario", usuario);
         } catch (Exception e) {
-            model.addAttribute("usuario", Map.of());
+            model.addAttribute("usuario", new UsuarioDto(null, null, null, null, null, null, null, null, null, null));
         }
         model.addAttribute("menuAtivo", "");
         return "usuarios/meu-perfil";
@@ -117,8 +116,8 @@ public class AuthController {
                                   HttpSession session,
                                   RedirectAttributes redirectAttributes) {
         try {
-            Map<String, Object> atualizado = usuarioApiService.atualizarMe(nome);
-            session.setAttribute("nome", atualizado.get("nome"));
+            UsuarioDto atualizado = usuarioApiService.atualizarMe(nome);
+            session.setAttribute("nome", atualizado.nome());
             redirectAttributes.addFlashAttribute("mensagemSucesso", "Perfil atualizado com sucesso!");
         } catch (HttpClientErrorException ex) {
             redirectAttributes.addFlashAttribute("formError",

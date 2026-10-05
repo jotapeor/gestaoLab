@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -355,5 +356,18 @@ class UsuarioControllerTest {
     void me_semToken_retorna401() throws Exception {
         mockMvc.perform(get("/api/usuarios/me"))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void buscarPorId_dataCriacaoSerializadaComoIso8601() throws Exception {
+        UsuarioResponse resp = new UsuarioResponse(1L, "Ana", null, "ana@lab.com",
+                PerfilUsuario.USUARIO, true, false,
+                LocalDateTime.of(2026, 10, 4, 22, 25, 51), null, null);
+        when(usuarioService.buscarPorId(eq(1L), any())).thenReturn(resp);
+        mockMvc.perform(get("/api/usuarios/1")
+                        .header("Authorization", "Bearer " + tokenCoordenador))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.dataCriacao").isString())
+                .andExpect(jsonPath("$.dataCriacao").value("2026-10-04T22:25:51"));
     }
 }

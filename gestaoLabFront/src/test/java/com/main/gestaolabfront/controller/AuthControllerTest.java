@@ -3,6 +3,7 @@ package com.main.gestaolabfront.controller;
 import com.main.gestaolabfront.config.SessionCheckInterceptor;
 import com.main.gestaolabfront.config.WebConfig;
 import com.main.gestaolabfront.dto.LoginResponse;
+import com.main.gestaolabfront.dto.UsuarioDto;
 import com.main.gestaolabfront.service.AuthApiService;
 import com.main.gestaolabfront.service.UsuarioApiService;
 import org.junit.jupiter.api.Test;
@@ -12,9 +13,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.HttpClientErrorException;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -122,19 +120,8 @@ class AuthControllerTest {
                 .andExpect(redirectedUrl("/login"));
     }
 
-    private static Map<String, Object> perfilMap(String nome) {
-        Map<String, Object> m = new HashMap<>();
-        m.put("id", 1);
-        m.put("nome", nome);
-        m.put("email", "ana@test.com");
-        m.put("perfil", "COORDENADOR");
-        m.put("ativo", true);
-        m.put("matricula", null);
-        m.put("cursoSetor", null);
-        m.put("responsavel", null);
-        m.put("dataCriacao", null);
-        m.put("primeiroAcesso", false);
-        return m;
+    private static UsuarioDto perfilMap(String nome) {
+        return new UsuarioDto(1L, nome, null, "ana@test.com", "COORDENADOR", true, false, null, null, null);
     }
 
     @Test

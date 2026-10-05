@@ -49,7 +49,8 @@
                         </dd>
 
                         <dt style="font-weight:600;color:var(--gl-text-secondary);">Cadastrado em</dt>
-                        <dd class="gl-mono" th:text="${usuario.dataCriacao ?: '-'}">-</dd>
+                        <dd class="gl-mono"
+                            th:text="${usuario.dataCriacao != null ? #temporals.format(usuario.dataCriacao, 'dd/MM/yyyy HH:mm') : '-'}">-</dd>
                     </dl>
                     <div style="display:flex;gap:10px;margin-top:20px;">
                         <a th:if="${isCoordenador}"
