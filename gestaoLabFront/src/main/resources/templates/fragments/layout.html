@@ -86,13 +86,6 @@
             </li>
         </ul>
     </nav>
-    <div class="gl-sidebar-footer">
-        <div class="gl-sidebar-user-name" th:text="${session.nome ?: 'Usuário'}">Usuário</div>
-        <div class="gl-sidebar-user-role"
-             th:text="${session.perfil == 'COORDENADOR' ? 'Coordenador' : (session.perfil == 'PROFESSOR' ? 'Professor' : 'Usuário')}">
-            Usuário
-        </div>
-    </div>
 </aside>
 
 <header th:fragment="topbar(pageTitle)" class="gl-topbar">
