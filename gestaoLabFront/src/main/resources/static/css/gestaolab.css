@@ -254,6 +254,8 @@ a:hover { color: var(--gl-primary-hover); }
 }
 
 .gl-topbar-role { font-size: .78rem; color: var(--gl-text-muted); }
+.gl-topbar-user-name { color: var(--gl-text-secondary); text-decoration: none; }
+.gl-topbar-user-name:hover { color: var(--gl-primary); text-decoration: underline; }
 
 .gl-topbar-logout {
     color: var(--gl-text-muted);

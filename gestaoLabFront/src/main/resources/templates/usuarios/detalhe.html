@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>GestãoLab — Detalhe do Usuário</title>
+    <th:block th:replace="~{fragments/layout :: head-content}"></th:block>
+</head>
+<body>
+<div class="gl-sidebar-overlay" id="sidebarOverlay"></div>
+<div class="gl-wrapper">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+    <div class="gl-main">
+        <div th:replace="~{fragments/layout :: topbar('Detalhe do Usuário')}"></div>
+        <main class="gl-content" id="main-content">
+            <div class="gl-page-header fade-in">
+                <h1 class="gl-page-title">Detalhe do Usuário</h1>
+            </div>
+
+            <div class="gl-card fade-in" style="max-width:600px;">
+                <div class="gl-card-body">
+                    <dl style="display:grid;grid-template-columns:160px 1fr;row-gap:12px;column-gap:16px;">
+                        <dt style="font-weight:600;color:var(--gl-text-secondary);">Nome</dt>
+                        <dd th:text="${usuario.nome}">-</dd>
+
+                        <dt style="font-weight:600;color:var(--gl-text-secondary);">E-mail</dt>
+                        <dd th:text="${usuario.email}">-</dd>
+
+                        <dt style="font-weight:600;color:var(--gl-text-secondary);">Matrícula</dt>
+                        <dd class="gl-mono" th:text="${usuario.matricula ?: '-'}">-</dd>
+
+                        <dt style="font-weight:600;color:var(--gl-text-secondary);">Perfil</dt>
+                        <dd>
+                            <span class="gl-badge"
+                                  th:classappend="${usuario.perfil == 'COORDENADOR'} ? ' gl-badge-warning' : (${usuario.perfil == 'PROFESSOR'} ? ' gl-badge-info' : ' gl-badge-neutral')"
+                                  th:text="${usuario.perfil == 'COORDENADOR'} ? 'Coordenador' : (${usuario.perfil == 'PROFESSOR'} ? 'Professor' : 'Aluno')">-</span>
+                        </dd>
+
+                        <dt style="font-weight:600;color:var(--gl-text-secondary);">Curso/Setor</dt>
+                        <dd th:text="${usuario.cursoSetor != null ? usuario.cursoSetor.nome : '-'}">-</dd>
+
+                        <dt style="font-weight:600;color:var(--gl-text-secondary);">Responsável</dt>
+                        <dd th:text="${usuario.responsavel != null ? usuario.responsavel.nome : '-'}">-</dd>
+
+                        <dt style="font-weight:600;color:var(--gl-text-secondary);">Situação</dt>
+                        <dd>
+                            <span class="gl-badge"
+                                  th:classappend="${usuario.ativo} ? ' gl-badge-success' : ' gl-badge-danger'"
+                                  th:text="${usuario.ativo} ? 'Ativo' : 'Inativo'">-</span>
+                        </dd>
+
+                        <dt style="font-weight:600;color:var(--gl-text-secondary);">Cadastrado em</dt>
+                        <dd class="gl-mono"
+                            th:text="${usuario.dataCriacao != null ? #temporals.format(usuario.dataCriacao, 'dd/MM/yyyy HH:mm') : '-'}">-</dd>
+                    </dl>
+                    <div style="display:flex;gap:10px;margin-top:20px;">
+                        <a th:if="${isCoordenador}"
+                           th:href="@{/usuarios/editar/{id}(id=${usuario.id})}"
+                           class="btn btn-primary">
+                            <i class="bi bi-pencil" aria-hidden="true"></i> Editar
+                        </a>
+                        <a th:href="@{/usuarios}" class="btn btn-outline">
+                            <i class="bi bi-arrow-left" aria-hidden="true"></i> Voltar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>GestãoLab — Usuários</title>
+    <th:block th:replace="~{fragments/layout :: head-content}"></th:block>
+</head>
+<body>
+<div class="gl-sidebar-overlay" id="sidebarOverlay"></div>
+<div class="gl-wrapper">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+    <div class="gl-main">
+        <div th:replace="~{fragments/layout :: topbar('Usuários')}"></div>
+        <main class="gl-content" id="main-content">
+            <div class="gl-page-header fade-in">
+                <h1 class="gl-page-title">Usuários</h1>
+                <p class="gl-page-subtitle">Gerencie os usuários do sistema.</p>
+            </div>
+
+            <!-- Filtros -->
+            <div class="gl-card fade-in" style="margin-bottom:20px;">
+                <div class="gl-card-body">
+                    <form method="get" th:action="@{/usuarios}"
+                          style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+                        <div class="gl-form-group" style="flex:1;min-width:160px;margin-bottom:0;">
+                            <label class="gl-form-label">Buscar</label>
+                            <input type="text" name="busca" class="gl-form-control"
+                                   placeholder="Nome, e-mail ou matrícula..."
+                                   th:value="${filtroBusca}">
+                        </div>
+                        <div class="gl-form-group" style="min-width:130px;margin-bottom:0;">
+                            <label class="gl-form-label">Perfil</label>
+                            <select name="perfil" class="gl-form-control">
+                                <option value="">Todos</option>
+                                <option value="COORDENADOR" th:selected="${filtroPerfil == 'COORDENADOR'}">Coordenador</option>
+                                <option value="PROFESSOR" th:selected="${filtroPerfil == 'PROFESSOR'}">Professor</option>
+                                <option value="USUARIO" th:selected="${filtroPerfil == 'USUARIO'}">Aluno</option>
+                            </select>
+                        </div>
+                        <div class="gl-form-group" style="min-width:140px;margin-bottom:0;">
+                            <label class="gl-form-label">Curso/Setor</label>
+                            <select name="cursoSetorId" class="gl-form-control">
+                                <option value="">Todos</option>
+                                <option th:each="cs : ${cursosAtivos}"
+                                        th:value="${cs.id}"
+                                        th:text="${cs.nome}"
+                                        th:selected="${filtroCursoSetorId != null and filtroCursoSetorId == cs.id}">-</option>
+                            </select>
+                        </div>
+                        <div class="gl-form-group" style="min-width:120px;margin-bottom:0;">
+                            <label class="gl-form-label">Situação</label>
+                            <select name="ativo" class="gl-form-control">
+                                <option value="">Todos</option>
+                                <option value="true" th:selected="${filtroAtivo == true}">Ativo</option>
+                                <option value="false" th:selected="${filtroAtivo == false}">Inativo</option>
+                            </select>
+                        </div>
+                        <div style="display:flex;gap:8px;">
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <i class="bi bi-search" aria-hidden="true"></i> Filtrar
+                            </button>
+                            <a th:href="@{/usuarios}" class="btn btn-outline btn-sm">Limpar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tabela -->
+            <div class="gl-card fade-in delay-1">
+                <div class="gl-card-header">
+                    <span class="gl-card-title">
+                        <i class="bi bi-people" aria-hidden="true"></i> Lista
+                    </span>
+                    <a th:if="${isCoordenador}" th:href="@{/usuarios/novo}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-plus-lg" aria-hidden="true"></i> Novo
+                    </a>
+                </div>
+                <div class="gl-card-body" style="padding:0;">
+                    <div th:if="${#lists.isEmpty(pagina.content)}"
+                         style="padding:32px;text-align:center;color:var(--gl-text-muted);">
+                        <i class="bi bi-inbox" aria-hidden="true"
+                           style="font-size:2rem;display:block;margin-bottom:8px;"></i>
+                        Nenhum registro encontrado.
+                    </div>
+                    <div th:unless="${#lists.isEmpty(pagina.content)}" style="overflow-x:auto;">
+                        <table class="gl-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>E-mail</th>
+                                    <th>Matrícula</th>
+                                    <th>Perfil</th>
+                                    <th>Curso/Setor</th>
+                                    <th>Responsável</th>
+                                    <th>Situação</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="u : ${pagina.content}">
+                                    <td th:text="${u.nome}">-</td>
+                                    <td th:text="${u.email}">-</td>
+                                    <td class="gl-mono" th:text="${u.matricula ?: '-'}">-</td>
+                                    <td>
+                                        <span class="gl-badge"
+                                              th:classappend="${u.perfil == 'COORDENADOR'} ? ' gl-badge-warning' : (${u.perfil == 'PROFESSOR'} ? ' gl-badge-info' : ' gl-badge-neutral')"
+                                              th:text="${u.perfil == 'COORDENADOR'} ? 'Coordenador' : (${u.perfil == 'PROFESSOR'} ? 'Professor' : 'Aluno')">-</span>
+                                    </td>
+                                    <td th:text="${u.cursoSetor != null ? u.cursoSetor.nome : '-'}">-</td>
+                                    <td th:text="${u.responsavel != null ? u.responsavel.nome : '-'}">-</td>
+                                    <td>
+                                        <span class="gl-badge"
+                                              th:classappend="${u.ativo} ? ' gl-badge-success' : ' gl-badge-danger'"
+                                              th:text="${u.ativo} ? 'Ativo' : 'Inativo'">-</span>
+                                    </td>
+                                    <td>
+                                        <div style="display:flex;gap:6px;align-items:center;">
+                                            <!-- Ver detalhe (professor) -->
+                                            <a th:unless="${isCoordenador}"
+                                               th:href="@{/usuarios/{id}(id=${u.id})}"
+                                               class="btn btn-outline btn-sm" title="Ver detalhe">
+                                                <i class="bi bi-eye" aria-hidden="true"></i>
+                                            </a>
+                                            <!-- Ações do coordenador -->
+                                            <th:block th:if="${isCoordenador}">
+                                                <a th:href="@{/usuarios/editar/{id}(id=${u.id})}"
+                                                   class="btn btn-outline btn-sm" title="Editar">
+                                                    <i class="bi bi-pencil" aria-hidden="true"></i>
+                                                </a>
+                                                <!-- Redefinir senha (abre modal) -->
+                                                <button type="button" class="btn btn-outline btn-sm"
+                                                        title="Redefinir senha"
+                                                        th:attr="data-user-id=${u.id},data-user-nome=${u.nome}"
+                                                        onclick="abrirModalSenha(this)">
+                                                    <i class="bi bi-key" aria-hidden="true"></i>
+                                                </button>
+                                                <!-- Inativar -->
+                                                <form th:if="${u.ativo}"
+                                                      th:action="@{/usuarios/{id}/inativar(id=${u.id})}"
+                                                      method="post" style="display:inline;"
+                                                      onsubmit="return confirm('Confirma a inativação deste usuário?');">
+                                                    <button type="submit" class="btn btn-sm"
+                                                            style="background:var(--gl-danger-bg);color:var(--gl-danger);"
+                                                            title="Inativar">
+                                                        <i class="bi bi-slash-circle" aria-hidden="true"></i>
+                                                    </button>
+                                                </form>
+                                                <!-- Reativar -->
+                                                <form th:unless="${u.ativo}"
+                                                      th:action="@{/usuarios/{id}/reativar(id=${u.id})}"
+                                                      method="post" style="display:inline;">
+                                                    <button type="submit" class="btn btn-sm"
+                                                            style="background:var(--gl-success-bg);color:var(--gl-success);"
+                                                            title="Reativar">
+                                                        <i class="bi bi-check-circle" aria-hidden="true"></i>
+                                                    </button>
+                                                </form>
+                                            </th:block>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paginação -->
+            <div th:if="${pagina.totalPages > 1}"
+                 style="display:flex;justify-content:center;gap:6px;margin-top:16px;">
+                <a th:each="p : ${#numbers.sequence(0, pagina.totalPages - 1)}"
+                   th:href="@{/usuarios(busca=${filtroBusca},perfil=${filtroPerfil},cursoSetorId=${filtroCursoSetorId},ativo=${filtroAtivo},page=${p})}"
+                   class="btn btn-sm"
+                   th:classappend="${p == pagina.number} ? ' btn-primary' : ' btn-outline'"
+                   th:text="${p + 1}">1</a>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Modal Redefinir Senha -->
+<div id="modalSenha" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.4);
+     z-index:1000;align-items:center;justify-content:center;">
+    <div class="gl-card" style="max-width:420px;width:90%;margin:0;z-index:1001;">
+        <div class="gl-card-header">
+            <span class="gl-card-title"><i class="bi bi-key" aria-hidden="true"></i> Redefinir Senha</span>
+            <button type="button" onclick="fecharModalSenha()"
+                    style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:var(--gl-text-secondary);">
+                <i class="bi bi-x-lg" aria-hidden="true"></i>
+            </button>
+        </div>
+        <div class="gl-card-body">
+            <p id="modalSenhaNome" style="color:var(--gl-text-secondary);margin-bottom:16px;"></p>
+            <form id="formSenha" method="post">
+                <div class="gl-form-group">
+                    <label class="gl-form-label" for="novaSenhaProvisoria">
+                        Nova senha provisória <span class="required">*</span>
+                    </label>
+                    <input type="password" id="novaSenhaProvisoria" name="novaSenhaProvisoria"
+                           class="gl-form-control" minlength="8" required
+                           placeholder="Mínimo 8 caracteres">
+                </div>
+                <div class="gl-form-group">
+                    <label class="gl-form-label" for="confirmacaoSenha">
+                        Confirmação <span class="required">*</span>
+                    </label>
+                    <input type="password" id="confirmacaoSenha" name="confirmacaoSenha"
+                           class="gl-form-control" minlength="8" required
+                           placeholder="Repita a senha">
+                </div>
+                <p class="gl-form-hint" style="color:var(--gl-text-muted);font-size:.8rem;margin-bottom:12px;">
+                    <i class="bi bi-info-circle" aria-hidden="true"></i>
+                    O usuário precisará trocar esta senha no próximo acesso.
+                </p>
+                <div style="display:flex;gap:10px;">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg" aria-hidden="true"></i> Redefinir
+                    </button>
+                    <button type="button" onclick="fecharModalSenha()" class="btn btn-outline">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+<script>
+function abrirModalSenha(btn) {
+    var userId = btn.getAttribute('data-user-id');
+    var nome = btn.getAttribute('data-user-nome');
+    document.getElementById('formSenha').action = '/usuarios/' + userId + '/redefinir-senha';
+    document.getElementById('modalSenhaNome').textContent = 'Redefinir senha de: ' + nome;
+    document.getElementById('novaSenhaProvisoria').value = '';
+    document.getElementById('confirmacaoSenha').value = '';
+    var modal = document.getElementById('modalSenha');
+    modal.style.display = 'flex';
+}
+function fecharModalSenha() {
+    document.getElementById('modalSenha').style.display = 'none';
+}
+document.getElementById('formSenha').addEventListener('submit', function(e) {
+    var s1 = document.getElementById('novaSenhaProvisoria').value;
+    var s2 = document.getElementById('confirmacaoSenha').value;
+    if (s1 !== s2) {
+        e.preventDefault();
+        alert('As senhas não conferem.');
+    }
+});
+</script>
+</body>
+</html>

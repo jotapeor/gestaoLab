@@ -4,6 +4,7 @@ import com.main.gestaolabfront.config.SessionCheckInterceptor;
 import com.main.gestaolabfront.config.WebConfig;
 import com.main.gestaolabfront.dto.LoginResponse;
 import com.main.gestaolabfront.service.AuthApiService;
+import com.main.gestaolabfront.service.UsuarioApiService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -11,6 +12,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.HttpClientErrorException;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -27,6 +31,9 @@ class AuthControllerTest {
 
     @MockitoBean
     private AuthApiService authApiService;
+
+    @MockitoBean
+    private UsuarioApiService usuarioApiService;
 
     @Test
     void paginaDeLogin_abre() throws Exception {
@@ -115,6 +122,21 @@ class AuthControllerTest {
                 .andExpect(redirectedUrl("/login"));
     }
 
+    private static Map<String, Object> perfilMap(String nome) {
+        Map<String, Object> m = new HashMap<>();
+        m.put("id", 1);
+        m.put("nome", nome);
+        m.put("email", "ana@test.com");
+        m.put("perfil", "COORDENADOR");
+        m.put("ativo", true);
+        m.put("matricula", null);
+        m.put("cursoSetor", null);
+        m.put("responsavel", null);
+        m.put("dataCriacao", null);
+        m.put("primeiroAcesso", false);
+        return m;
+    }
+
     @Test
     void login_sucesso_redirecionamento_naoContemJsessionid() throws Exception {
         when(authApiService.logar(anyString(), anyString()))
@@ -126,5 +148,30 @@ class AuthControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(result -> assertThat(result.getResponse().getHeader("Location"))
                         .doesNotContainIgnoringCase("jsessionid"));
+    }
+
+    @Test
+    void meuPerfil_exibeDados() throws Exception {
+        when(usuarioApiService.me()).thenReturn(perfilMap("Ana Lima"));
+        mockMvc.perform(get("/meu-perfil")
+                        .sessionAttr("token", "tok")
+                        .sessionAttr("perfil", "COORDENADOR")
+                        .sessionAttr("primeiroAcesso", "false"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("usuarios/meu-perfil"));
+    }
+
+    @Test
+    void salvarMeuPerfil_atualizaNomeSessao() throws Exception {
+        when(usuarioApiService.atualizarMe("Novo Nome")).thenReturn(perfilMap("Novo Nome"));
+        mockMvc.perform(post("/meu-perfil")
+                        .param("nome", "Novo Nome")
+                        .sessionAttr("token", "tok")
+                        .sessionAttr("perfil", "COORDENADOR")
+                        .sessionAttr("primeiroAcesso", "false"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/meu-perfil"))
+                .andExpect(flash().attribute("mensagemSucesso", "Perfil atualizado com sucesso!"))
+                .andExpect(request().sessionAttribute("nome", "Novo Nome"));
     }
 }

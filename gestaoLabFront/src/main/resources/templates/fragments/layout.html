@@ -33,7 +33,8 @@
                 </a>
             </li>
             <li><p class="gl-nav-label">Gestão</p></li>
-            <li class="gl-nav-item">
+            <li class="gl-nav-item"
+                th:if="${session.perfil == 'COORDENADOR' or session.perfil == 'PROFESSOR'}">
                 <a th:href="@{/usuarios}"
                    class="gl-nav-link"
                    th:classappend="${menuAtivo == 'usuarios'} ? ' active' : ''">
@@ -100,7 +101,8 @@
     <div class="gl-topbar-spacer"></div>
     <div class="gl-topbar-user">
         <i class="bi bi-person-circle" aria-hidden="true"></i>
-        <span th:text="${session.nome ?: 'Usuário'}">Usuário</span>
+        <a th:href="@{/meu-perfil}" class="gl-topbar-user-name"
+           th:text="${session.nome ?: 'Usuário'}">Usuário</a>
         <span class="gl-topbar-role"
               th:text="${'(' + (session.perfil == 'COORDENADOR' ? 'Coordenador' : (session.perfil == 'PROFESSOR' ? 'Professor' : 'Usuário')) + ')'}">
             (Usuário)
