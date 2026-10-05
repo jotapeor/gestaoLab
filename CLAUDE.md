@@ -60,10 +60,11 @@ Tipografia:
 Menu lateral (sidebar):
 - Fundo branco, borda direita 1px em --gl-border.
 - Logo no topo: ícone frasco SVG inline + texto "GestãoLab" em bold.
-- Sempre expandido no desktop; recolhível (toggle) em telas < 992px.
-- Item ativo: fundo #E6F4F1, texto #0F766E, barra vertical de 3px à esquerda.
-- Hover: fundo --gl-bg, texto --gl-text. Sem hover que expanda o sidebar.
-- Rodapé: nome e perfil do usuário.
+- Desktop (≥ 993px): estado padrão recolhido (~72px), mostrando apenas ícones; labels de seção (GESTÃO, CONFIGURAÇÕES) viram uma linha divisória discreta. Ao passar o mouse ou receber foco (:focus-within), expande para 240px SOBRE o conteúdo (position: fixed, conteúdo não se move) com sombra suave. Fechamento com 200ms de atraso e transição suave. Não há bloco de usuário no rodapé.
+- Telas < 992px: recolhível via botão de menu (toggle), comportamento de slide com overlay.
+- Item ativo: fundo #E6F4F1, texto #0F766E, barra vertical de 3px à esquerda — visível nos dois estados (recolhido e expandido).
+- Itens recolhidos têm atributo title com o nome do módulo.
+- Hover em item não-ativo: fundo --gl-bg, texto --gl-text.
 
 Topbar: branco, borda inferior 1px em --gl-border. Título à esquerda; usuário,
 perfil e botão sair à direita. Sem barra colorida no topo.
