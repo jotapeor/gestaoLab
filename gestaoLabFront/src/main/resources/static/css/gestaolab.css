@@ -28,7 +28,8 @@
     --gl-success-bg:      #DCFCE7;
 
     /* Layout */
-    --gl-sidebar-width:   240px;
+    --gl-sidebar-width:             240px;
+    --gl-sidebar-width-collapsed:    72px;
     --gl-radius:          10px;
     --gl-radius-sm:       6px;
 
@@ -69,7 +70,7 @@ a:hover { color: var(--gl-primary-hover); }
 .gl-wrapper { display: flex; min-height: 100vh; }
 
 /* ─────────────────────────────────────────────
-   SIDEBAR — claro, fixo, sempre expandido
+   SIDEBAR — recolhível; expande por hover/foco
    ───────────────────────────────────────────── */
 .gl-sidebar {
     width: var(--gl-sidebar-width);
@@ -109,6 +110,7 @@ a:hover { color: var(--gl-primary-hover); }
     font-weight: 800;
     color: var(--gl-text);
     letter-spacing: -.5px;
+    white-space: nowrap;
 }
 
 .gl-sidebar-brand-text span { color: var(--gl-primary); }
@@ -127,6 +129,7 @@ a:hover { color: var(--gl-primary-hover); }
     letter-spacing: .7px;
     color: var(--gl-text-muted);
     white-space: nowrap;
+    position: relative;
 }
 
 .gl-nav-item { list-style: none; margin: 2px 0; }
@@ -142,6 +145,8 @@ a:hover { color: var(--gl-primary-hover); }
     text-decoration: none;
     border-radius: var(--gl-radius-sm);
     position: relative;
+    white-space: nowrap;
+    overflow: hidden;
     transition: background 0.12s, color 0.12s;
 }
 
@@ -173,38 +178,82 @@ a:hover { color: var(--gl-primary-hover); }
     flex-shrink: 0;
 }
 
-/* Rodapé do menu — nome e perfil */
-.gl-sidebar-footer {
-    padding: 14px 20px;
-    border-top: 1px solid var(--gl-border);
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.gl-sidebar-user-name {
-    font-size: .82rem;
-    font-weight: 600;
-    color: var(--gl-text);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.gl-sidebar-user-role {
-    font-size: .72rem;
-    color: var(--gl-text-muted);
-}
-
 /* ─────────────────────────────────────────────
-   MAIN — empurrado pelo sidebar
+   MAIN — margem fixa pela faixa recolhida
    ───────────────────────────────────────────── */
 .gl-main {
-    margin-left: var(--gl-sidebar-width);
+    margin-left: var(--gl-sidebar-width-collapsed);
     flex: 1;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+}
+
+/* ─────────────────────────────────────────────
+   SIDEBAR DESKTOP — recolhido + hover-expand
+   ───────────────────────────────────────────── */
+@media (min-width: 993px) {
+    /* Collapsed state: narrow strip showing only icons */
+    .gl-sidebar {
+        width: var(--gl-sidebar-width-collapsed);
+        transition: width 0.22s ease 0.2s, box-shadow 0.22s ease 0.2s;
+    }
+
+    /* Expand over content on hover or keyboard focus */
+    .gl-sidebar:hover,
+    .gl-sidebar:focus-within {
+        width: var(--gl-sidebar-width);
+        box-shadow: 4px 0 20px rgba(15,23,42,.10);
+        transition-delay: 0s;
+    }
+
+    /* Brand text: hidden when collapsed */
+    .gl-sidebar-brand-text {
+        opacity: 0;
+        transition: opacity 0.12s ease 0s;
+    }
+    .gl-sidebar:hover .gl-sidebar-brand-text,
+    .gl-sidebar:focus-within .gl-sidebar-brand-text {
+        opacity: 1;
+        transition-delay: 0.10s;
+    }
+
+    /* Nav link text: hidden when collapsed */
+    .gl-nav-link span {
+        opacity: 0;
+        transition: opacity 0.12s ease 0s;
+    }
+    .gl-sidebar:hover .gl-nav-link span,
+    .gl-sidebar:focus-within .gl-nav-link span {
+        opacity: 1;
+        transition-delay: 0.10s;
+    }
+
+    /* Section labels: become a thin divider line when collapsed */
+    .gl-nav-label {
+        color: transparent;
+        transition: color 0.12s ease 0s;
+    }
+    .gl-nav-label::before {
+        content: '';
+        position: absolute;
+        left: 0; right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 1px;
+        background: var(--gl-border);
+        transition: opacity 0.12s ease 0s;
+    }
+    .gl-sidebar:hover .gl-nav-label,
+    .gl-sidebar:focus-within .gl-nav-label {
+        color: var(--gl-text-muted);
+        transition-delay: 0.10s;
+    }
+    .gl-sidebar:hover .gl-nav-label::before,
+    .gl-sidebar:focus-within .gl-nav-label::before {
+        opacity: 0;
+        transition-delay: 0s;
+    }
 }
 
 /* ─────────────────────────────────────────────
@@ -800,11 +849,15 @@ button.gl-topbar-logout {
    ───────────────────────────────────────────── */
 @media (max-width: 992px) {
     .gl-sidebar {
+        width: var(--gl-sidebar-width);
         transform: translateX(-100%);
         transition: transform 0.25s ease;
     }
 
-    .gl-sidebar.open { transform: translateX(0); }
+    .gl-sidebar.open {
+        transform: translateX(0);
+        box-shadow: 4px 0 20px rgba(15,23,42,.15);
+    }
 
     .gl-main { margin-left: 0; }
     .gl-topbar-toggle { display: flex; }

@@ -28,6 +28,7 @@
             <li class="gl-nav-item">
                 <a th:href="@{/dashboard}"
                    class="gl-nav-link"
+                   title="Dashboard"
                    th:classappend="${menuAtivo == 'dashboard'} ? ' active' : ''">
                     <i class="bi bi-grid-1x2" aria-hidden="true"></i><span>Dashboard</span>
                 </a>
@@ -37,6 +38,7 @@
                 th:if="${session.perfil == 'COORDENADOR' or session.perfil == 'PROFESSOR'}">
                 <a th:href="@{/usuarios}"
                    class="gl-nav-link"
+                   title="Usuários"
                    th:classappend="${menuAtivo == 'usuarios'} ? ' active' : ''">
                     <i class="bi bi-people" aria-hidden="true"></i><span>Usuários</span>
                 </a>
@@ -44,6 +46,7 @@
             <li class="gl-nav-item">
                 <a th:href="@{/uso-laboratorio}"
                    class="gl-nav-link"
+                   title="Uso do Laboratório"
                    th:classappend="${menuAtivo == 'uso-laboratorio'} ? ' active' : ''">
                     <i class="bi bi-clipboard2-pulse" aria-hidden="true"></i><span>Uso do Laboratório</span>
                 </a>
@@ -51,6 +54,7 @@
             <li class="gl-nav-item">
                 <a th:href="@{/materiais}"
                    class="gl-nav-link"
+                   title="Materiais"
                    th:classappend="${menuAtivo == 'materiais'} ? ' active' : ''">
                     <i class="bi bi-eyedropper" aria-hidden="true"></i><span>Materiais</span>
                 </a>
@@ -58,6 +62,7 @@
             <li class="gl-nav-item">
                 <a th:href="@{/equipamentos}"
                    class="gl-nav-link"
+                   title="Equipamentos"
                    th:classappend="${menuAtivo == 'equipamentos'} ? ' active' : ''">
                     <i class="bi bi-thermometer" aria-hidden="true"></i><span>Equipamentos</span>
                 </a>
@@ -65,6 +70,7 @@
             <li class="gl-nav-item">
                 <a th:href="@{/relatorios}"
                    class="gl-nav-link"
+                   title="Relatórios"
                    th:classappend="${menuAtivo == 'relatorios'} ? ' active' : ''">
                     <i class="bi bi-activity" aria-hidden="true"></i><span>Relatórios</span>
                 </a>
@@ -73,6 +79,7 @@
             <li class="gl-nav-item" th:if="${session.perfil == 'COORDENADOR'}">
                 <a th:href="@{/cursos-setores}"
                    class="gl-nav-link"
+                   title="Cursos e Setores"
                    th:classappend="${menuAtivo == 'cursos-setores'} ? ' active' : ''">
                     <i class="bi bi-journal-bookmark" aria-hidden="true"></i><span>Cursos e Setores</span>
                 </a>
@@ -80,6 +87,7 @@
             <li class="gl-nav-item" th:if="${session.perfil == 'COORDENADOR'}">
                 <a th:href="@{/laboratorios}"
                    class="gl-nav-link"
+                   title="Laboratórios"
                    th:classappend="${menuAtivo == 'laboratorios'} ? ' active' : ''">
                     <i class="bi bi-door-open" aria-hidden="true"></i><span>Laboratórios</span>
                 </a>
