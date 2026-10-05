@@ -107,13 +107,40 @@
               th:text="${'(' + (session.perfil == 'COORDENADOR' ? 'Coordenador' : (session.perfil == 'PROFESSOR' ? 'Professor' : 'Usuário')) + ')'}">
             (Usuário)
         </span>
-        <a th:href="@{/logout}" class="gl-topbar-logout" title="Sair"><i class="bi bi-box-arrow-right" aria-hidden="true"></i></a>
+        <button type="button" class="gl-topbar-logout" title="Sair"
+                data-modal-titulo="Sair do sistema"
+                data-modal-msg="Deseja sair do sistema?"
+                data-modal-confirma="Sair"
+                data-modal-classe="btn-danger"
+                data-modal-href="/logout"
+                onclick="glAbrirModalHref(this)">
+            <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+        </button>
     </div>
 </header>
 
 <th:block th:fragment="scripts">
     <input type="hidden" id="toast-success-message" th:if="${mensagemSucesso != null}" th:value="${mensagemSucesso}"/>
     <input type="hidden" id="toast-error-message" th:if="${errorMessage != null}" th:value="${errorMessage}"/>
+    <!-- Modal de Confirmação reutilizável -->
+    <div id="glModalConfirmacao"
+         role="dialog" aria-modal="true" aria-labelledby="glModalConfirmacaoTitulo"
+         style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:2000;align-items:center;justify-content:center;">
+        <div class="gl-card" style="max-width:400px;width:90%;margin:0;z-index:2001;">
+            <div class="gl-card-header">
+                <span class="gl-card-title" id="glModalConfirmacaoTitulo">Confirmação</span>
+            </div>
+            <div class="gl-card-body">
+                <p id="glModalConfirmacaoMsg" style="color:var(--gl-text-secondary);margin-bottom:20px;"></p>
+                <div style="display:flex;gap:10px;justify-content:flex-end;">
+                    <button type="button" id="glModalBtnCancelar" class="btn btn-outline"
+                            onclick="glFecharModal()">Cancelar</button>
+                    <button type="button" id="glModalBtnConfirmar" class="btn btn-primary"
+                            onclick="glConfirmarModal()">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script th:src="@{/js/gestaolab.js}"></script>
 </th:block>
 </body>

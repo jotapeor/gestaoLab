@@ -85,21 +85,34 @@
                                                 <i class="bi bi-pencil" aria-hidden="true"></i>
                                             </a>
                                             <form th:if="${lab.ativo}"
+                                                  th:id="'form-inativar-lab-' + ${lab.id}"
                                                   th:action="@{/laboratorios/{id}/inativar(id=${lab.id})}"
-                                                  method="post" style="display:inline;"
-                                                  onsubmit="return confirm('Confirma a inativação deste laboratório?');">
-                                                <button type="submit" class="btn btn-sm"
+                                                  method="post" style="display:inline;">
+                                                <button type="button" class="btn btn-sm"
                                                         style="background:var(--gl-danger-bg);color:var(--gl-danger);"
-                                                        title="Inativar">
+                                                        title="Inativar"
+                                                        data-modal-titulo="Inativar laboratório"
+                                                        data-modal-msg="Confirma a inativação deste laboratório?"
+                                                        data-modal-confirma="Inativar"
+                                                        data-modal-classe="btn-danger"
+                                                        th:attr="data-modal-form='form-inativar-lab-' + ${lab.id}"
+                                                        onclick="glAbrirModalForm(this)">
                                                     <i class="bi bi-slash-circle" aria-hidden="true"></i>
                                                 </button>
                                             </form>
                                             <form th:unless="${lab.ativo}"
+                                                  th:id="'form-reativar-lab-' + ${lab.id}"
                                                   th:action="@{/laboratorios/{id}/reativar(id=${lab.id})}"
                                                   method="post" style="display:inline;">
-                                                <button type="submit" class="btn btn-sm"
+                                                <button type="button" class="btn btn-sm"
                                                         style="background:var(--gl-success-bg);color:var(--gl-success);"
-                                                        title="Reativar">
+                                                        title="Reativar"
+                                                        data-modal-titulo="Reativar laboratório"
+                                                        data-modal-msg="Confirma a reativação deste laboratório?"
+                                                        data-modal-confirma="Reativar"
+                                                        data-modal-classe="btn-primary"
+                                                        th:attr="data-modal-form='form-reativar-lab-' + ${lab.id}"
+                                                        onclick="glAbrirModalForm(this)">
                                                     <i class="bi bi-check-circle" aria-hidden="true"></i>
                                                 </button>
                                             </form>

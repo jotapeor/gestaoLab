@@ -136,22 +136,35 @@
                                                 </button>
                                                 <!-- Inativar -->
                                                 <form th:if="${u.ativo}"
+                                                      th:id="'form-inativar-u-' + ${u.id}"
                                                       th:action="@{/usuarios/{id}/inativar(id=${u.id})}"
-                                                      method="post" style="display:inline;"
-                                                      onsubmit="return confirm('Confirma a inativação deste usuário?');">
-                                                    <button type="submit" class="btn btn-sm"
+                                                      method="post" style="display:inline;">
+                                                    <button type="button" class="btn btn-sm"
                                                             style="background:var(--gl-danger-bg);color:var(--gl-danger);"
-                                                            title="Inativar">
+                                                            title="Inativar"
+                                                            data-modal-titulo="Inativar usuário"
+                                                            data-modal-msg="Confirma a inativação deste usuário?"
+                                                            data-modal-confirma="Inativar"
+                                                            data-modal-classe="btn-danger"
+                                                            th:attr="data-modal-form='form-inativar-u-' + ${u.id}"
+                                                            onclick="glAbrirModalForm(this)">
                                                         <i class="bi bi-slash-circle" aria-hidden="true"></i>
                                                     </button>
                                                 </form>
                                                 <!-- Reativar -->
                                                 <form th:unless="${u.ativo}"
+                                                      th:id="'form-reativar-u-' + ${u.id}"
                                                       th:action="@{/usuarios/{id}/reativar(id=${u.id})}"
                                                       method="post" style="display:inline;">
-                                                    <button type="submit" class="btn btn-sm"
+                                                    <button type="button" class="btn btn-sm"
                                                             style="background:var(--gl-success-bg);color:var(--gl-success);"
-                                                            title="Reativar">
+                                                            title="Reativar"
+                                                            data-modal-titulo="Reativar usuário"
+                                                            data-modal-msg="Confirma a reativação deste usuário?"
+                                                            data-modal-confirma="Reativar"
+                                                            data-modal-classe="btn-primary"
+                                                            th:attr="data-modal-form='form-reativar-u-' + ${u.id}"
+                                                            onclick="glAbrirModalForm(this)">
                                                         <i class="bi bi-check-circle" aria-hidden="true"></i>
                                                     </button>
                                                 </form>
@@ -245,7 +258,7 @@ document.getElementById('formSenha').addEventListener('submit', function(e) {
     var s2 = document.getElementById('confirmacaoSenha').value;
     if (s1 !== s2) {
         e.preventDefault();
-        alert('As senhas não conferem.');
+        showToast('As senhas não conferem.', 'danger');
     }
 });
 </script>
