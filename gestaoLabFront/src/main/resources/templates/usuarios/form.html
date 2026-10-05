@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${edicao} ? 'GestãoLab — Editar Usuário' : 'GestãoLab — Novo Usuário'">GestãoLab</title>
+    <th:block th:replace="~{fragments/layout :: head-content}"></th:block>
+</head>
+<body>
+<div class="gl-sidebar-overlay" id="sidebarOverlay"></div>
+<div class="gl-wrapper">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+    <div class="gl-main">
+        <div th:replace="~{fragments/layout :: topbar(${edicao} ? 'Editar Usuário' : 'Novo Usuário')}"></div>
+        <main class="gl-content" id="main-content">
+            <div class="gl-page-header fade-in">
+                <h1 class="gl-page-title"
+                    th:text="${edicao} ? 'Editar Usuário' : 'Novo Usuário'">Usuário</h1>
+            </div>
+
+            <div th:if="${formError}" class="gl-alert gl-alert-danger" role="alert">
+                <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+                <span th:text="${formError}">Erro.</span>
+            </div>
+
+            <div class="gl-card fade-in" style="max-width:600px;">
+                <div class="gl-card-body">
+                    <form th:action="${edicao} ? @{/usuarios/editar/{id}(id=${usuario.id})} : @{/usuarios/salvar}"
+                          method="post">
+                        <div class="gl-form-group">
+                            <label class="gl-form-label" for="nome">
+                                Nome <span class="required">*</span>
+                            </label>
+                            <input type="text" id="nome" name="nome" class="gl-form-control"
+                                   th:value="${formNome ?: usuario?.nome}"
+                                   maxlength="150" required placeholder="Nome completo">
+                        </div>
+                        <div class="gl-form-group">
+                            <label class="gl-form-label" for="email">
+                                E-mail <span class="required">*</span>
+                            </label>
+                            <input type="email" id="email" name="email" class="gl-form-control"
+                                   th:value="${formEmail ?: usuario?.email}"
+                                   maxlength="150" required placeholder="usuario@exemplo.com">
+                        </div>
+                        <div class="gl-form-group">
+                            <label class="gl-form-label" for="matricula">Matrícula</label>
+                            <input type="text" id="matricula" name="matricula" class="gl-form-control gl-mono"
+                                   th:value="${formMatricula ?: usuario?.matricula}"
+                                   maxlength="50" placeholder="Opcional">
+                        </div>
+                        <div class="gl-form-group">
+                            <label class="gl-form-label" for="perfil">Perfil</label>
+                            <select id="perfil" name="perfil" class="gl-form-control">
+                                <option value="USUARIO"
+                                        th:selected="${formPerfil != null ? formPerfil == 'USUARIO' : (usuario == null or usuario.perfil == 'USUARIO')}">
+                                    Aluno
+                                </option>
+                                <option value="PROFESSOR"
+                                        th:selected="${formPerfil != null ? formPerfil == 'PROFESSOR' : usuario?.perfil == 'PROFESSOR'}">
+                                    Professor
+                                </option>
+                                <option value="COORDENADOR"
+                                        th:selected="${formPerfil != null ? formPerfil == 'COORDENADOR' : usuario?.perfil == 'COORDENADOR'}">
+                                    Coordenador
+                                </option>
+                            </select>
+                        </div>
+                        <div class="gl-form-group">
+                            <label class="gl-form-label" for="cursoSetorId">Curso/Setor</label>
+                            <select id="cursoSetorId" name="cursoSetorId" class="gl-form-control">
+                                <option value="">Nenhum</option>
+                                <option th:each="cs : ${cursosAtivos}"
+                                        th:value="${cs.id}"
+                                        th:text="${cs.nome}"
+                                        th:selected="${formCursoSetorId != null ? formCursoSetorId == cs.id :
+                                                       (usuario?.cursoSetor != null and usuario.cursoSetor.id == cs.id)}">-</option>
+                            </select>
+                        </div>
+                        <div class="gl-form-group">
+                            <label class="gl-form-label" for="responsavelId">Responsável</label>
+                            <select id="responsavelId" name="responsavelId" class="gl-form-control">
+                                <option value="">Nenhum</option>
+                                <option th:each="r : ${responsaveis}"
+                                        th:value="${r.id}"
+                                        th:text="${r.nome}"
+                                        th:selected="${formResponsavelId != null ? formResponsavelId == r.id :
+                                                       (usuario?.responsavel != null and usuario.responsavel.id == r.id)}">-</option>
+                            </select>
+                        </div>
+                        <!-- Senha provisória apenas no cadastro -->
+                        <div th:unless="${edicao}" class="gl-card"
+                             style="background:var(--gl-bg);border:1px dashed var(--gl-border);margin-bottom:16px;">
+                            <div class="gl-card-body">
+                                <div class="gl-form-group" style="margin-bottom:8px;">
+                                    <label class="gl-form-label" for="senhaProvisoria">
+                                        Senha provisória <span class="required">*</span>
+                                    </label>
+                                    <input type="password" id="senhaProvisoria" name="senhaProvisoria"
+                                           class="gl-form-control"
+                                           minlength="8" required placeholder="Mínimo 8 caracteres">
+                                </div>
+                                <p style="color:var(--gl-text-muted);font-size:.82rem;margin:0;">
+                                    <i class="bi bi-info-circle" aria-hidden="true"></i>
+                                    O usuário deverá trocar esta senha no primeiro acesso.
+                                </p>
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:10px;margin-top:8px;">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg" aria-hidden="true"></i>
+                                <span th:text="${edicao} ? 'Salvar alterações' : 'Cadastrar'">Salvar</span>
+                            </button>
+                            <a th:href="@{/usuarios}" class="btn btn-outline">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

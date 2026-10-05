@@ -132,11 +132,69 @@ function initToasts() {
     if (errorMsg && errorMsg.value) showToast(errorMsg.value, 'danger');
 }
 
+var _glModalCallback = null;
+
+function glAbrirModal(titulo, mensagem, confirmText, confirmClass, callback) {
+    document.getElementById('glModalConfirmacaoTitulo').textContent = titulo;
+    document.getElementById('glModalConfirmacaoMsg').textContent = mensagem;
+    var btn = document.getElementById('glModalBtnConfirmar');
+    btn.textContent = confirmText || 'Confirmar';
+    btn.className = 'btn ' + (confirmClass || 'btn-primary');
+    _glModalCallback = callback;
+    document.getElementById('glModalConfirmacao').style.display = 'flex';
+    document.getElementById('glModalBtnCancelar').focus();
+}
+
+function glFecharModal() {
+    document.getElementById('glModalConfirmacao').style.display = 'none';
+    _glModalCallback = null;
+}
+
+function glConfirmarModal() {
+    var cb = _glModalCallback;
+    glFecharModal();
+    if (cb) cb();
+}
+
+function glAbrirModalForm(btn) {
+    var formId = btn.getAttribute('data-modal-form');
+    glAbrirModal(
+        btn.getAttribute('data-modal-titulo') || 'Confirmar',
+        btn.getAttribute('data-modal-msg') || 'Deseja confirmar esta ação?',
+        btn.getAttribute('data-modal-confirma') || 'Confirmar',
+        btn.getAttribute('data-modal-classe') || 'btn-primary',
+        function() { document.getElementById(formId).submit(); }
+    );
+}
+
+function glAbrirModalHref(btn) {
+    var href = btn.getAttribute('data-modal-href');
+    glAbrirModal(
+        btn.getAttribute('data-modal-titulo') || 'Confirmar',
+        btn.getAttribute('data-modal-msg') || 'Deseja confirmar esta ação?',
+        btn.getAttribute('data-modal-confirma') || 'Confirmar',
+        btn.getAttribute('data-modal-classe') || 'btn-primary',
+        function() { window.location.href = href; }
+    );
+}
+
+function initModal() {
+    var modal = document.getElementById('glModalConfirmacao');
+    if (!modal) return;
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) glFecharModal();
+    });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.style.display === 'flex') glFecharModal();
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     initSidebar();
     initSubmitLoading();
     initTrocarSenhaValidation();
     initToasts();
+    initModal();
 
     const emailInput = document.getElementById('email');
     const senhaInput = document.getElementById('senha');

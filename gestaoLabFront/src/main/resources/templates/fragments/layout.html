@@ -28,14 +28,17 @@
             <li class="gl-nav-item">
                 <a th:href="@{/dashboard}"
                    class="gl-nav-link"
+                   title="Dashboard"
                    th:classappend="${menuAtivo == 'dashboard'} ? ' active' : ''">
                     <i class="bi bi-grid-1x2" aria-hidden="true"></i><span>Dashboard</span>
                 </a>
             </li>
             <li><p class="gl-nav-label">Gestão</p></li>
-            <li class="gl-nav-item">
+            <li class="gl-nav-item"
+                th:if="${session.perfil == 'COORDENADOR' or session.perfil == 'PROFESSOR'}">
                 <a th:href="@{/usuarios}"
                    class="gl-nav-link"
+                   title="Usuários"
                    th:classappend="${menuAtivo == 'usuarios'} ? ' active' : ''">
                     <i class="bi bi-people" aria-hidden="true"></i><span>Usuários</span>
                 </a>
@@ -43,6 +46,7 @@
             <li class="gl-nav-item">
                 <a th:href="@{/uso-laboratorio}"
                    class="gl-nav-link"
+                   title="Uso do Laboratório"
                    th:classappend="${menuAtivo == 'uso-laboratorio'} ? ' active' : ''">
                     <i class="bi bi-clipboard2-pulse" aria-hidden="true"></i><span>Uso do Laboratório</span>
                 </a>
@@ -50,6 +54,7 @@
             <li class="gl-nav-item">
                 <a th:href="@{/materiais}"
                    class="gl-nav-link"
+                   title="Materiais"
                    th:classappend="${menuAtivo == 'materiais'} ? ' active' : ''">
                     <i class="bi bi-eyedropper" aria-hidden="true"></i><span>Materiais</span>
                 </a>
@@ -57,6 +62,7 @@
             <li class="gl-nav-item">
                 <a th:href="@{/equipamentos}"
                    class="gl-nav-link"
+                   title="Equipamentos"
                    th:classappend="${menuAtivo == 'equipamentos'} ? ' active' : ''">
                     <i class="bi bi-thermometer" aria-hidden="true"></i><span>Equipamentos</span>
                 </a>
@@ -64,6 +70,7 @@
             <li class="gl-nav-item">
                 <a th:href="@{/relatorios}"
                    class="gl-nav-link"
+                   title="Relatórios"
                    th:classappend="${menuAtivo == 'relatorios'} ? ' active' : ''">
                     <i class="bi bi-activity" aria-hidden="true"></i><span>Relatórios</span>
                 </a>
@@ -72,6 +79,7 @@
             <li class="gl-nav-item" th:if="${session.perfil == 'COORDENADOR'}">
                 <a th:href="@{/cursos-setores}"
                    class="gl-nav-link"
+                   title="Cursos e Setores"
                    th:classappend="${menuAtivo == 'cursos-setores'} ? ' active' : ''">
                     <i class="bi bi-journal-bookmark" aria-hidden="true"></i><span>Cursos e Setores</span>
                 </a>
@@ -79,19 +87,13 @@
             <li class="gl-nav-item" th:if="${session.perfil == 'COORDENADOR'}">
                 <a th:href="@{/laboratorios}"
                    class="gl-nav-link"
+                   title="Laboratórios"
                    th:classappend="${menuAtivo == 'laboratorios'} ? ' active' : ''">
                     <i class="bi bi-door-open" aria-hidden="true"></i><span>Laboratórios</span>
                 </a>
             </li>
         </ul>
     </nav>
-    <div class="gl-sidebar-footer">
-        <div class="gl-sidebar-user-name" th:text="${session.nome ?: 'Usuário'}">Usuário</div>
-        <div class="gl-sidebar-user-role"
-             th:text="${session.perfil == 'COORDENADOR' ? 'Coordenador' : (session.perfil == 'PROFESSOR' ? 'Professor' : 'Usuário')}">
-            Usuário
-        </div>
-    </div>
 </aside>
 
 <header th:fragment="topbar(pageTitle)" class="gl-topbar">
@@ -100,18 +102,46 @@
     <div class="gl-topbar-spacer"></div>
     <div class="gl-topbar-user">
         <i class="bi bi-person-circle" aria-hidden="true"></i>
-        <span th:text="${session.nome ?: 'Usuário'}">Usuário</span>
+        <a th:href="@{/meu-perfil}" class="gl-topbar-user-name"
+           th:text="${session.nome ?: 'Usuário'}">Usuário</a>
         <span class="gl-topbar-role"
               th:text="${'(' + (session.perfil == 'COORDENADOR' ? 'Coordenador' : (session.perfil == 'PROFESSOR' ? 'Professor' : 'Usuário')) + ')'}">
             (Usuário)
         </span>
-        <a th:href="@{/logout}" class="gl-topbar-logout" title="Sair"><i class="bi bi-box-arrow-right" aria-hidden="true"></i></a>
+        <button type="button" class="gl-topbar-logout" title="Sair"
+                data-modal-titulo="Sair do sistema"
+                data-modal-msg="Deseja sair do sistema?"
+                data-modal-confirma="Sair"
+                data-modal-classe="btn-danger"
+                data-modal-href="/logout"
+                onclick="glAbrirModalHref(this)">
+            <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+        </button>
     </div>
 </header>
 
 <th:block th:fragment="scripts">
     <input type="hidden" id="toast-success-message" th:if="${mensagemSucesso != null}" th:value="${mensagemSucesso}"/>
     <input type="hidden" id="toast-error-message" th:if="${errorMessage != null}" th:value="${errorMessage}"/>
+    <!-- Modal de Confirmação reutilizável -->
+    <div id="glModalConfirmacao"
+         role="dialog" aria-modal="true" aria-labelledby="glModalConfirmacaoTitulo"
+         style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:2000;align-items:center;justify-content:center;">
+        <div class="gl-card" style="max-width:400px;width:90%;margin:0;z-index:2001;">
+            <div class="gl-card-header">
+                <span class="gl-card-title" id="glModalConfirmacaoTitulo">Confirmação</span>
+            </div>
+            <div class="gl-card-body">
+                <p id="glModalConfirmacaoMsg" style="color:var(--gl-text-secondary);margin-bottom:20px;"></p>
+                <div style="display:flex;gap:10px;justify-content:flex-end;">
+                    <button type="button" id="glModalBtnCancelar" class="btn btn-outline"
+                            onclick="glFecharModal()">Cancelar</button>
+                    <button type="button" id="glModalBtnConfirmar" class="btn btn-primary"
+                            onclick="glConfirmarModal()">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script th:src="@{/js/gestaolab.js}"></script>
 </th:block>
 </body>

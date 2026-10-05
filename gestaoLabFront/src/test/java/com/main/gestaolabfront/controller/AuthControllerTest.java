@@ -3,7 +3,9 @@ package com.main.gestaolabfront.controller;
 import com.main.gestaolabfront.config.SessionCheckInterceptor;
 import com.main.gestaolabfront.config.WebConfig;
 import com.main.gestaolabfront.dto.LoginResponse;
+import com.main.gestaolabfront.dto.UsuarioDto;
 import com.main.gestaolabfront.service.AuthApiService;
+import com.main.gestaolabfront.service.UsuarioApiService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -27,6 +29,9 @@ class AuthControllerTest {
 
     @MockitoBean
     private AuthApiService authApiService;
+
+    @MockitoBean
+    private UsuarioApiService usuarioApiService;
 
     @Test
     void paginaDeLogin_abre() throws Exception {
@@ -115,6 +120,10 @@ class AuthControllerTest {
                 .andExpect(redirectedUrl("/login"));
     }
 
+    private static UsuarioDto perfilMap(String nome) {
+        return new UsuarioDto(1L, nome, null, "ana@test.com", "COORDENADOR", true, false, null, null, null);
+    }
+
     @Test
     void login_sucesso_redirecionamento_naoContemJsessionid() throws Exception {
         when(authApiService.logar(anyString(), anyString()))
@@ -126,5 +135,30 @@ class AuthControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(result -> assertThat(result.getResponse().getHeader("Location"))
                         .doesNotContainIgnoringCase("jsessionid"));
+    }
+
+    @Test
+    void meuPerfil_exibeDados() throws Exception {
+        when(usuarioApiService.me()).thenReturn(perfilMap("Ana Lima"));
+        mockMvc.perform(get("/meu-perfil")
+                        .sessionAttr("token", "tok")
+                        .sessionAttr("perfil", "COORDENADOR")
+                        .sessionAttr("primeiroAcesso", "false"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("usuarios/meu-perfil"));
+    }
+
+    @Test
+    void salvarMeuPerfil_atualizaNomeSessao() throws Exception {
+        when(usuarioApiService.atualizarMe("Novo Nome")).thenReturn(perfilMap("Novo Nome"));
+        mockMvc.perform(post("/meu-perfil")
+                        .param("nome", "Novo Nome")
+                        .sessionAttr("token", "tok")
+                        .sessionAttr("perfil", "COORDENADOR")
+                        .sessionAttr("primeiroAcesso", "false"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/meu-perfil"))
+                .andExpect(flash().attribute("mensagemSucesso", "Perfil atualizado com sucesso!"))
+                .andExpect(request().sessionAttribute("nome", "Novo Nome"));
     }
 }

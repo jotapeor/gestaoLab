@@ -36,6 +36,7 @@ NOTAS TÉCNICAS (Spring Boot 4.1.1)
 - Antes de concluir que uma classe/anotação "não existe" no Boot 4, procure o pacote novo no jar dentro do .m2.
 - Jackson 3.x: Spring Boot 4 usa tools.jackson.core:jackson-databind. O pacote mudou de com.fasterxml.jackson.* para tools.jackson.* (ex.: tools.jackson.databind.ObjectMapper). Nunca importar com.fasterxml.*.
 - Mockito: NUNCA usar mock-maker-subclass nem arquivos em mockito-extensions. O agente do Mockito é carregado via -javaagent no argLine do maven-surefire-plugin (o caminho do usuário tem espaço e acento, o que quebra a anexação dinâmica). Mantenha esse argLine igual nos dois projetos.
+- Datas: a API trafega datas em ISO-8601 (texto), configurado via spring.jackson.datatype.datetime.write-dates-as-timestamps=false (Jackson 3 moveu WRITE_DATES_AS_TIMESTAMPS para DateTimeFeature, não SerializationFeature). No front, DTOs usam LocalDateTime/LocalDate e a formatação é feita só na view com #temporals.format (dd/MM/yyyy HH:mm ou dd/MM/yyyy). Nunca converter datas manualmente em controllers.
 
 IDENTIDADE VISUAL
 Do TCC copiamos arquitetura, organização de código e padrões de implementação; a aparência do GestãoLab é própria e NÃO deve reproduzir a do TCC (nem o sidebar escuro, nem o verde, nem o layout de login do AgroTrack).
@@ -59,10 +60,11 @@ Tipografia:
 Menu lateral (sidebar):
 - Fundo branco, borda direita 1px em --gl-border.
 - Logo no topo: ícone frasco SVG inline + texto "GestãoLab" em bold.
-- Sempre expandido no desktop; recolhível (toggle) em telas < 992px.
-- Item ativo: fundo #E6F4F1, texto #0F766E, barra vertical de 3px à esquerda.
-- Hover: fundo --gl-bg, texto --gl-text. Sem hover que expanda o sidebar.
-- Rodapé: nome e perfil do usuário.
+- Desktop (≥ 993px): estado padrão recolhido (~72px), mostrando apenas ícones; labels de seção (GESTÃO, CONFIGURAÇÕES) viram uma linha divisória discreta. Ao passar o mouse ou receber foco (:focus-within), expande para 240px SOBRE o conteúdo (position: fixed, conteúdo não se move) com sombra suave. Fechamento com 200ms de atraso e transição suave. Não há bloco de usuário no rodapé.
+- Telas < 992px: recolhível via botão de menu (toggle), comportamento de slide com overlay.
+- Item ativo: fundo #E6F4F1, texto #0F766E, barra vertical de 3px à esquerda — visível nos dois estados (recolhido e expandido).
+- Itens recolhidos têm atributo title com o nome do módulo.
+- Hover em item não-ativo: fundo --gl-bg, texto --gl-text.
 
 Topbar: branco, borda inferior 1px em --gl-border. Título à esquerda; usuário,
 perfil e botão sair à direita. Sem barra colorida no topo.
@@ -86,3 +88,6 @@ branco, formulário centralizado. Em telas ≤ 768px mostra só o formulário.
 
 Acessibilidade: contraste mínimo WCAG AA. :focus-visible com outline 2px
 em --gl-primary. aria-hidden="true" em todos os ícones decorativos.
+
+- Confirmações sempre com o modal de confirmação padrão do projeto (glAbrirModalForm / glAbrirModalHref); nunca usar confirm(), alert() ou prompt() do navegador.
+- Erros nunca exibem stack trace nem a Whitelabel Error Page; usar as páginas de erro do projeto (templates/error/).

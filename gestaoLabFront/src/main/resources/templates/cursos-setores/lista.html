@@ -95,21 +95,34 @@
                                                 <i class="bi bi-pencil" aria-hidden="true"></i>
                                             </a>
                                             <form th:if="${cs.ativo}"
+                                                  th:id="'form-inativar-cs-' + ${cs.id}"
                                                   th:action="@{/cursos-setores/{id}/inativar(id=${cs.id})}"
-                                                  method="post" style="display:inline;"
-                                                  onsubmit="return confirm('Confirma a inativação deste registro?');">
-                                                <button type="submit" class="btn btn-sm"
+                                                  method="post" style="display:inline;">
+                                                <button type="button" class="btn btn-sm"
                                                         style="background:var(--gl-danger-bg);color:var(--gl-danger);"
-                                                        title="Inativar">
+                                                        title="Inativar"
+                                                        data-modal-titulo="Inativar registro"
+                                                        data-modal-msg="Confirma a inativação deste registro?"
+                                                        data-modal-confirma="Inativar"
+                                                        data-modal-classe="btn-danger"
+                                                        th:attr="data-modal-form='form-inativar-cs-' + ${cs.id}"
+                                                        onclick="glAbrirModalForm(this)">
                                                     <i class="bi bi-slash-circle" aria-hidden="true"></i>
                                                 </button>
                                             </form>
                                             <form th:unless="${cs.ativo}"
+                                                  th:id="'form-reativar-cs-' + ${cs.id}"
                                                   th:action="@{/cursos-setores/{id}/reativar(id=${cs.id})}"
                                                   method="post" style="display:inline;">
-                                                <button type="submit" class="btn btn-sm"
+                                                <button type="button" class="btn btn-sm"
                                                         style="background:var(--gl-success-bg);color:var(--gl-success);"
-                                                        title="Reativar">
+                                                        title="Reativar"
+                                                        data-modal-titulo="Reativar registro"
+                                                        data-modal-msg="Confirma a reativação deste registro?"
+                                                        data-modal-confirma="Reativar"
+                                                        data-modal-classe="btn-primary"
+                                                        th:attr="data-modal-form='form-reativar-cs-' + ${cs.id}"
+                                                        onclick="glAbrirModalForm(this)">
                                                     <i class="bi bi-check-circle" aria-hidden="true"></i>
                                                 </button>
                                             </form>

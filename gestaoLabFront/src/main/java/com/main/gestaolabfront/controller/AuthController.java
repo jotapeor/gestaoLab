@@ -1,7 +1,9 @@
 package com.main.gestaolabfront.controller;
 
 import com.main.gestaolabfront.dto.LoginResponse;
+import com.main.gestaolabfront.dto.UsuarioDto;
 import com.main.gestaolabfront.service.AuthApiService;
+import com.main.gestaolabfront.service.UsuarioApiService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,9 +17,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class AuthController {
 
     private final AuthApiService authApiService;
+    private final UsuarioApiService usuarioApiService;
 
-    public AuthController(AuthApiService authApiService) {
+    public AuthController(AuthApiService authApiService, UsuarioApiService usuarioApiService) {
         this.authApiService = authApiService;
+        this.usuarioApiService = usuarioApiService;
     }
 
     @GetMapping("/")
@@ -93,6 +97,35 @@ public class AuthController {
     public String logout(HttpSession session) {
         session.invalidate();
         return "redirect:/login";
+    }
+
+    @GetMapping("/meu-perfil")
+    public String meuPerfil(HttpSession session, Model model) {
+        try {
+            UsuarioDto usuario = usuarioApiService.me();
+            model.addAttribute("usuario", usuario);
+        } catch (Exception e) {
+            model.addAttribute("usuario", new UsuarioDto(null, null, null, null, null, null, null, null, null, null));
+        }
+        model.addAttribute("menuAtivo", "");
+        return "usuarios/meu-perfil";
+    }
+
+    @PostMapping("/meu-perfil")
+    public String salvarMeuPerfil(@RequestParam String nome,
+                                  HttpSession session,
+                                  RedirectAttributes redirectAttributes) {
+        try {
+            UsuarioDto atualizado = usuarioApiService.atualizarMe(nome);
+            session.setAttribute("nome", atualizado.nome());
+            redirectAttributes.addFlashAttribute("mensagemSucesso", "Perfil atualizado com sucesso!");
+        } catch (HttpClientErrorException ex) {
+            redirectAttributes.addFlashAttribute("formError",
+                    extrairMensagemErro(ex.getResponseBodyAsString(), "Erro ao atualizar perfil."));
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("formError", "Erro inesperado ao salvar.");
+        }
+        return "redirect:/meu-perfil";
     }
 
     private String extrairMensagemErro(String responseBody, String fallback) {

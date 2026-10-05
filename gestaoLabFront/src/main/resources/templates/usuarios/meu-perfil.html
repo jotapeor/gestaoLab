@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>GestãoLab — Meu Perfil</title>
+    <th:block th:replace="~{fragments/layout :: head-content}"></th:block>
+</head>
+<body>
+<div class="gl-sidebar-overlay" id="sidebarOverlay"></div>
+<div class="gl-wrapper">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+    <div class="gl-main">
+        <div th:replace="~{fragments/layout :: topbar('Meu Perfil')}"></div>
+        <main class="gl-content" id="main-content">
+            <div class="gl-page-header fade-in">
+                <h1 class="gl-page-title">Meu Perfil</h1>
+            </div>
+
+            <div th:if="${formError}" class="gl-alert gl-alert-danger" role="alert">
+                <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+                <span th:text="${formError}">Erro.</span>
+            </div>
+
+            <div class="gl-card fade-in" style="max-width:520px;">
+                <div class="gl-card-body">
+                    <form th:action="@{/meu-perfil}" method="post">
+                        <div class="gl-form-group">
+                            <label class="gl-form-label" for="nome">
+                                Nome <span class="required">*</span>
+                            </label>
+                            <input type="text" id="nome" name="nome" class="gl-form-control"
+                                   th:value="${usuario.nome}"
+                                   maxlength="150" required placeholder="Seu nome">
+                        </div>
+                        <div class="gl-form-group">
+                            <label class="gl-form-label">E-mail</label>
+                            <input type="text" class="gl-form-control"
+                                   th:value="${usuario.email}"
+                                   disabled aria-readonly="true">
+                        </div>
+                        <div class="gl-form-group">
+                            <label class="gl-form-label">Matrícula</label>
+                            <input type="text" class="gl-form-control gl-mono"
+                                   th:value="${usuario.matricula ?: '-'}"
+                                   disabled aria-readonly="true">
+                        </div>
+                        <div class="gl-form-group">
+                            <label class="gl-form-label">Perfil</label>
+                            <input type="text" class="gl-form-control"
+                                   th:value="${usuario.perfil == 'COORDENADOR'} ? 'Coordenador' : (${usuario.perfil == 'PROFESSOR'} ? 'Professor' : 'Aluno')"
+                                   disabled aria-readonly="true">
+                        </div>
+                        <div class="gl-form-group">
+                            <label class="gl-form-label">Curso/Setor</label>
+                            <input type="text" class="gl-form-control"
+                                   th:value="${usuario.cursoSetor != null ? usuario.cursoSetor.nome : '-'}"
+                                   disabled aria-readonly="true">
+                        </div>
+                        <div class="gl-form-group">
+                            <label class="gl-form-label">Responsável</label>
+                            <input type="text" class="gl-form-control"
+                                   th:value="${usuario.responsavel != null ? usuario.responsavel.nome : '-'}"
+                                   disabled aria-readonly="true">
+                        </div>
+                        <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;align-items:center;">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg" aria-hidden="true"></i> Salvar nome
+                            </button>
+                            <a th:href="@{/trocar-senha}" class="btn btn-outline">
+                                <i class="bi bi-shield-lock" aria-hidden="true"></i> Alterar senha
+                            </a>
+                            <a th:href="@{/dashboard}" class="btn btn-outline">
+                                <i class="bi bi-arrow-left" aria-hidden="true"></i> Voltar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
