@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -253,5 +254,77 @@ class UsuarioControllerTest {
                         .sessionAttr("primeiroAcesso", "false"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/acesso-negado"));
+    }
+
+    // ---- renderização de templates ----
+
+    @Test
+    void detalhe_renderizaComDataCriacao_semErro() throws Exception {
+        when(usuarioApiService.buscarPorId(1L)).thenReturn(usuarioMapComData());
+        mockMvc.perform(get("/usuarios/1")
+                        .sessionAttr("token", "tok")
+                        .sessionAttr("perfil", "COORDENADOR")
+                        .sessionAttr("primeiroAcesso", "false"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("usuarios/detalhe"));
+    }
+
+    @Test
+    void listar_renderizaListagemCompleta_semErro() throws Exception {
+        Map<String, Object> pagina = new HashMap<>();
+        pagina.put("content", List.of(usuarioMapComData()));
+        pagina.put("totalPages", 1);
+        pagina.put("number", 0);
+        when(usuarioApiService.listar(any(), any(), any(), any(), anyInt())).thenReturn(pagina);
+        when(cursoSetorApiService.listar(any(), any(), any())).thenReturn(List.of());
+        mockMvc.perform(get("/usuarios")
+                        .sessionAttr("token", "tok")
+                        .sessionAttr("perfil", "COORDENADOR")
+                        .sessionAttr("primeiroAcesso", "false"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("usuarios/lista"));
+    }
+
+    @Test
+    void novoForm_renderizaFormularioCadastro() throws Exception {
+        when(cursoSetorApiService.listar(any(), any(), any())).thenReturn(List.of());
+        when(usuarioApiService.listarResponsaveis()).thenReturn(List.of());
+        mockMvc.perform(get("/usuarios/novo")
+                        .sessionAttr("token", "tok")
+                        .sessionAttr("perfil", "COORDENADOR")
+                        .sessionAttr("primeiroAcesso", "false"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("usuarios/form"));
+    }
+
+    @Test
+    void editarForm_renderizaFormularioEdicao() throws Exception {
+        when(usuarioApiService.buscarPorId(1L)).thenReturn(usuarioMapComData());
+        when(cursoSetorApiService.listar(any(), any(), any())).thenReturn(List.of());
+        when(usuarioApiService.listarResponsaveis()).thenReturn(List.of());
+        mockMvc.perform(get("/usuarios/editar/1")
+                        .sessionAttr("token", "tok")
+                        .sessionAttr("perfil", "COORDENADOR")
+                        .sessionAttr("primeiroAcesso", "false"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("usuarios/form"));
+    }
+
+    private static Map<String, Object> usuarioMapComData() {
+        List<Integer> data = new ArrayList<>();
+        data.add(2026); data.add(9); data.add(22);
+        data.add(21); data.add(53); data.add(22);
+        Map<String, Object> m = new HashMap<>();
+        m.put("id", 2);
+        m.put("nome", "Prof. Silva");
+        m.put("email", "silva@lab.com");
+        m.put("perfil", "PROFESSOR");
+        m.put("ativo", true);
+        m.put("matricula", null);
+        m.put("cursoSetor", null);
+        m.put("responsavel", null);
+        m.put("dataCriacao", data);
+        m.put("primeiroAcesso", false);
+        return m;
     }
 }
