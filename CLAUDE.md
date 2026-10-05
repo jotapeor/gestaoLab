@@ -86,3 +86,6 @@ branco, formulário centralizado. Em telas ≤ 768px mostra só o formulário.
 
 Acessibilidade: contraste mínimo WCAG AA. :focus-visible com outline 2px
 em --gl-primary. aria-hidden="true" em todos os ícones decorativos.
+
+- Confirmações sempre com o modal de confirmação padrão do projeto (glAbrirModalForm / glAbrirModalHref); nunca usar confirm(), alert() ou prompt() do navegador.
+- Erros nunca exibem stack trace nem a Whitelabel Error Page; usar as páginas de erro do projeto (templates/error/).
