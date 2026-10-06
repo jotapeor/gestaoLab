@@ -39,6 +39,7 @@ NOTAS TÉCNICAS (Spring Boot 4.1.1)
 - Datas: a API trafega datas em ISO-8601 (texto), configurado via spring.jackson.datatype.datetime.write-dates-as-timestamps=false (Jackson 3 moveu WRITE_DATES_AS_TIMESTAMPS para DateTimeFeature, não SerializationFeature). No front, DTOs usam LocalDateTime/LocalDate e a formatação é feita só na view com #temporals.format (dd/MM/yyyy HH:mm ou dd/MM/yyyy). Nunca converter datas manualmente em controllers.
 - Relacionamentos @ManyToMany: sempre gravar pelo lado dono (o que tem @JoinTable) e manter os dois lados sincronizados com métodos auxiliares. Testes de persistência devem fazer flush/clear e reler do banco.
 - Paginação: endpoints paginados retornam sempre PaginaResponse<T> (conteudo, pagina, tamanho, totalElementos, totalPaginas); nunca retornar Page do Spring diretamente.
+- Front: respostas da API sempre desserializadas em DTOs tipados (records), inclusive PaginaResponse<T>; nunca ler respostas como Map ou extrair campos por nome.
 
 IDENTIDADE VISUAL
 Do TCC copiamos arquitetura, organização de código e padrões de implementação; a aparência do GestãoLab é própria e NÃO deve reproduzir a do TCC (nem o sidebar escuro, nem o verde, nem o layout de login do AgroTrack).
