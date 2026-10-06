@@ -37,6 +37,7 @@ NOTAS TÉCNICAS (Spring Boot 4.1.1)
 - Jackson 3.x: Spring Boot 4 usa tools.jackson.core:jackson-databind. O pacote mudou de com.fasterxml.jackson.* para tools.jackson.* (ex.: tools.jackson.databind.ObjectMapper). Nunca importar com.fasterxml.*.
 - Mockito: NUNCA usar mock-maker-subclass nem arquivos em mockito-extensions. O agente do Mockito é carregado via -javaagent no argLine do maven-surefire-plugin (o caminho do usuário tem espaço e acento, o que quebra a anexação dinâmica). Mantenha esse argLine igual nos dois projetos.
 - Datas: a API trafega datas em ISO-8601 (texto), configurado via spring.jackson.datatype.datetime.write-dates-as-timestamps=false (Jackson 3 moveu WRITE_DATES_AS_TIMESTAMPS para DateTimeFeature, não SerializationFeature). No front, DTOs usam LocalDateTime/LocalDate e a formatação é feita só na view com #temporals.format (dd/MM/yyyy HH:mm ou dd/MM/yyyy). Nunca converter datas manualmente em controllers.
+- Relacionamentos @ManyToMany: sempre gravar pelo lado dono (o que tem @JoinTable) e manter os dois lados sincronizados com métodos auxiliares. Testes de persistência devem fazer flush/clear e reler do banco.
 
 IDENTIDADE VISUAL
 Do TCC copiamos arquitetura, organização de código e padrões de implementação; a aparência do GestãoLab é própria e NÃO deve reproduzir a do TCC (nem o sidebar escuro, nem o verde, nem o layout de login do AgroTrack).
@@ -92,3 +93,4 @@ em --gl-primary. aria-hidden="true" em todos os ícones decorativos.
 - Rótulos de perfil na interface: COORDENADOR = Coordenador, PROFESSOR = Professor, USUARIO = Usuário.
 - Confirmações sempre com o modal de confirmação padrão do projeto (glAbrirModalForm / glAbrirModalHref); nunca usar confirm(), alert() ou prompt() do navegador.
 - Erros nunca exibem stack trace nem a Whitelabel Error Page; usar as páginas de erro do projeto (templates/error/).
+- Toda página (exceto o dashboard) usa o fragmento de cabeçalho page-header(titulo, subtitulo, urlVoltar) com botão Voltar para a página pai definida pelo controller; nunca usar history.back().
