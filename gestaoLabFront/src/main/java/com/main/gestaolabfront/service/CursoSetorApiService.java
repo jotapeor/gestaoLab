@@ -1,5 +1,7 @@
 package com.main.gestaolabfront.service;
 
+import com.main.gestaolabfront.dto.CursoSetorDto;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -18,8 +20,7 @@ public class CursoSetorApiService {
         this.restClient = restClient;
     }
 
-    @SuppressWarnings("unchecked")
-    public List<Map<String, Object>> listar(String nome, Boolean ativo, String tipo) {
+    public List<CursoSetorDto> listar(String nome, Boolean ativo, String tipo) {
         return restClient.get()
                 .uri(b -> b.path("/cursos-setores")
                         .queryParamIfPresent("nome", Optional.ofNullable(nome).filter(s -> !s.isBlank()))
@@ -27,15 +28,14 @@ public class CursoSetorApiService {
                         .queryParamIfPresent("tipo", Optional.ofNullable(tipo).filter(s -> !s.isBlank()))
                         .build())
                 .retrieve()
-                .body(List.class);
+                .body(new ParameterizedTypeReference<List<CursoSetorDto>>() {});
     }
 
-    @SuppressWarnings("unchecked")
-    public Map<String, Object> buscarPorId(Long id) {
+    public CursoSetorDto buscarPorId(Long id) {
         return restClient.get()
                 .uri("/cursos-setores/{id}", id)
                 .retrieve()
-                .body(Map.class);
+                .body(CursoSetorDto.class);
     }
 
     public void criar(String nome, String tipo) {

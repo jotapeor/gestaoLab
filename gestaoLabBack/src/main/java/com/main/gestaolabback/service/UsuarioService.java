@@ -1,6 +1,7 @@
 package com.main.gestaolabback.service;
 
 import com.main.gestaolabback.dto.MeuPerfilRequest;
+import com.main.gestaolabback.dto.ParticipanteDisponivelResponse;
 import com.main.gestaolabback.dto.ResponsavelResponse;
 import com.main.gestaolabback.dto.UsuarioAutenticado;
 import com.main.gestaolabback.dto.UsuarioRequest;
@@ -164,6 +165,17 @@ public class UsuarioService {
                         List.of(PerfilUsuario.PROFESSOR, PerfilUsuario.COORDENADOR))
                 .stream()
                 .map(u -> new ResponsavelResponse(u.getId(), u.getNome()))
+                .toList();
+    }
+
+    public List<ParticipanteDisponivelResponse> listarParticipantesDisponiveis(String busca) {
+        String buscaFiltro = (busca != null && !busca.isBlank()) ? busca.trim() : null;
+        return usuarioRepository.findParticipantesDisponiveis(buscaFiltro, PageRequest.of(0, 20))
+                .getContent()
+                .stream()
+                .map(u -> new ParticipanteDisponivelResponse(
+                        u.getId(), u.getNome(), u.getMatricula(),
+                        u.getCursoSetor() != null ? u.getCursoSetor().getNome() : null))
                 .toList();
     }
 

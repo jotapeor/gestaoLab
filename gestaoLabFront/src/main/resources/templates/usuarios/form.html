@@ -12,10 +12,7 @@
     <div class="gl-main">
         <div th:replace="~{fragments/layout :: topbar(${edicao} ? 'Editar Usuário' : 'Novo Usuário')}"></div>
         <main class="gl-content" id="main-content">
-            <div class="gl-page-header fade-in">
-                <h1 class="gl-page-title"
-                    th:text="${edicao} ? 'Editar Usuário' : 'Novo Usuário'">Usuário</h1>
-            </div>
+            <div th:replace="~{fragments/layout :: page-header(${edicao} ? 'Editar Usuário' : 'Novo Usuário', null, ${urlVoltar})}"></div>
 
             <div th:if="${formError}" class="gl-alert gl-alert-danger" role="alert">
                 <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
@@ -53,7 +50,7 @@
                             <select id="perfil" name="perfil" class="gl-form-control">
                                 <option value="USUARIO"
                                         th:selected="${formPerfil != null ? formPerfil == 'USUARIO' : (usuario == null or usuario.perfil == 'USUARIO')}">
-                                    Aluno
+                                    Usuário
                                 </option>
                                 <option value="PROFESSOR"
                                         th:selected="${formPerfil != null ? formPerfil == 'PROFESSOR' : usuario?.perfil == 'PROFESSOR'}">

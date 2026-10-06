@@ -1,6 +1,10 @@
 package com.main.gestaolabfront.service;
 
+import com.main.gestaolabfront.dto.PaginaResponse;
+import com.main.gestaolabfront.dto.ParticipanteDisponivelDto;
+import com.main.gestaolabfront.dto.ResponsavelDto;
 import com.main.gestaolabfront.dto.UsuarioDto;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -19,9 +23,8 @@ public class UsuarioApiService {
         this.restClient = restClient;
     }
 
-    @SuppressWarnings("unchecked")
-    public Map<String, Object> listar(String busca, String perfil, Long cursoSetorId,
-                                      Boolean ativo, int page) {
+    public PaginaResponse<UsuarioDto> listar(String busca, String perfil, Long cursoSetorId,
+                                             Boolean ativo, int page) {
         return restClient.get()
                 .uri(b -> b.path("/usuarios")
                         .queryParamIfPresent("busca", Optional.ofNullable(busca).filter(s -> !s.isBlank()))
@@ -31,7 +34,7 @@ public class UsuarioApiService {
                         .queryParam("page", page)
                         .build())
                 .retrieve()
-                .body(Map.class);
+                .body(new ParameterizedTypeReference<PaginaResponse<UsuarioDto>>() {});
     }
 
     public UsuarioDto buscarPorId(Long id) {
@@ -84,12 +87,20 @@ public class UsuarioApiService {
                 .toBodilessEntity();
     }
 
-    @SuppressWarnings("unchecked")
-    public List<Map<String, Object>> listarResponsaveis() {
+    public List<ParticipanteDisponivelDto> listarParticipantesDisponiveis(String busca) {
+        return restClient.get()
+                .uri(b -> b.path("/usuarios/participantes-disponiveis")
+                        .queryParamIfPresent("busca", Optional.ofNullable(busca).filter(s -> !s.isBlank()))
+                        .build())
+                .retrieve()
+                .body(new ParameterizedTypeReference<List<ParticipanteDisponivelDto>>() {});
+    }
+
+    public List<ResponsavelDto> listarResponsaveis() {
         return restClient.get()
                 .uri("/usuarios/responsaveis")
                 .retrieve()
-                .body(List.class);
+                .body(new ParameterizedTypeReference<List<ResponsavelDto>>() {});
     }
 
     public UsuarioDto me() {

@@ -5,6 +5,7 @@ import com.main.gestaolabfront.config.WebConfig;
 import com.main.gestaolabfront.dto.LoginResponse;
 import com.main.gestaolabfront.dto.UsuarioDto;
 import com.main.gestaolabfront.service.AuthApiService;
+import com.main.gestaolabfront.service.ProjetoApiService;
 import com.main.gestaolabfront.service.UsuarioApiService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,9 @@ class AuthControllerTest {
 
     @MockitoBean
     private UsuarioApiService usuarioApiService;
+
+    @MockitoBean
+    private ProjetoApiService projetoApiService;
 
     @Test
     void paginaDeLogin_abre() throws Exception {

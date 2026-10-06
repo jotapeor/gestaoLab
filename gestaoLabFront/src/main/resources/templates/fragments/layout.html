@@ -44,6 +44,14 @@
                 </a>
             </li>
             <li class="gl-nav-item">
+                <a th:href="@{/projetos}"
+                   class="gl-nav-link"
+                   title="Projetos"
+                   th:classappend="${menuAtivo == 'projetos'} ? ' active' : ''">
+                    <i class="bi bi-journal-text" aria-hidden="true"></i><span>Projetos</span>
+                </a>
+            </li>
+            <li class="gl-nav-item">
                 <a th:href="@{/uso-laboratorio}"
                    class="gl-nav-link"
                    title="Uso do Laboratório"
@@ -119,6 +127,22 @@
         </button>
     </div>
 </header>
+
+<th:block th:fragment="page-header(titulo, subtitulo, urlVoltar)">
+    <div class="gl-page-header fade-in">
+        <div class="gl-page-header-row">
+            <a th:if="${urlVoltar != null}" th:href="${urlVoltar}" class="gl-btn-voltar" aria-label="Voltar">
+                <i class="bi bi-arrow-left" aria-hidden="true"></i>
+                <span>Voltar</span>
+            </a>
+            <div>
+                <h1 class="gl-page-title" th:text="${titulo}">Título</h1>
+                <p th:if="${subtitulo != null and !#strings.isEmpty(subtitulo)}"
+                   class="gl-page-subtitle" th:text="${subtitulo}">Subtítulo</p>
+            </div>
+        </div>
+    </div>
+</th:block>
 
 <th:block th:fragment="scripts">
     <input type="hidden" id="toast-success-message" th:if="${mensagemSucesso != null}" th:value="${mensagemSucesso}"/>

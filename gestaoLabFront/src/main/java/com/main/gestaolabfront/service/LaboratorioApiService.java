@@ -1,5 +1,7 @@
 package com.main.gestaolabfront.service;
 
+import com.main.gestaolabfront.dto.LaboratorioDto;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -18,23 +20,21 @@ public class LaboratorioApiService {
         this.restClient = restClient;
     }
 
-    @SuppressWarnings("unchecked")
-    public List<Map<String, Object>> listar(String nome, Boolean ativo) {
+    public List<LaboratorioDto> listar(String nome, Boolean ativo) {
         return restClient.get()
                 .uri(b -> b.path("/laboratorios")
                         .queryParamIfPresent("nome", Optional.ofNullable(nome).filter(s -> !s.isBlank()))
                         .queryParamIfPresent("ativo", Optional.ofNullable(ativo))
                         .build())
                 .retrieve()
-                .body(List.class);
+                .body(new ParameterizedTypeReference<List<LaboratorioDto>>() {});
     }
 
-    @SuppressWarnings("unchecked")
-    public Map<String, Object> buscarPorId(Long id) {
+    public LaboratorioDto buscarPorId(Long id) {
         return restClient.get()
                 .uri("/laboratorios/{id}", id)
                 .retrieve()
-                .body(Map.class);
+                .body(LaboratorioDto.class);
     }
 
     public void criar(String nome, String localizacao, Integer capacidade) {

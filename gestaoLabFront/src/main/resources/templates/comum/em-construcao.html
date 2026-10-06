@@ -12,18 +12,12 @@
     <div class="gl-main">
         <div th:replace="~{fragments/layout :: topbar(${tituloModulo ?: 'Em Construção'})}"></div>
         <main class="gl-content" id="main-content">
-            <div class="gl-page-header fade-in">
-                <h1 class="gl-page-title" th:text="${tituloModulo ?: 'Em Construção'}">Em Construção</h1>
-                <p class="gl-page-subtitle">Esta funcionalidade será disponibilizada em breve.</p>
-            </div>
+            <div th:replace="~{fragments/layout :: page-header(${tituloModulo ?: 'Em Construção'}, 'Esta funcionalidade será disponibilizada em breve.', ${urlVoltar})}"></div>
             <div class="gl-card fade-in delay-1" style="max-width:500px;">
                 <div class="gl-card-body" style="text-align:center;padding:48px 24px;">
                     <i class="bi bi-eyedropper" style="font-size:3rem;color:var(--gl-primary);margin-bottom:16px;display:block;" aria-hidden="true"></i>
                     <p style="color:var(--gl-text-secondary);">
-                        Estamos trabalhando para entregar esta funcionalidade.<br>
-                        <a th:href="@{/dashboard}" class="btn btn-outline" style="margin-top:16px;">
-                            <i class="bi bi-arrow-left" aria-hidden="true"></i> Voltar ao Dashboard
-                        </a>
+                        Estamos trabalhando para entregar esta funcionalidade.
                     </p>
                 </div>
             </div>

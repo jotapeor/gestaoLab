@@ -2,6 +2,7 @@ package com.main.gestaolabfront.controller;
 
 import com.main.gestaolabfront.config.SessionCheckInterceptor;
 import com.main.gestaolabfront.config.WebConfig;
+import com.main.gestaolabfront.dto.LaboratorioDto;
 import com.main.gestaolabfront.service.LaboratorioApiService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -51,13 +51,8 @@ class LaboratorioControllerTest {
 
     @Test
     void listar_coordenador_retornaOk() throws Exception {
-        Map<String, Object> lab = new java.util.HashMap<>();
-        lab.put("id", 1);
-        lab.put("nome", "Lab A");
-        lab.put("localizacao", "Bloco 1");
-        lab.put("capacidade", 30);
-        lab.put("ativo", true);
-        when(laboratorioApiService.listar(any(), any())).thenReturn(List.of(lab));
+        when(laboratorioApiService.listar(any(), any()))
+                .thenReturn(List.of(new LaboratorioDto(1L, "Lab A", "Bloco 1", 30, true, null)));
         mockMvc.perform(get("/laboratorios")
                         .sessionAttr("token", "jwt-valido")
                         .sessionAttr("perfil", "COORDENADOR")

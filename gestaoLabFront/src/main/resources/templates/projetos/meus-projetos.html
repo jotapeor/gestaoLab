@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>GestãoLab — Meus Projetos</title>
+    <th:block th:replace="~{fragments/layout :: head-content}"></th:block>
+</head>
+<body>
+<div class="gl-sidebar-overlay" id="sidebarOverlay"></div>
+<div class="gl-wrapper">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+    <div class="gl-main">
+        <div th:replace="~{fragments/layout :: topbar('Meus Projetos')}"></div>
+        <main class="gl-content" id="main-content">
+            <div th:replace="~{fragments/layout :: page-header('Meus Projetos', 'Projetos em que você participa ou orienta.', ${urlVoltar})}"></div>
+
+            <div class="gl-card fade-in">
+                <div class="gl-card-header">
+                    <span class="gl-card-title">
+                        <i class="bi bi-journal-text" aria-hidden="true"></i> Projetos ativos
+                    </span>
+                    <a th:if="${isProfessorOuCoordenador}" th:href="@{/projetos}" class="btn btn-outline btn-sm">
+                        <i class="bi bi-list-ul" aria-hidden="true"></i> Ver todos
+                    </a>
+                </div>
+                <div class="gl-card-body" style="padding:0;">
+                    <div th:if="${#lists.isEmpty(projetos)}"
+                         style="padding:32px;text-align:center;color:var(--gl-text-muted);">
+                        <i class="bi bi-inbox" aria-hidden="true"
+                           style="font-size:2rem;display:block;margin-bottom:8px;"></i>
+                        Você não está vinculado a nenhum projeto ativo.
+                    </div>
+                    <div th:unless="${#lists.isEmpty(projetos)}" style="overflow-x:auto;">
+                        <table class="gl-table">
+                            <thead>
+                                <tr>
+                                    <th>Título</th>
+                                    <th>Tipo</th>
+                                    <th>Orientador</th>
+                                    <th>Participantes</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="p : ${projetos}">
+                                    <td th:text="${p.titulo}">-</td>
+                                    <td>
+                                        <span class="gl-badge gl-badge-info"
+                                              th:text="${p.tipo == 'TCC_I' ? 'TCC I' :
+                                                         p.tipo == 'TCC_II' ? 'TCC II' :
+                                                         p.tipo == 'EXTENSAO' ? 'Extensão' :
+                                                         p.tipo == 'MONITORIA' ? 'Monitoria' :
+                                                         p.tipo == 'BOLSISTA' ? 'Bolsista' :
+                                                         p.tipo == 'PESQUISA' ? 'Pesquisa' :
+                                                         p.tipo == 'AULA' ? 'Aula' : 'Outro'}">-</span>
+                                    </td>
+                                    <td th:text="${p.orientador != null ? p.orientador.nome : '-'}">-</td>
+                                    <td class="gl-mono" th:text="${p.quantidadeParticipantes}">0</td>
+                                    <td>
+                                        <a th:href="@{/projetos/{id}(id=${p.id})}"
+                                           class="btn btn-outline btn-sm" title="Ver detalhe">
+                                            <i class="bi bi-eye" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

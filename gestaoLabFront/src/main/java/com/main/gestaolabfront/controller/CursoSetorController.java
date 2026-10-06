@@ -1,6 +1,8 @@
 package com.main.gestaolabfront.controller;
 
 import tools.jackson.databind.ObjectMapper;
+import com.main.gestaolabfront.dto.ApiErrorDto;
+import com.main.gestaolabfront.dto.CursoSetorDto;
 import com.main.gestaolabfront.service.CursoSetorApiService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -10,7 +12,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/cursos-setores")
@@ -31,7 +32,7 @@ public class CursoSetorController {
                          @RequestParam(required = false) String tipo) {
         if (!isCoordenador(session)) return "redirect:/acesso-negado";
         try {
-            List<Map<String, Object>> lista = cursoSetorApiService.listar(nome, ativo, tipo);
+            List<CursoSetorDto> lista = cursoSetorApiService.listar(nome, ativo, tipo);
             model.addAttribute("cursos", lista != null ? lista : List.of());
         } catch (HttpClientErrorException.Forbidden e) {
             return "redirect:/acesso-negado";
@@ -42,6 +43,7 @@ public class CursoSetorController {
         model.addAttribute("filtroBusca", nome);
         model.addAttribute("filtroAtivo", ativo);
         model.addAttribute("filtroTipo", tipo);
+        model.addAttribute("urlVoltar", "/dashboard");
         return "cursos-setores/lista";
     }
 
@@ -49,6 +51,7 @@ public class CursoSetorController {
     public String novoForm(HttpSession session, Model model) {
         if (!isCoordenador(session)) return "redirect:/acesso-negado";
         model.addAttribute("menuAtivo", "cursos-setores");
+        model.addAttribute("urlVoltar", "/cursos-setores");
         return "cursos-setores/form";
     }
 
@@ -81,7 +84,7 @@ public class CursoSetorController {
                              RedirectAttributes redirectAttributes) {
         if (!isCoordenador(session)) return "redirect:/acesso-negado";
         try {
-            Map<String, Object> cs = cursoSetorApiService.buscarPorId(id);
+            CursoSetorDto cs = cursoSetorApiService.buscarPorId(id);
             model.addAttribute("cursoSetor", cs);
             model.addAttribute("edicao", true);
         } catch (Exception e) {
@@ -89,6 +92,7 @@ public class CursoSetorController {
             return "redirect:/cursos-setores";
         }
         model.addAttribute("menuAtivo", "cursos-setores");
+        model.addAttribute("urlVoltar", "/cursos-setores");
         return "cursos-setores/form";
     }
 
@@ -147,13 +151,11 @@ public class CursoSetorController {
         return "COORDENADOR".equals(session.getAttribute("perfil"));
     }
 
-    @SuppressWarnings("unchecked")
     private String extrairMensagem(String responseBody, String fallback) {
         if (responseBody == null || responseBody.isBlank()) return fallback;
         try {
-            Map<String, Object> map = objectMapper.readValue(responseBody, Map.class);
-            Object msg = map.get("message");
-            return msg != null ? msg.toString() : fallback;
+            ApiErrorDto error = objectMapper.readValue(responseBody, ApiErrorDto.class);
+            return error.message() != null ? error.message() : fallback;
         } catch (Exception e) {
             return fallback;
         }

@@ -338,6 +338,41 @@ button.gl-topbar-logout {
 
 .gl-page-header { margin-bottom: 1.75rem; }
 
+.gl-page-header-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.gl-btn-voltar {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: var(--gl-radius-sm);
+    border: 1px solid var(--gl-border);
+    background: var(--gl-surface);
+    color: var(--gl-text-secondary);
+    font-size: .875rem;
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 2px;
+    transition: background .15s, border-color .15s, color .15s;
+}
+
+.gl-btn-voltar:hover {
+    background: var(--gl-bg);
+    border-color: var(--gl-primary);
+    color: var(--gl-primary);
+}
+
+.gl-btn-voltar:focus-visible {
+    outline: 2px solid var(--gl-primary);
+    outline-offset: 2px;
+}
+
 .gl-page-title {
     font-size: 1.65rem;
     font-weight: 700;

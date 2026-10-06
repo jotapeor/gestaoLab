@@ -12,9 +12,7 @@
     <div class="gl-main">
         <div th:replace="~{fragments/layout :: topbar('Meu Perfil')}"></div>
         <main class="gl-content" id="main-content">
-            <div class="gl-page-header fade-in">
-                <h1 class="gl-page-title">Meu Perfil</h1>
-            </div>
+            <div th:replace="~{fragments/layout :: page-header('Meu Perfil', null, ${urlVoltar})}"></div>
 
             <div th:if="${formError}" class="gl-alert gl-alert-danger" role="alert">
                 <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
@@ -47,7 +45,7 @@
                         <div class="gl-form-group">
                             <label class="gl-form-label">Perfil</label>
                             <input type="text" class="gl-form-control"
-                                   th:value="${usuario.perfil == 'COORDENADOR'} ? 'Coordenador' : (${usuario.perfil == 'PROFESSOR'} ? 'Professor' : 'Aluno')"
+                                   th:value="${usuario.perfil == 'COORDENADOR'} ? 'Coordenador' : (${usuario.perfil == 'PROFESSOR'} ? 'Professor' : 'Usuário')"
                                    disabled aria-readonly="true">
                         </div>
                         <div class="gl-form-group">
@@ -69,11 +67,61 @@
                             <a th:href="@{/trocar-senha}" class="btn btn-outline">
                                 <i class="bi bi-shield-lock" aria-hidden="true"></i> Alterar senha
                             </a>
-                            <a th:href="@{/dashboard}" class="btn btn-outline">
-                                <i class="bi bi-arrow-left" aria-hidden="true"></i> Voltar
-                            </a>
                         </div>
                     </form>
+                </div>
+            </div>
+            <!-- Meus projetos -->
+            <div th:if="${meusProjetos != null}"
+                 class="gl-card fade-in delay-1" style="max-width:520px;margin-top:20px;">
+                <div class="gl-card-header">
+                    <span class="gl-card-title">
+                        <i class="bi bi-journal-text" aria-hidden="true"></i> Meus Projetos
+                        <span class="gl-badge gl-badge-neutral gl-mono"
+                              style="margin-left:8px;"
+                              th:text="${#lists.size(meusProjetos)}">0</span>
+                    </span>
+                    <a th:href="@{/projetos/meus}" class="btn btn-outline btn-sm">
+                        Ver todos
+                    </a>
+                </div>
+                <div class="gl-card-body" style="padding:0;">
+                    <div th:if="${#lists.isEmpty(meusProjetos)}"
+                         style="padding:24px;text-align:center;color:var(--gl-text-muted);">
+                        Você não está vinculado a nenhum projeto ativo.
+                    </div>
+                    <div th:unless="${#lists.isEmpty(meusProjetos)}" style="overflow-x:auto;">
+                        <table class="gl-table">
+                            <thead>
+                                <tr>
+                                    <th>Título</th>
+                                    <th>Tipo</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="p : ${meusProjetos}">
+                                    <td th:text="${p.titulo}">-</td>
+                                    <td>
+                                        <span class="gl-badge gl-badge-info"
+                                              th:text="${p.tipo == 'TCC_I' ? 'TCC I' :
+                                                         p.tipo == 'TCC_II' ? 'TCC II' :
+                                                         p.tipo == 'EXTENSAO' ? 'Extensão' :
+                                                         p.tipo == 'MONITORIA' ? 'Monitoria' :
+                                                         p.tipo == 'BOLSISTA' ? 'Bolsista' :
+                                                         p.tipo == 'PESQUISA' ? 'Pesquisa' :
+                                                         p.tipo == 'AULA' ? 'Aula' : 'Outro'}">-</span>
+                                    </td>
+                                    <td>
+                                        <a th:href="@{/projetos/{id}(id=${p.id})}"
+                                           class="btn btn-outline btn-sm" title="Ver detalhe">
+                                            <i class="bi bi-eye" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </main>

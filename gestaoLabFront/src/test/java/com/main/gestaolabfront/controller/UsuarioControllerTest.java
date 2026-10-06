@@ -2,7 +2,10 @@ package com.main.gestaolabfront.controller;
 
 import com.main.gestaolabfront.config.SessionCheckInterceptor;
 import com.main.gestaolabfront.config.WebConfig;
+import com.main.gestaolabfront.dto.PaginaResponse;
+import com.main.gestaolabfront.dto.UsuarioDto;
 import com.main.gestaolabfront.service.CursoSetorApiService;
+import com.main.gestaolabfront.service.ProjetoApiService;
 import com.main.gestaolabfront.service.UsuarioApiService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +18,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.nio.charset.StandardCharsets;
-import com.main.gestaolabfront.dto.UsuarioDto;
-
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.hamcrest.Matchers.containsString;
 
@@ -38,32 +37,7 @@ class UsuarioControllerTest {
 
     @MockitoBean private UsuarioApiService usuarioApiService;
     @MockitoBean private CursoSetorApiService cursoSetorApiService;
-
-    private static final Map<String, Object> USUARIO_MAP = usuarioMap();
-    private static final Map<String, Object> PAGINA_MAP = paginaMap();
-
-    private static Map<String, Object> usuarioMap() {
-        Map<String, Object> m = new HashMap<>();
-        m.put("id", 1);
-        m.put("nome", "Ana");
-        m.put("email", "ana@lab.com");
-        m.put("perfil", "USUARIO");
-        m.put("ativo", true);
-        m.put("matricula", "MAT001");
-        m.put("cursoSetor", null);
-        m.put("responsavel", null);
-        m.put("dataCriacao", null);
-        m.put("primeiroAcesso", true);
-        return m;
-    }
-
-    private static Map<String, Object> paginaMap() {
-        Map<String, Object> m = new HashMap<>();
-        m.put("content", List.of(USUARIO_MAP));
-        m.put("totalPages", 1);
-        m.put("number", 0);
-        return m;
-    }
+    @MockitoBean private ProjetoApiService projetoApiService;
 
     // ---- listagem ----
 
@@ -86,7 +60,8 @@ class UsuarioControllerTest {
 
     @Test
     void listar_coordenador_retornaOk() throws Exception {
-        when(usuarioApiService.listar(any(), any(), any(), any(), anyInt())).thenReturn(PAGINA_MAP);
+        when(usuarioApiService.listar(any(), any(), any(), any(), anyInt()))
+                .thenReturn(new PaginaResponse<>(List.of(), 0, 10, 0L, 1));
         when(cursoSetorApiService.listar(any(), any(), any())).thenReturn(List.of());
         mockMvc.perform(get("/usuarios")
                         .sessionAttr("token", "tok")
@@ -98,7 +73,8 @@ class UsuarioControllerTest {
 
     @Test
     void listar_professor_retornaOkSemBotaoNovo() throws Exception {
-        when(usuarioApiService.listar(any(), any(), any(), any(), anyInt())).thenReturn(PAGINA_MAP);
+        when(usuarioApiService.listar(any(), any(), any(), any(), anyInt()))
+                .thenReturn(new PaginaResponse<>(List.of(), 0, 10, 0L, 1));
         when(cursoSetorApiService.listar(any(), any(), any())).thenReturn(List.of());
         mockMvc.perform(get("/usuarios")
                         .sessionAttr("token", "tok")
@@ -276,11 +252,8 @@ class UsuarioControllerTest {
 
     @Test
     void listar_renderizaListagemCompleta_semErro() throws Exception {
-        Map<String, Object> pagina = new HashMap<>();
-        pagina.put("content", List.of(usuarioDtoComData()));
-        pagina.put("totalPages", 1);
-        pagina.put("number", 0);
-        when(usuarioApiService.listar(any(), any(), any(), any(), anyInt())).thenReturn(pagina);
+        when(usuarioApiService.listar(any(), any(), any(), any(), anyInt()))
+                .thenReturn(new PaginaResponse<>(List.of(usuarioDtoComData()), 0, 10, 1L, 1));
         when(cursoSetorApiService.listar(any(), any(), any())).thenReturn(List.of());
         mockMvc.perform(get("/usuarios")
                         .sessionAttr("token", "tok")

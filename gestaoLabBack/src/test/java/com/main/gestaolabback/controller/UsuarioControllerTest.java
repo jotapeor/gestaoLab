@@ -1,6 +1,6 @@
 package com.main.gestaolabback.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.main.gestaolabback.dto.MeuPerfilRequest;
 import com.main.gestaolabback.dto.ResponsavelResponse;
 import com.main.gestaolabback.dto.UsuarioRequest;
@@ -67,9 +67,8 @@ class UsuarioControllerTest {
 
         usuarioResponse = new UsuarioResponse(1L, "Ana", null, "ana@lab.com",
                 PerfilUsuario.USUARIO, true, true, null, null, null);
-        Page<UsuarioResponse> page = new PageImpl<>(List.of(usuarioResponse));
 
-        when(usuarioService.listar(any(), any(), any(), any(), any(), anyInt())).thenReturn(page);
+        when(usuarioService.listar(any(), any(), any(), any(), any(), anyInt())).thenReturn(new PageImpl<>(List.of(usuarioResponse)));
         when(usuarioService.buscarPorId(anyLong(), any())).thenReturn(usuarioResponse);
         when(usuarioService.criar(any())).thenReturn(usuarioResponse);
         when(usuarioService.atualizar(anyLong(), any())).thenReturn(usuarioResponse);
@@ -356,6 +355,19 @@ class UsuarioControllerTest {
     void me_semToken_retorna401() throws Exception {
         mockMvc.perform(get("/api/usuarios/me"))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void listar_formatoJsonPaginaResponse() throws Exception {
+        mockMvc.perform(get("/api/usuarios")
+                        .param("page", "0")
+                        .header("Authorization", "Bearer " + tokenCoordenador))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.conteudo").isArray())
+                .andExpect(jsonPath("$.pagina").value(0))
+                .andExpect(jsonPath("$.tamanho").isNumber())
+                .andExpect(jsonPath("$.totalElementos").value(1))
+                .andExpect(jsonPath("$.totalPaginas").value(1));
     }
 
     @Test

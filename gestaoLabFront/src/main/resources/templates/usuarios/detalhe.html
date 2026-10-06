@@ -12,11 +12,9 @@
     <div class="gl-main">
         <div th:replace="~{fragments/layout :: topbar('Detalhe do Usuário')}"></div>
         <main class="gl-content" id="main-content">
-            <div class="gl-page-header fade-in">
-                <h1 class="gl-page-title">Detalhe do Usuário</h1>
-            </div>
+            <div th:replace="~{fragments/layout :: page-header('Detalhe do Usuário', null, ${urlVoltar})}"></div>
 
-            <div class="gl-card fade-in" style="max-width:600px;">
+            <div class="gl-card fade-in" style="max-width:680px;">
                 <div class="gl-card-body">
                     <dl style="display:grid;grid-template-columns:160px 1fr;row-gap:12px;column-gap:16px;">
                         <dt style="font-weight:600;color:var(--gl-text-secondary);">Nome</dt>
@@ -32,7 +30,7 @@
                         <dd>
                             <span class="gl-badge"
                                   th:classappend="${usuario.perfil == 'COORDENADOR'} ? ' gl-badge-warning' : (${usuario.perfil == 'PROFESSOR'} ? ' gl-badge-info' : ' gl-badge-neutral')"
-                                  th:text="${usuario.perfil == 'COORDENADOR'} ? 'Coordenador' : (${usuario.perfil == 'PROFESSOR'} ? 'Professor' : 'Aluno')">-</span>
+                                  th:text="${usuario.perfil == 'COORDENADOR'} ? 'Coordenador' : (${usuario.perfil == 'PROFESSOR'} ? 'Professor' : 'Usuário')">-</span>
                         </dd>
 
                         <dt style="font-weight:600;color:var(--gl-text-secondary);">Curso/Setor</dt>
@@ -58,9 +56,63 @@
                            class="btn btn-primary">
                             <i class="bi bi-pencil" aria-hidden="true"></i> Editar
                         </a>
-                        <a th:href="@{/usuarios}" class="btn btn-outline">
-                            <i class="bi bi-arrow-left" aria-hidden="true"></i> Voltar
-                        </a>
+                    </div>
+                </div>
+            </div>
+            <!-- Projetos do usuário -->
+            <div th:if="${projetosDoUsuario != null}"
+                 class="gl-card fade-in delay-1" style="max-width:680px;margin-top:20px;">
+                <div class="gl-card-header">
+                    <span class="gl-card-title">
+                        <i class="bi bi-journal-text" aria-hidden="true"></i>
+                        <span th:text="${usuario.perfil == 'PROFESSOR' or usuario.perfil == 'COORDENADOR'} ? 'Projetos orientados' : 'Projetos'">Projetos</span>
+                        <span class="gl-badge gl-badge-neutral gl-mono"
+                              style="margin-left:8px;"
+                              th:text="${#lists.size(projetosDoUsuario)}">0</span>
+                    </span>
+                </div>
+                <div class="gl-card-body" style="padding:0;">
+                    <div th:if="${#lists.isEmpty(projetosDoUsuario)}"
+                         style="padding:24px;text-align:center;color:var(--gl-text-muted);">
+                        Nenhum projeto vinculado.
+                    </div>
+                    <div th:unless="${#lists.isEmpty(projetosDoUsuario)}" style="overflow-x:auto;">
+                        <table class="gl-table">
+                            <thead>
+                                <tr>
+                                    <th>Título</th>
+                                    <th>Tipo</th>
+                                    <th>Situação</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="p : ${projetosDoUsuario}">
+                                    <td th:text="${p.titulo}">-</td>
+                                    <td>
+                                        <span class="gl-badge gl-badge-info"
+                                              th:text="${p.tipo == 'TCC_I' ? 'TCC I' :
+                                                         p.tipo == 'TCC_II' ? 'TCC II' :
+                                                         p.tipo == 'EXTENSAO' ? 'Extensão' :
+                                                         p.tipo == 'MONITORIA' ? 'Monitoria' :
+                                                         p.tipo == 'BOLSISTA' ? 'Bolsista' :
+                                                         p.tipo == 'PESQUISA' ? 'Pesquisa' :
+                                                         p.tipo == 'AULA' ? 'Aula' : 'Outro'}">-</span>
+                                    </td>
+                                    <td>
+                                        <span class="gl-badge"
+                                              th:classappend="${p.ativo} ? ' gl-badge-success' : ' gl-badge-danger'"
+                                              th:text="${p.ativo} ? 'Ativo' : 'Inativo'">-</span>
+                                    </td>
+                                    <td>
+                                        <a th:href="@{/projetos/{id}(id=${p.id})}"
+                                           class="btn btn-outline btn-sm" title="Ver detalhe">
+                                            <i class="bi bi-eye" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

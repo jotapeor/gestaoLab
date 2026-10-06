@@ -1,7 +1,11 @@
 package com.main.gestaolabfront.controller;
 
 import tools.jackson.databind.ObjectMapper;
+import com.main.gestaolabfront.dto.ApiErrorDto;
+import com.main.gestaolabfront.dto.PaginaResponse;
+import com.main.gestaolabfront.dto.ProjetoDto;
 import com.main.gestaolabfront.dto.UsuarioDto;
+import com.main.gestaolabfront.service.ProjetoApiService;
 import com.main.gestaolabfront.service.UsuarioApiService;
 import com.main.gestaolabfront.service.CursoSetorApiService;
 import jakarta.servlet.http.HttpSession;
@@ -20,13 +24,16 @@ public class UsuarioController {
 
     private final UsuarioApiService usuarioApiService;
     private final CursoSetorApiService cursoSetorApiService;
+    private final ProjetoApiService projetoApiService;
     private final ObjectMapper objectMapper;
 
     public UsuarioController(UsuarioApiService usuarioApiService,
                               CursoSetorApiService cursoSetorApiService,
+                              ProjetoApiService projetoApiService,
                               ObjectMapper objectMapper) {
         this.usuarioApiService = usuarioApiService;
         this.cursoSetorApiService = cursoSetorApiService;
+        this.projetoApiService = projetoApiService;
         this.objectMapper = objectMapper;
     }
 
@@ -42,13 +49,12 @@ public class UsuarioController {
         String perfilSessao = (String) session.getAttribute("perfil");
         if (!isCoordenadorOuProfessor(session)) return "redirect:/acesso-negado";
         try {
-            Map<String, Object> resultado = usuarioApiService.listar(busca, perfil, cursoSetorId, ativo, page);
-            model.addAttribute("pagina", resultado);
+            model.addAttribute("pagina", usuarioApiService.listar(busca, perfil, cursoSetorId, ativo, page));
             model.addAttribute("isCoordenador", "COORDENADOR".equals(perfilSessao));
         } catch (HttpClientErrorException.Forbidden e) {
             return "redirect:/acesso-negado";
         } catch (Exception e) {
-            model.addAttribute("pagina", Map.of("content", List.of(), "totalPages", 0, "number", 0));
+            model.addAttribute("pagina", new PaginaResponse<UsuarioDto>(List.of(), 0, 0, 0L, 0));
             model.addAttribute("isCoordenador", "COORDENADOR".equals(perfilSessao));
         }
         carregarCursosAtivosNoModel(model);
@@ -58,6 +64,7 @@ public class UsuarioController {
         model.addAttribute("filtroCursoSetorId", cursoSetorId);
         model.addAttribute("filtroAtivo", ativo);
         model.addAttribute("pageAtual", page);
+        model.addAttribute("urlVoltar", "/dashboard");
         return "usuarios/lista";
     }
 
@@ -68,6 +75,7 @@ public class UsuarioController {
         if (!isCoordenador(session)) return "redirect:/acesso-negado";
         carregarSelectsNoModel(model);
         model.addAttribute("menuAtivo", "usuarios");
+        model.addAttribute("urlVoltar", "/usuarios");
         return "usuarios/form";
     }
 
@@ -116,6 +124,7 @@ public class UsuarioController {
         }
         carregarSelectsNoModel(model);
         model.addAttribute("menuAtivo", "usuarios");
+        model.addAttribute("urlVoltar", "/usuarios/" + id);
         return "usuarios/form";
     }
 
@@ -209,8 +218,9 @@ public class UsuarioController {
     public String detalhe(@PathVariable Long id, HttpSession session, Model model,
                           RedirectAttributes redirectAttributes) {
         if (!isCoordenadorOuProfessor(session)) return "redirect:/acesso-negado";
+        UsuarioDto usuario;
         try {
-            UsuarioDto usuario = usuarioApiService.buscarPorId(id);
+            usuario = usuarioApiService.buscarPorId(id);
             model.addAttribute("usuario", usuario);
         } catch (HttpClientErrorException.Forbidden e) {
             return "redirect:/acesso-negado";
@@ -221,8 +231,20 @@ public class UsuarioController {
             redirectAttributes.addFlashAttribute("errorMessage", "Erro ao carregar usuário.");
             return "redirect:/usuarios";
         }
+        try {
+            List<ProjetoDto> projetos;
+            if ("USUARIO".equals(usuario.perfil())) {
+                projetos = projetoApiService.listarPorParticipante(id);
+            } else {
+                projetos = projetoApiService.listarPorOrientador(id);
+            }
+            model.addAttribute("projetosDoUsuario", projetos);
+        } catch (Exception e) {
+            model.addAttribute("projetosDoUsuario", List.of());
+        }
         model.addAttribute("menuAtivo", "usuarios");
         model.addAttribute("isCoordenador", isCoordenador(session));
+        model.addAttribute("urlVoltar", "/usuarios");
         return "usuarios/detalhe";
     }
 
@@ -277,13 +299,11 @@ public class UsuarioController {
         redirectAttributes.addFlashAttribute("formResponsavelId", responsavelId);
     }
 
-    @SuppressWarnings("unchecked")
     private String extrairMensagem(String responseBody, String fallback) {
         if (responseBody == null || responseBody.isBlank()) return fallback;
         try {
-            Map<String, Object> map = objectMapper.readValue(responseBody, Map.class);
-            Object msg = map.get("message");
-            return msg != null ? msg.toString() : fallback;
+            ApiErrorDto error = objectMapper.readValue(responseBody, ApiErrorDto.class);
+            return error.message() != null ? error.message() : fallback;
         } catch (Exception e) {
             return fallback;
         }

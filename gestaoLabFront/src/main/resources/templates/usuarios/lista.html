@@ -12,10 +12,7 @@
     <div class="gl-main">
         <div th:replace="~{fragments/layout :: topbar('Usuários')}"></div>
         <main class="gl-content" id="main-content">
-            <div class="gl-page-header fade-in">
-                <h1 class="gl-page-title">Usuários</h1>
-                <p class="gl-page-subtitle">Gerencie os usuários do sistema.</p>
-            </div>
+            <div th:replace="~{fragments/layout :: page-header('Usuários', 'Gerencie os usuários do sistema.', ${urlVoltar})}"></div>
 
             <!-- Filtros -->
             <div class="gl-card fade-in" style="margin-bottom:20px;">
@@ -34,7 +31,7 @@
                                 <option value="">Todos</option>
                                 <option value="COORDENADOR" th:selected="${filtroPerfil == 'COORDENADOR'}">Coordenador</option>
                                 <option value="PROFESSOR" th:selected="${filtroPerfil == 'PROFESSOR'}">Professor</option>
-                                <option value="USUARIO" th:selected="${filtroPerfil == 'USUARIO'}">Aluno</option>
+                                <option value="USUARIO" th:selected="${filtroPerfil == 'USUARIO'}">Usuário</option>
                             </select>
                         </div>
                         <div class="gl-form-group" style="min-width:140px;margin-bottom:0;">
@@ -76,13 +73,13 @@
                     </a>
                 </div>
                 <div class="gl-card-body" style="padding:0;">
-                    <div th:if="${#lists.isEmpty(pagina.content)}"
+                    <div th:if="${#lists.isEmpty(pagina.conteudo)}"
                          style="padding:32px;text-align:center;color:var(--gl-text-muted);">
                         <i class="bi bi-inbox" aria-hidden="true"
                            style="font-size:2rem;display:block;margin-bottom:8px;"></i>
                         Nenhum registro encontrado.
                     </div>
-                    <div th:unless="${#lists.isEmpty(pagina.content)}" style="overflow-x:auto;">
+                    <div th:unless="${#lists.isEmpty(pagina.conteudo)}" style="overflow-x:auto;">
                         <table class="gl-table">
                             <thead>
                                 <tr>
@@ -97,14 +94,14 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr th:each="u : ${pagina.content}">
+                                <tr th:each="u : ${pagina.conteudo}">
                                     <td th:text="${u.nome}">-</td>
                                     <td th:text="${u.email}">-</td>
                                     <td class="gl-mono" th:text="${u.matricula ?: '-'}">-</td>
                                     <td>
                                         <span class="gl-badge"
                                               th:classappend="${u.perfil == 'COORDENADOR'} ? ' gl-badge-warning' : (${u.perfil == 'PROFESSOR'} ? ' gl-badge-info' : ' gl-badge-neutral')"
-                                              th:text="${u.perfil == 'COORDENADOR'} ? 'Coordenador' : (${u.perfil == 'PROFESSOR'} ? 'Professor' : 'Aluno')">-</span>
+                                              th:text="${u.perfil == 'COORDENADOR'} ? 'Coordenador' : (${u.perfil == 'PROFESSOR'} ? 'Professor' : 'Usuário')">-</span>
                                     </td>
                                     <td th:text="${u.cursoSetor != null ? u.cursoSetor.nome : '-'}">-</td>
                                     <td th:text="${u.responsavel != null ? u.responsavel.nome : '-'}">-</td>
@@ -179,12 +176,12 @@
             </div>
 
             <!-- Paginação -->
-            <div th:if="${pagina.totalPages > 1}"
+            <div th:if="${pagina.totalPaginas > 1}"
                  style="display:flex;justify-content:center;gap:6px;margin-top:16px;">
-                <a th:each="p : ${#numbers.sequence(0, pagina.totalPages - 1)}"
+                <a th:each="p : ${#numbers.sequence(0, pagina.totalPaginas - 1)}"
                    th:href="@{/usuarios(busca=${filtroBusca},perfil=${filtroPerfil},cursoSetorId=${filtroCursoSetorId},ativo=${filtroAtivo},page=${p})}"
                    class="btn btn-sm"
-                   th:classappend="${p == pagina.number} ? ' btn-primary' : ' btn-outline'"
+                   th:classappend="${p == pagina.pagina} ? ' btn-primary' : ' btn-outline'"
                    th:text="${p + 1}">1</a>
             </div>
         </main>

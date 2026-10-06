@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>GestãoLab — Detalhe do Projeto</title>
+    <th:block th:replace="~{fragments/layout :: head-content}"></th:block>
+</head>
+<body>
+<div class="gl-sidebar-overlay" id="sidebarOverlay"></div>
+<div class="gl-wrapper">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+    <div class="gl-main">
+        <div th:replace="~{fragments/layout :: topbar('Detalhe do Projeto')}"></div>
+        <main class="gl-content" id="main-content">
+            <div th:replace="~{fragments/layout :: page-header(${projeto.titulo}, null, ${urlVoltar})}"></div>
+
+            <!-- Dados do projeto -->
+            <div class="gl-card fade-in" style="max-width:680px;margin-bottom:20px;">
+                <div class="gl-card-header">
+                    <span class="gl-card-title">
+                        <i class="bi bi-journal-text" aria-hidden="true"></i> Informações
+                    </span>
+                    <div th:if="${podeGerenciar}" style="display:flex;gap:8px;">
+                        <a th:href="@{/projetos/editar/{id}(id=${projeto.id})}"
+                           class="btn btn-outline btn-sm">
+                            <i class="bi bi-pencil" aria-hidden="true"></i> Editar
+                        </a>
+                        <form th:if="${projeto.ativo}"
+                              th:id="'form-inativar-' + ${projeto.id}"
+                              th:action="@{/projetos/{id}/inativar(id=${projeto.id})}"
+                              method="post" style="display:inline;">
+                            <button type="button" class="btn btn-sm"
+                                    style="background:var(--gl-danger-bg);color:var(--gl-danger);"
+                                    data-modal-titulo="Inativar projeto"
+                                    data-modal-msg="Confirma a inativação deste projeto?"
+                                    data-modal-confirma="Inativar"
+                                    data-modal-classe="btn-danger"
+                                    th:attr="data-modal-form='form-inativar-' + ${projeto.id}"
+                                    onclick="glAbrirModalForm(this)">
+                                <i class="bi bi-slash-circle" aria-hidden="true"></i> Inativar
+                            </button>
+                        </form>
+                        <form th:unless="${projeto.ativo}"
+                              th:id="'form-reativar-' + ${projeto.id}"
+                              th:action="@{/projetos/{id}/reativar(id=${projeto.id})}"
+                              method="post" style="display:inline;">
+                            <button type="button" class="btn btn-sm"
+                                    style="background:var(--gl-success-bg);color:var(--gl-success);"
+                                    data-modal-titulo="Reativar projeto"
+                                    data-modal-msg="Confirma a reativação deste projeto?"
+                                    data-modal-confirma="Reativar"
+                                    data-modal-classe="btn-primary"
+                                    th:attr="data-modal-form='form-reativar-' + ${projeto.id}"
+                                    onclick="glAbrirModalForm(this)">
+                                <i class="bi bi-check-circle" aria-hidden="true"></i> Reativar
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <div class="gl-card-body">
+                    <dl style="display:grid;grid-template-columns:160px 1fr;row-gap:12px;column-gap:16px;">
+                        <dt style="font-weight:600;color:var(--gl-text-secondary);">Tipo</dt>
+                        <dd>
+                            <span class="gl-badge gl-badge-info"
+                                  th:text="${projeto.tipo == 'TCC_I' ? 'TCC I' :
+                                             projeto.tipo == 'TCC_II' ? 'TCC II' :
+                                             projeto.tipo == 'EXTENSAO' ? 'Extensão' :
+                                             projeto.tipo == 'MONITORIA' ? 'Monitoria' :
+                                             projeto.tipo == 'BOLSISTA' ? 'Bolsista' :
+                                             projeto.tipo == 'PESQUISA' ? 'Pesquisa' :
+                                             projeto.tipo == 'AULA' ? 'Aula' :
+                                             projeto.tipo != null ? 'Outro' : '-'}">-</span>
+                        </dd>
+                        <dt style="font-weight:600;color:var(--gl-text-secondary);">Orientador</dt>
+                        <dd th:text="${projeto.orientador != null ? projeto.orientador.nome : '-'}">-</dd>
+                        <dt style="font-weight:600;color:var(--gl-text-secondary);">Descrição</dt>
+                        <dd th:text="${projeto.descricao ?: '-'}">-</dd>
+                        <dt style="font-weight:600;color:var(--gl-text-secondary);">Situação</dt>
+                        <dd>
+                            <span class="gl-badge"
+                                  th:classappend="${projeto.ativo} ? ' gl-badge-success' : ' gl-badge-danger'"
+                                  th:text="${projeto.ativo} ? 'Ativo' : 'Inativo'">-</span>
+                        </dd>
+                        <dt style="font-weight:600;color:var(--gl-text-secondary);">Cadastrado em</dt>
+                        <dd class="gl-mono"
+                            th:text="${projeto.dataCadastro != null ? #temporals.format(projeto.dataCadastro, 'dd/MM/yyyy HH:mm') : '-'}">-</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Participantes -->
+            <div class="gl-card fade-in delay-1" style="max-width:680px;">
+                <div class="gl-card-header">
+                    <span class="gl-card-title">
+                        <i class="bi bi-people" aria-hidden="true"></i>
+                        Participantes
+                        <span class="gl-badge gl-badge-neutral gl-mono"
+                              style="margin-left:8px;"
+                              th:text="${#lists.size(projeto.participantes)}">0</span>
+                    </span>
+                </div>
+                <div class="gl-card-body">
+                    <!-- Busca de novos participantes (só para quem pode gerenciar e projeto ativo) -->
+                    <div th:if="${podeGerenciar and projeto.ativo}" style="margin-bottom:16px;">
+                        <form method="get" th:action="@{/projetos/{id}(id=${projeto.id})}"
+                              style="display:flex;gap:8px;align-items:flex-end;">
+                            <div class="gl-form-group" style="flex:1;margin-bottom:0;">
+                                <label class="gl-form-label">Buscar participante</label>
+                                <input type="text" name="buscaParticipante" class="gl-form-control"
+                                       placeholder="Nome ou matrícula..."
+                                       th:value="${buscaParticipante}">
+                            </div>
+                            <button type="submit" class="btn btn-outline btn-sm">
+                                <i class="bi bi-search" aria-hidden="true"></i> Buscar
+                            </button>
+                        </form>
+
+                        <!-- Resultados da busca -->
+                        <div th:if="${not #lists.isEmpty(participantesDisponiveis)}"
+                             style="margin-top:12px;border:1px solid var(--gl-border);border-radius:8px;overflow:hidden;">
+                            <table class="gl-table" style="margin:0;">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Matrícula</th>
+                                        <th>Curso/Setor</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="disp : ${participantesDisponiveis}">
+                                        <td th:text="${disp.nome}">-</td>
+                                        <td class="gl-mono" th:text="${disp.matricula ?: '-'}">-</td>
+                                        <td th:text="${disp.cursoSetor ?: '-'}">-</td>
+                                        <td>
+                                            <form th:action="@{/projetos/{id}/participantes(id=${projeto.id})}"
+                                                  method="post" style="display:inline;">
+                                                <input type="hidden" name="usuarioId" th:value="${disp.id}">
+                                                <button type="submit" class="btn btn-primary btn-sm">
+                                                    <i class="bi bi-plus-lg" aria-hidden="true"></i> Adicionar
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div th:if="${buscaParticipante != null and not buscaParticipante.isBlank() and #lists.isEmpty(participantesDisponiveis)}"
+                             style="margin-top:8px;color:var(--gl-text-secondary);font-size:.9rem;">
+                            <i class="bi bi-info-circle" aria-hidden="true"></i>
+                            Nenhum usuário disponível encontrado.
+                        </div>
+                    </div>
+
+                    <!-- Lista de participantes -->
+                    <div th:if="${#lists.isEmpty(projeto.participantes)}"
+                         style="padding:16px 0;text-align:center;color:var(--gl-text-muted);">
+                        <i class="bi bi-person-x" aria-hidden="true"
+                           style="font-size:1.5rem;display:block;margin-bottom:6px;"></i>
+                        Nenhum participante cadastrado.
+                    </div>
+                    <div th:unless="${#lists.isEmpty(projeto.participantes)}" style="overflow-x:auto;">
+                        <table class="gl-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Matrícula</th>
+                                    <th>Curso/Setor</th>
+                                    <th>Situação</th>
+                                    <th th:if="${podeGerenciar and projeto.ativo}"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="part : ${projeto.participantes}">
+                                    <td th:text="${part.nome}">-</td>
+                                    <td class="gl-mono" th:text="${part.matricula ?: '-'}">-</td>
+                                    <td th:text="${part.cursoSetor ?: '-'}">-</td>
+                                    <td>
+                                        <span class="gl-badge"
+                                              th:classappend="${part.ativo} ? ' gl-badge-success' : ' gl-badge-danger'"
+                                              th:text="${part.ativo} ? 'Ativo' : 'Inativo'">-</span>
+                                    </td>
+                                    <td th:if="${podeGerenciar and projeto.ativo}">
+                                        <form th:id="'form-rem-' + ${part.id}"
+                                              th:action="@{/projetos/{id}/participantes/{uid}/remover(id=${projeto.id},uid=${part.id})}"
+                                              method="post" style="display:inline;">
+                                            <button type="button" class="btn btn-sm"
+                                                    style="background:var(--gl-danger-bg);color:var(--gl-danger);"
+                                                    title="Remover participante"
+                                                    data-modal-titulo="Remover participante"
+                                                    data-modal-msg="Confirma a remoção deste participante?"
+                                                    data-modal-confirma="Remover"
+                                                    data-modal-classe="btn-danger"
+                                                    th:attr="data-modal-form='form-rem-' + ${part.id}"
+                                                    onclick="glAbrirModalForm(this)">
+                                                <i class="bi bi-person-dash" aria-hidden="true"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
