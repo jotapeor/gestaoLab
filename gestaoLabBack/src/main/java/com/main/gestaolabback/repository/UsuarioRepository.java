@@ -45,6 +45,13 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
             Pageable pageable
     );
 
+    @Query("SELECT u FROM Usuario u LEFT JOIN FETCH u.cursoSetor " +
+           "WHERE u.ativo = true AND u.perfil = com.main.gestaolabback.model.PerfilUsuario.USUARIO " +
+           "AND (:busca IS NULL OR LOWER(u.nome) LIKE LOWER(CONCAT('%', :busca, '%')) " +
+           "  OR (:busca IS NOT NULL AND u.matricula IS NOT NULL AND LOWER(u.matricula) LIKE LOWER(CONCAT('%', :busca, '%')))) " +
+           "ORDER BY u.nome")
+    Page<Usuario> findParticipantesDisponiveis(@Param("busca") String busca, Pageable pageable);
+
     @Query("SELECT u FROM Usuario u LEFT JOIN FETCH u.cursoSetor LEFT JOIN FETCH u.responsavel WHERE " +
            "u.responsavel.id = :responsavelId AND " +
            "(:busca IS NULL OR LOWER(u.nome) LIKE LOWER(CONCAT('%', :busca, '%')) " +

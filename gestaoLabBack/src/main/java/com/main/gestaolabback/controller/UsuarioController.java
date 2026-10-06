@@ -1,6 +1,7 @@
 package com.main.gestaolabback.controller;
 
 import com.main.gestaolabback.dto.MeuPerfilRequest;
+import com.main.gestaolabback.dto.ParticipanteDisponivelResponse;
 import com.main.gestaolabback.dto.ResponsavelResponse;
 import com.main.gestaolabback.dto.UsuarioAutenticado;
 import com.main.gestaolabback.dto.UsuarioRequest;
@@ -93,6 +94,13 @@ public class UsuarioController {
     @GetMapping("/responsaveis")
     public ResponseEntity<List<ResponsavelResponse>> listarResponsaveis() {
         return ResponseEntity.ok(usuarioService.listarResponsaveis());
+    }
+
+    @PreAuthorize("hasAnyRole('COORDENADOR', 'PROFESSOR')")
+    @GetMapping("/participantes-disponiveis")
+    public ResponseEntity<List<ParticipanteDisponivelResponse>> listarParticipantesDisponiveis(
+            @RequestParam(required = false) String busca) {
+        return ResponseEntity.ok(usuarioService.listarParticipantesDisponiveis(busca));
     }
 
     @GetMapping("/me")
