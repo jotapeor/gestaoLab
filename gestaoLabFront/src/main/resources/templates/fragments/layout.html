@@ -128,6 +128,22 @@
     </div>
 </header>
 
+<th:block th:fragment="page-header(titulo, subtitulo, urlVoltar)">
+    <div class="gl-page-header fade-in">
+        <div class="gl-page-header-row">
+            <a th:if="${urlVoltar != null}" th:href="${urlVoltar}" class="gl-btn-voltar" aria-label="Voltar">
+                <i class="bi bi-arrow-left" aria-hidden="true"></i>
+                <span>Voltar</span>
+            </a>
+            <div>
+                <h1 class="gl-page-title" th:text="${titulo}">Título</h1>
+                <p th:if="${subtitulo != null and !#strings.isEmpty(subtitulo)}"
+                   class="gl-page-subtitle" th:text="${subtitulo}">Subtítulo</p>
+            </div>
+        </div>
+    </div>
+</th:block>
+
 <th:block th:fragment="scripts">
     <input type="hidden" id="toast-success-message" th:if="${mensagemSucesso != null}" th:value="${mensagemSucesso}"/>
     <input type="hidden" id="toast-error-message" th:if="${errorMessage != null}" th:value="${errorMessage}"/>

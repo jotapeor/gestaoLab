@@ -12,9 +12,7 @@
     <div class="gl-main">
         <div th:replace="~{fragments/layout :: topbar('Meu Perfil')}"></div>
         <main class="gl-content" id="main-content">
-            <div class="gl-page-header fade-in">
-                <h1 class="gl-page-title">Meu Perfil</h1>
-            </div>
+            <div th:replace="~{fragments/layout :: page-header('Meu Perfil', null, ${urlVoltar})}"></div>
 
             <div th:if="${formError}" class="gl-alert gl-alert-danger" role="alert">
                 <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
@@ -68,9 +66,6 @@
                             </button>
                             <a th:href="@{/trocar-senha}" class="btn btn-outline">
                                 <i class="bi bi-shield-lock" aria-hidden="true"></i> Alterar senha
-                            </a>
-                            <a th:href="@{/dashboard}" class="btn btn-outline">
-                                <i class="bi bi-arrow-left" aria-hidden="true"></i> Voltar
                             </a>
                         </div>
                     </form>

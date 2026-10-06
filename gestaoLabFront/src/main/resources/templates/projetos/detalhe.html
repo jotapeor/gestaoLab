@@ -12,9 +12,7 @@
     <div class="gl-main">
         <div th:replace="~{fragments/layout :: topbar('Detalhe do Projeto')}"></div>
         <main class="gl-content" id="main-content">
-            <div class="gl-page-header fade-in">
-                <h1 class="gl-page-title" th:text="${projeto.titulo}">Projeto</h1>
-            </div>
+            <div th:replace="~{fragments/layout :: page-header(${projeto.titulo}, null, ${urlVoltar})}"></div>
 
             <!-- Dados do projeto -->
             <div class="gl-card fade-in" style="max-width:680px;margin-bottom:20px;">
@@ -87,14 +85,6 @@
                         <dd class="gl-mono"
                             th:text="${projeto.dataCadastro != null ? #temporals.format(projeto.dataCadastro, 'dd/MM/yyyy HH:mm') : '-'}">-</dd>
                     </dl>
-                    <div style="margin-top:16px;">
-                        <a th:if="${isCoordenadorOuProfessor}" th:href="@{/projetos}" class="btn btn-outline">
-                            <i class="bi bi-arrow-left" aria-hidden="true"></i> Voltar
-                        </a>
-                        <a th:unless="${isCoordenadorOuProfessor}" th:href="@{/projetos/meus}" class="btn btn-outline">
-                            <i class="bi bi-arrow-left" aria-hidden="true"></i> Voltar
-                        </a>
-                    </div>
                 </div>
             </div>
 

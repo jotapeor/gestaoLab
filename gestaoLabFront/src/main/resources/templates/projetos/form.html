@@ -12,10 +12,7 @@
     <div class="gl-main">
         <div th:replace="~{fragments/layout :: topbar(${edicao} ? 'Editar Projeto' : 'Novo Projeto')}"></div>
         <main class="gl-content" id="main-content">
-            <div class="gl-page-header fade-in">
-                <h1 class="gl-page-title"
-                    th:text="${edicao} ? 'Editar Projeto' : 'Novo Projeto'">Projeto</h1>
-            </div>
+            <div th:replace="~{fragments/layout :: page-header(${edicao} ? 'Editar Projeto' : 'Novo Projeto', null, ${urlVoltar})}"></div>
 
             <div th:if="${formError}" class="gl-alert gl-alert-danger" role="alert">
                 <i class="bi bi-exclamation-circle" aria-hidden="true"></i>

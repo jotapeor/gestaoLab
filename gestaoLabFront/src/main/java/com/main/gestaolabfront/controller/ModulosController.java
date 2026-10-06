@@ -11,6 +11,7 @@ public class ModulosController {
     public String usoLaboratorio(Model model) {
         model.addAttribute("menuAtivo", "uso-laboratorio");
         model.addAttribute("tituloModulo", "Uso do Laboratório");
+        model.addAttribute("urlVoltar", "/dashboard");
         return "comum/em-construcao";
     }
 
@@ -18,6 +19,7 @@ public class ModulosController {
     public String materiais(Model model) {
         model.addAttribute("menuAtivo", "materiais");
         model.addAttribute("tituloModulo", "Materiais");
+        model.addAttribute("urlVoltar", "/dashboard");
         return "comum/em-construcao";
     }
 
@@ -25,6 +27,7 @@ public class ModulosController {
     public String equipamentos(Model model) {
         model.addAttribute("menuAtivo", "equipamentos");
         model.addAttribute("tituloModulo", "Equipamentos");
+        model.addAttribute("urlVoltar", "/dashboard");
         return "comum/em-construcao";
     }
 
@@ -32,12 +35,14 @@ public class ModulosController {
     public String relatorios(Model model) {
         model.addAttribute("menuAtivo", "relatorios");
         model.addAttribute("tituloModulo", "Relatórios");
+        model.addAttribute("urlVoltar", "/dashboard");
         return "comum/em-construcao";
     }
 
     @GetMapping("/acesso-negado")
     public String acessoNegado(Model model) {
         model.addAttribute("menuAtivo", "");
+        model.addAttribute("urlVoltar", "/dashboard");
         return "comum/acesso-negado";
     }
 }

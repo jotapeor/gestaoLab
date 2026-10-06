@@ -149,6 +149,11 @@
                     <i class="bi bi-check-lg" aria-hidden="true"></i> Confirmar Nova Senha
                 </button>
             </form>
+            <div th:if="${session.primeiroAcesso != 'true'}" style="text-align:center;margin-top:16px;">
+                <a th:href="@{/meu-perfil}" style="color:var(--gl-text-secondary);font-size:.875rem;text-decoration:none;">
+                    <i class="bi bi-arrow-left" aria-hidden="true"></i> Voltar ao Meu Perfil
+                </a>
+            </div>
         </div>
     </div>
 

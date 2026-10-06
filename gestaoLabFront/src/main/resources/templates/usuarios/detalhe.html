@@ -12,9 +12,7 @@
     <div class="gl-main">
         <div th:replace="~{fragments/layout :: topbar('Detalhe do Usuário')}"></div>
         <main class="gl-content" id="main-content">
-            <div class="gl-page-header fade-in">
-                <h1 class="gl-page-title">Detalhe do Usuário</h1>
-            </div>
+            <div th:replace="~{fragments/layout :: page-header('Detalhe do Usuário', null, ${urlVoltar})}"></div>
 
             <div class="gl-card fade-in" style="max-width:680px;">
                 <div class="gl-card-body">
@@ -57,9 +55,6 @@
                            th:href="@{/usuarios/editar/{id}(id=${usuario.id})}"
                            class="btn btn-primary">
                             <i class="bi bi-pencil" aria-hidden="true"></i> Editar
-                        </a>
-                        <a th:href="@{/usuarios}" class="btn btn-outline">
-                            <i class="bi bi-arrow-left" aria-hidden="true"></i> Voltar
                         </a>
                     </div>
                 </div>

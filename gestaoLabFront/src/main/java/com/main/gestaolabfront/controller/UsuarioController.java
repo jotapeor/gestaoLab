@@ -62,6 +62,7 @@ public class UsuarioController {
         model.addAttribute("filtroCursoSetorId", cursoSetorId);
         model.addAttribute("filtroAtivo", ativo);
         model.addAttribute("pageAtual", page);
+        model.addAttribute("urlVoltar", "/dashboard");
         return "usuarios/lista";
     }
 
@@ -72,6 +73,7 @@ public class UsuarioController {
         if (!isCoordenador(session)) return "redirect:/acesso-negado";
         carregarSelectsNoModel(model);
         model.addAttribute("menuAtivo", "usuarios");
+        model.addAttribute("urlVoltar", "/usuarios");
         return "usuarios/form";
     }
 
@@ -120,6 +122,7 @@ public class UsuarioController {
         }
         carregarSelectsNoModel(model);
         model.addAttribute("menuAtivo", "usuarios");
+        model.addAttribute("urlVoltar", "/usuarios/" + id);
         return "usuarios/form";
     }
 
@@ -240,6 +243,7 @@ public class UsuarioController {
         }
         model.addAttribute("menuAtivo", "usuarios");
         model.addAttribute("isCoordenador", isCoordenador(session));
+        model.addAttribute("urlVoltar", "/usuarios");
         return "usuarios/detalhe";
     }
 

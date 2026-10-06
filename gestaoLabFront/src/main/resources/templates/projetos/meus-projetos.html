@@ -12,10 +12,7 @@
     <div class="gl-main">
         <div th:replace="~{fragments/layout :: topbar('Meus Projetos')}"></div>
         <main class="gl-content" id="main-content">
-            <div class="gl-page-header fade-in">
-                <h1 class="gl-page-title">Meus Projetos</h1>
-                <p class="gl-page-subtitle">Projetos em que você participa ou orienta.</p>
-            </div>
+            <div th:replace="~{fragments/layout :: page-header('Meus Projetos', 'Projetos em que você participa ou orienta.', ${urlVoltar})}"></div>
 
             <div class="gl-card fade-in">
                 <div class="gl-card-header">

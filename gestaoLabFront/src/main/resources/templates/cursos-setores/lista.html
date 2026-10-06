@@ -12,10 +12,7 @@
     <div class="gl-main">
         <div th:replace="~{fragments/layout :: topbar('Cursos e Setores')}"></div>
         <main class="gl-content" id="main-content">
-            <div class="gl-page-header fade-in">
-                <h1 class="gl-page-title">Cursos e Setores</h1>
-                <p class="gl-page-subtitle">Gerencie os cursos e setores vinculados ao laboratório.</p>
-            </div>
+            <div th:replace="~{fragments/layout :: page-header('Cursos e Setores', 'Gerencie os cursos e setores vinculados ao laboratório.', ${urlVoltar})}"></div>
 
             <div class="gl-card fade-in" style="margin-bottom:20px;">
                 <div class="gl-card-body">

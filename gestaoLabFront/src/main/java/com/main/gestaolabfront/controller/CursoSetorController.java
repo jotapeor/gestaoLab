@@ -42,6 +42,7 @@ public class CursoSetorController {
         model.addAttribute("filtroBusca", nome);
         model.addAttribute("filtroAtivo", ativo);
         model.addAttribute("filtroTipo", tipo);
+        model.addAttribute("urlVoltar", "/dashboard");
         return "cursos-setores/lista";
     }
 
@@ -49,6 +50,7 @@ public class CursoSetorController {
     public String novoForm(HttpSession session, Model model) {
         if (!isCoordenador(session)) return "redirect:/acesso-negado";
         model.addAttribute("menuAtivo", "cursos-setores");
+        model.addAttribute("urlVoltar", "/cursos-setores");
         return "cursos-setores/form";
     }
 
@@ -89,6 +91,7 @@ public class CursoSetorController {
             return "redirect:/cursos-setores";
         }
         model.addAttribute("menuAtivo", "cursos-setores");
+        model.addAttribute("urlVoltar", "/cursos-setores");
         return "cursos-setores/form";
     }
 

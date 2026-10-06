@@ -67,6 +67,7 @@ public class ProjetoController {
         model.addAttribute("filtroOrientadorId", orientadorId);
         model.addAttribute("filtroAtivo", ativo);
         model.addAttribute("pageAtual", page);
+        model.addAttribute("urlVoltar", "/dashboard");
         return "projetos/lista";
     }
 
@@ -82,6 +83,7 @@ public class ProjetoController {
         }
         model.addAttribute("menuAtivo", "projetos");
         model.addAttribute("isProfessorOuCoordenador", isCoordenadorOuProfessor(session));
+        model.addAttribute("urlVoltar", "/dashboard");
         return "projetos/meus-projetos";
     }
 
@@ -92,6 +94,7 @@ public class ProjetoController {
         if (!isCoordenadorOuProfessor(session)) return "redirect:/acesso-negado";
         carregarSelectsNoModel(model, session);
         model.addAttribute("menuAtivo", "projetos");
+        model.addAttribute("urlVoltar", "/projetos");
         return "projetos/form";
     }
 
@@ -138,6 +141,7 @@ public class ProjetoController {
         }
         carregarSelectsNoModel(model, session);
         model.addAttribute("menuAtivo", "projetos");
+        model.addAttribute("urlVoltar", "/projetos/" + id);
         return "projetos/form";
     }
 
@@ -235,6 +239,7 @@ public class ProjetoController {
         model.addAttribute("menuAtivo", "projetos");
         model.addAttribute("isCoordenadorOuProfessor", isCoordenadorOuProfessor(session));
         model.addAttribute("buscaParticipante", buscaParticipante);
+        model.addAttribute("urlVoltar", isCoordenadorOuProfessor(session) ? "/projetos" : "/projetos/meus");
         return "projetos/detalhe";
     }
 

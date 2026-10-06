@@ -12,10 +12,7 @@
     <div class="gl-main">
         <div th:replace="~{fragments/layout :: topbar('Usuários')}"></div>
         <main class="gl-content" id="main-content">
-            <div class="gl-page-header fade-in">
-                <h1 class="gl-page-title">Usuários</h1>
-                <p class="gl-page-subtitle">Gerencie os usuários do sistema.</p>
-            </div>
+            <div th:replace="~{fragments/layout :: page-header('Usuários', 'Gerencie os usuários do sistema.', ${urlVoltar})}"></div>
 
             <!-- Filtros -->
             <div class="gl-card fade-in" style="margin-bottom:20px;">

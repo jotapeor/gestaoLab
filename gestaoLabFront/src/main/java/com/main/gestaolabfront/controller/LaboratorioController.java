@@ -40,6 +40,7 @@ public class LaboratorioController {
         model.addAttribute("menuAtivo", "laboratorios");
         model.addAttribute("filtroBusca", nome);
         model.addAttribute("filtroAtivo", ativo);
+        model.addAttribute("urlVoltar", "/dashboard");
         return "laboratorios/lista";
     }
 
@@ -47,6 +48,7 @@ public class LaboratorioController {
     public String novoForm(HttpSession session, Model model) {
         if (!isCoordenador(session)) return "redirect:/acesso-negado";
         model.addAttribute("menuAtivo", "laboratorios");
+        model.addAttribute("urlVoltar", "/laboratorios");
         return "laboratorios/form";
     }
 
@@ -91,6 +93,7 @@ public class LaboratorioController {
             return "redirect:/laboratorios";
         }
         model.addAttribute("menuAtivo", "laboratorios");
+        model.addAttribute("urlVoltar", "/laboratorios");
         return "laboratorios/form";
     }
 

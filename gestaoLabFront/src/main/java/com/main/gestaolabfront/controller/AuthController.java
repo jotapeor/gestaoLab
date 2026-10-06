@@ -117,6 +117,7 @@ public class AuthController {
             model.addAttribute("meusProjetos", java.util.List.of());
         }
         model.addAttribute("menuAtivo", "");
+        model.addAttribute("urlVoltar", "/dashboard");
         return "usuarios/meu-perfil";
     }
 

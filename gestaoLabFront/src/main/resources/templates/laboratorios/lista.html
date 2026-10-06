@@ -12,10 +12,7 @@
     <div class="gl-main">
         <div th:replace="~{fragments/layout :: topbar('Laboratórios')}"></div>
         <main class="gl-content" id="main-content">
-            <div class="gl-page-header fade-in">
-                <h1 class="gl-page-title">Laboratórios</h1>
-                <p class="gl-page-subtitle">Gerencie os laboratórios disponíveis.</p>
-            </div>
+            <div th:replace="~{fragments/layout :: page-header('Laboratórios', 'Gerencie os laboratórios disponíveis.', ${urlVoltar})}"></div>
 
             <div class="gl-card fade-in" style="margin-bottom:20px;">
                 <div class="gl-card-body">
