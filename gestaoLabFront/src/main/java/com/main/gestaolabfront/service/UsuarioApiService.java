@@ -85,6 +85,16 @@ public class UsuarioApiService {
     }
 
     @SuppressWarnings("unchecked")
+    public List<Map<String, Object>> listarParticipantesDisponiveis(String busca) {
+        return restClient.get()
+                .uri(b -> b.path("/usuarios/participantes-disponiveis")
+                        .queryParamIfPresent("busca", Optional.ofNullable(busca).filter(s -> !s.isBlank()))
+                        .build())
+                .retrieve()
+                .body(List.class);
+    }
+
+    @SuppressWarnings("unchecked")
     public List<Map<String, Object>> listarResponsaveis() {
         return restClient.get()
                 .uri("/usuarios/responsaveis")

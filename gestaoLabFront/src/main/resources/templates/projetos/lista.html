@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>GestãoLab — Projetos</title>
+    <th:block th:replace="~{fragments/layout :: head-content}"></th:block>
+</head>
+<body>
+<div class="gl-sidebar-overlay" id="sidebarOverlay"></div>
+<div class="gl-wrapper">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+    <div class="gl-main">
+        <div th:replace="~{fragments/layout :: topbar('Projetos')}"></div>
+        <main class="gl-content" id="main-content">
+            <div class="gl-page-header fade-in">
+                <h1 class="gl-page-title">Projetos</h1>
+                <p class="gl-page-subtitle">Gerencie os projetos do laboratório.</p>
+            </div>
+
+            <!-- Filtros -->
+            <div class="gl-card fade-in" style="margin-bottom:20px;">
+                <div class="gl-card-body">
+                    <form method="get" th:action="@{/projetos}"
+                          style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+                        <div class="gl-form-group" style="flex:1;min-width:160px;margin-bottom:0;">
+                            <label class="gl-form-label">Buscar</label>
+                            <input type="text" name="busca" class="gl-form-control"
+                                   placeholder="Título do projeto..."
+                                   th:value="${filtroBusca}">
+                        </div>
+                        <div class="gl-form-group" style="min-width:130px;margin-bottom:0;">
+                            <label class="gl-form-label">Tipo</label>
+                            <select name="tipo" class="gl-form-control">
+                                <option value="">Todos</option>
+                                <option value="TCC_I"     th:selected="${filtroTipo == 'TCC_I'}">TCC I</option>
+                                <option value="TCC_II"    th:selected="${filtroTipo == 'TCC_II'}">TCC II</option>
+                                <option value="EXTENSAO"  th:selected="${filtroTipo == 'EXTENSAO'}">Extensão</option>
+                                <option value="MONITORIA" th:selected="${filtroTipo == 'MONITORIA'}">Monitoria</option>
+                                <option value="BOLSISTA"  th:selected="${filtroTipo == 'BOLSISTA'}">Bolsista</option>
+                                <option value="PESQUISA"  th:selected="${filtroTipo == 'PESQUISA'}">Pesquisa</option>
+                                <option value="AULA"      th:selected="${filtroTipo == 'AULA'}">Aula</option>
+                                <option value="OUTRO"     th:selected="${filtroTipo == 'OUTRO'}">Outro</option>
+                            </select>
+                        </div>
+                        <div th:if="${isCoordenador}" class="gl-form-group" style="min-width:150px;margin-bottom:0;">
+                            <label class="gl-form-label">Orientador</label>
+                            <select name="orientadorId" class="gl-form-control">
+                                <option value="">Todos</option>
+                                <option th:each="r : ${responsaveis}"
+                                        th:value="${r.id}"
+                                        th:text="${r.nome}"
+                                        th:selected="${filtroOrientadorId != null and filtroOrientadorId == r.id}">-</option>
+                            </select>
+                        </div>
+                        <div class="gl-form-group" style="min-width:120px;margin-bottom:0;">
+                            <label class="gl-form-label">Situação</label>
+                            <select name="ativo" class="gl-form-control">
+                                <option value="">Todos</option>
+                                <option value="true"  th:selected="${filtroAtivo == true}">Ativo</option>
+                                <option value="false" th:selected="${filtroAtivo == false}">Inativo</option>
+                            </select>
+                        </div>
+                        <div style="display:flex;gap:8px;">
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <i class="bi bi-search" aria-hidden="true"></i> Filtrar
+                            </button>
+                            <a th:href="@{/projetos}" class="btn btn-outline btn-sm">Limpar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tabela -->
+            <div class="gl-card fade-in delay-1">
+                <div class="gl-card-header">
+                    <span class="gl-card-title">
+                        <i class="bi bi-journal-text" aria-hidden="true"></i> Lista
+                    </span>
+                    <a th:href="@{/projetos/novo}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-plus-lg" aria-hidden="true"></i> Novo
+                    </a>
+                </div>
+                <div class="gl-card-body" style="padding:0;">
+                    <div th:if="${#lists.isEmpty(pagina.content)}"
+                         style="padding:32px;text-align:center;color:var(--gl-text-muted);">
+                        <i class="bi bi-inbox" aria-hidden="true"
+                           style="font-size:2rem;display:block;margin-bottom:8px;"></i>
+                        Nenhum registro encontrado.
+                    </div>
+                    <div th:unless="${#lists.isEmpty(pagina.content)}" style="overflow-x:auto;">
+                        <table class="gl-table">
+                            <thead>
+                                <tr>
+                                    <th>Título</th>
+                                    <th>Tipo</th>
+                                    <th>Orientador</th>
+                                    <th>Participantes</th>
+                                    <th>Situação</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="p : ${pagina.content}">
+                                    <td th:text="${p.titulo}">-</td>
+                                    <td>
+                                        <span class="gl-badge gl-badge-info"
+                                              th:text="${p.tipo == 'TCC_I' ? 'TCC I' :
+                                                         p.tipo == 'TCC_II' ? 'TCC II' :
+                                                         p.tipo == 'EXTENSAO' ? 'Extensão' :
+                                                         p.tipo == 'MONITORIA' ? 'Monitoria' :
+                                                         p.tipo == 'BOLSISTA' ? 'Bolsista' :
+                                                         p.tipo == 'PESQUISA' ? 'Pesquisa' :
+                                                         p.tipo == 'AULA' ? 'Aula' : 'Outro'}">-</span>
+                                    </td>
+                                    <td th:text="${p.orientador != null ? p.orientador.nome : '-'}">-</td>
+                                    <td class="gl-mono" th:text="${p.quantidadeParticipantes}">0</td>
+                                    <td>
+                                        <span class="gl-badge"
+                                              th:classappend="${p.ativo} ? ' gl-badge-success' : ' gl-badge-danger'"
+                                              th:text="${p.ativo} ? 'Ativo' : 'Inativo'">-</span>
+                                    </td>
+                                    <td>
+                                        <div style="display:flex;gap:6px;align-items:center;">
+                                            <a th:href="@{/projetos/{id}(id=${p.id})}"
+                                               class="btn btn-outline btn-sm" title="Ver detalhe">
+                                                <i class="bi bi-eye" aria-hidden="true"></i>
+                                            </a>
+                                            <a th:href="@{/projetos/editar/{id}(id=${p.id})}"
+                                               class="btn btn-outline btn-sm" title="Editar">
+                                                <i class="bi bi-pencil" aria-hidden="true"></i>
+                                            </a>
+                                            <!-- Inativar -->
+                                            <form th:if="${p.ativo}"
+                                                  th:id="'form-inativar-p-' + ${p.id}"
+                                                  th:action="@{/projetos/{id}/inativar(id=${p.id})}"
+                                                  method="post" style="display:inline;">
+                                                <button type="button" class="btn btn-sm"
+                                                        style="background:var(--gl-danger-bg);color:var(--gl-danger);"
+                                                        title="Inativar"
+                                                        data-modal-titulo="Inativar projeto"
+                                                        data-modal-msg="Confirma a inativação deste projeto?"
+                                                        data-modal-confirma="Inativar"
+                                                        data-modal-classe="btn-danger"
+                                                        th:attr="data-modal-form='form-inativar-p-' + ${p.id}"
+                                                        onclick="glAbrirModalForm(this)">
+                                                    <i class="bi bi-slash-circle" aria-hidden="true"></i>
+                                                </button>
+                                            </form>
+                                            <!-- Reativar -->
+                                            <form th:unless="${p.ativo}"
+                                                  th:id="'form-reativar-p-' + ${p.id}"
+                                                  th:action="@{/projetos/{id}/reativar(id=${p.id})}"
+                                                  method="post" style="display:inline;">
+                                                <button type="button" class="btn btn-sm"
+                                                        style="background:var(--gl-success-bg);color:var(--gl-success);"
+                                                        title="Reativar"
+                                                        data-modal-titulo="Reativar projeto"
+                                                        data-modal-msg="Confirma a reativação deste projeto?"
+                                                        data-modal-confirma="Reativar"
+                                                        data-modal-classe="btn-primary"
+                                                        th:attr="data-modal-form='form-reativar-p-' + ${p.id}"
+                                                        onclick="glAbrirModalForm(this)">
+                                                    <i class="bi bi-check-circle" aria-hidden="true"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paginação -->
+            <div th:if="${pagina.totalPages > 1}"
+                 style="display:flex;justify-content:center;gap:6px;margin-top:16px;">
+                <a th:each="pg : ${#numbers.sequence(0, pagina.totalPages - 1)}"
+                   th:href="@{/projetos(busca=${filtroBusca},tipo=${filtroTipo},orientadorId=${filtroOrientadorId},ativo=${filtroAtivo},page=${pg})}"
+                   class="btn btn-sm"
+                   th:classappend="${pg == pagina.number} ? ' btn-primary' : ' btn-outline'"
+                   th:text="${pg + 1}">1</a>
+            </div>
+        </main>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

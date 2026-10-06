@@ -2,6 +2,7 @@ package com.main.gestaolabfront.controller;
 
 import tools.jackson.databind.ObjectMapper;
 import com.main.gestaolabfront.dto.UsuarioDto;
+import com.main.gestaolabfront.service.ProjetoApiService;
 import com.main.gestaolabfront.service.UsuarioApiService;
 import com.main.gestaolabfront.service.CursoSetorApiService;
 import jakarta.servlet.http.HttpSession;
@@ -20,13 +21,16 @@ public class UsuarioController {
 
     private final UsuarioApiService usuarioApiService;
     private final CursoSetorApiService cursoSetorApiService;
+    private final ProjetoApiService projetoApiService;
     private final ObjectMapper objectMapper;
 
     public UsuarioController(UsuarioApiService usuarioApiService,
                               CursoSetorApiService cursoSetorApiService,
+                              ProjetoApiService projetoApiService,
                               ObjectMapper objectMapper) {
         this.usuarioApiService = usuarioApiService;
         this.cursoSetorApiService = cursoSetorApiService;
+        this.projetoApiService = projetoApiService;
         this.objectMapper = objectMapper;
     }
 
@@ -209,8 +213,9 @@ public class UsuarioController {
     public String detalhe(@PathVariable Long id, HttpSession session, Model model,
                           RedirectAttributes redirectAttributes) {
         if (!isCoordenadorOuProfessor(session)) return "redirect:/acesso-negado";
+        UsuarioDto usuario;
         try {
-            UsuarioDto usuario = usuarioApiService.buscarPorId(id);
+            usuario = usuarioApiService.buscarPorId(id);
             model.addAttribute("usuario", usuario);
         } catch (HttpClientErrorException.Forbidden e) {
             return "redirect:/acesso-negado";
@@ -220,6 +225,18 @@ public class UsuarioController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Erro ao carregar usuário.");
             return "redirect:/usuarios";
+        }
+        try {
+            String perfilUsuario = usuario.perfil();
+            java.util.List<java.util.Map<String, Object>> projetos;
+            if ("USUARIO".equals(perfilUsuario)) {
+                projetos = projetoApiService.listarPorParticipante(id);
+            } else {
+                projetos = projetoApiService.listarPorOrientador(id);
+            }
+            model.addAttribute("projetosDoUsuario", projetos);
+        } catch (Exception e) {
+            model.addAttribute("projetosDoUsuario", java.util.List.of());
         }
         model.addAttribute("menuAtivo", "usuarios");
         model.addAttribute("isCoordenador", isCoordenador(session));

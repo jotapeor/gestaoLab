@@ -3,6 +3,7 @@ package com.main.gestaolabfront.controller;
 import com.main.gestaolabfront.config.SessionCheckInterceptor;
 import com.main.gestaolabfront.config.WebConfig;
 import com.main.gestaolabfront.service.CursoSetorApiService;
+import com.main.gestaolabfront.service.ProjetoApiService;
 import com.main.gestaolabfront.service.UsuarioApiService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ class UsuarioControllerTest {
 
     @MockitoBean private UsuarioApiService usuarioApiService;
     @MockitoBean private CursoSetorApiService cursoSetorApiService;
+    @MockitoBean private ProjetoApiService projetoApiService;
 
     private static final Map<String, Object> USUARIO_MAP = usuarioMap();
     private static final Map<String, Object> PAGINA_MAP = paginaMap();

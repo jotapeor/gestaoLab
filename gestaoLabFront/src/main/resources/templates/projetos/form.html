@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${edicao} ? 'GestãoLab — Editar Projeto' : 'GestãoLab — Novo Projeto'">GestãoLab</title>
+    <th:block th:replace="~{fragments/layout :: head-content}"></th:block>
+</head>
+<body>
+<div class="gl-sidebar-overlay" id="sidebarOverlay"></div>
+<div class="gl-wrapper">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+    <div class="gl-main">
+        <div th:replace="~{fragments/layout :: topbar(${edicao} ? 'Editar Projeto' : 'Novo Projeto')}"></div>
+        <main class="gl-content" id="main-content">
+            <div class="gl-page-header fade-in">
+                <h1 class="gl-page-title"
+                    th:text="${edicao} ? 'Editar Projeto' : 'Novo Projeto'">Projeto</h1>
+            </div>
+
+            <div th:if="${formError}" class="gl-alert gl-alert-danger" role="alert">
+                <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+                <span th:text="${formError}">Erro.</span>
+            </div>
+
+            <div class="gl-card fade-in" style="max-width:600px;">
+                <div class="gl-card-body">
+                    <form th:action="${edicao} ? @{/projetos/editar/{id}(id=${projeto.id})} : @{/projetos/salvar}"
+                          method="post">
+                        <div class="gl-form-group">
+                            <label class="gl-form-label" for="titulo">
+                                Título <span class="required">*</span>
+                            </label>
+                            <input type="text" id="titulo" name="titulo" class="gl-form-control"
+                                   th:value="${formTitulo ?: projeto?.titulo}"
+                                   maxlength="255" required placeholder="Título do projeto">
+                        </div>
+                        <div class="gl-form-group">
+                            <label class="gl-form-label" for="tipo">Tipo</label>
+                            <select id="tipo" name="tipo" class="gl-form-control">
+                                <option value="">Selecione...</option>
+                                <option value="TCC_I"     th:selected="${(formTipo ?: projeto?.tipo) == 'TCC_I'}">TCC I</option>
+                                <option value="TCC_II"    th:selected="${(formTipo ?: projeto?.tipo) == 'TCC_II'}">TCC II</option>
+                                <option value="EXTENSAO"  th:selected="${(formTipo ?: projeto?.tipo) == 'EXTENSAO'}">Extensão</option>
+                                <option value="MONITORIA" th:selected="${(formTipo ?: projeto?.tipo) == 'MONITORIA'}">Monitoria</option>
+                                <option value="BOLSISTA"  th:selected="${(formTipo ?: projeto?.tipo) == 'BOLSISTA'}">Bolsista</option>
+                                <option value="PESQUISA"  th:selected="${(formTipo ?: projeto?.tipo) == 'PESQUISA'}">Pesquisa</option>
+                                <option value="AULA"      th:selected="${(formTipo ?: projeto?.tipo) == 'AULA'}">Aula</option>
+                                <option value="OUTRO"     th:selected="${(formTipo ?: projeto?.tipo) == 'OUTRO'}">Outro</option>
+                            </select>
+                        </div>
+                        <!-- Orientador: select só para coordenador, texto fixo para professor -->
+                        <div th:if="${session.perfil == 'COORDENADOR'}" class="gl-form-group">
+                            <label class="gl-form-label" for="orientadorId">
+                                Orientador <span class="required">*</span>
+                            </label>
+                            <select id="orientadorId" name="orientadorId" class="gl-form-control" required>
+                                <option value="">Selecione...</option>
+                                <option th:each="r : ${responsaveis}"
+                                        th:value="${r.id}"
+                                        th:text="${r.nome}"
+                                        th:selected="${formOrientadorId != null ? formOrientadorId == r.id :
+                                                       (projeto?.orientador != null and projeto.orientador.id == r.id)}">-</option>
+                            </select>
+                        </div>
+                        <div th:unless="${session.perfil == 'COORDENADOR'}" class="gl-form-group">
+                            <label class="gl-form-label">Orientador</label>
+                            <input type="text" class="gl-form-control"
+                                   th:value="${session.nome}"
+                                   disabled aria-readonly="true">
+                            <p class="gl-form-hint" style="color:var(--gl-text-muted);font-size:.82rem;margin-top:4px;">
+                                Como professor, você é automaticamente o orientador deste projeto.
+                            </p>
+                        </div>
+                        <div class="gl-form-group">
+                            <label class="gl-form-label" for="descricao">Descrição</label>
+                            <textarea id="descricao" name="descricao" class="gl-form-control"
+                                      rows="3" placeholder="Descrição opcional do projeto"
+                                      th:text="${formDescricao ?: projeto?.descricao}"></textarea>
+                        </div>
+                        <div style="display:flex;gap:10px;margin-top:8px;">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg" aria-hidden="true"></i>
+                                <span th:text="${edicao} ? 'Salvar alterações' : 'Cadastrar'">Salvar</span>
+                            </button>
+                            <a th:href="@{/projetos}" class="btn btn-outline">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

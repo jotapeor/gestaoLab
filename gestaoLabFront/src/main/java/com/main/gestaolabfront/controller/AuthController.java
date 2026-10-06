@@ -3,6 +3,7 @@ package com.main.gestaolabfront.controller;
 import com.main.gestaolabfront.dto.LoginResponse;
 import com.main.gestaolabfront.dto.UsuarioDto;
 import com.main.gestaolabfront.service.AuthApiService;
+import com.main.gestaolabfront.service.ProjetoApiService;
 import com.main.gestaolabfront.service.UsuarioApiService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -18,10 +19,13 @@ public class AuthController {
 
     private final AuthApiService authApiService;
     private final UsuarioApiService usuarioApiService;
+    private final ProjetoApiService projetoApiService;
 
-    public AuthController(AuthApiService authApiService, UsuarioApiService usuarioApiService) {
+    public AuthController(AuthApiService authApiService, UsuarioApiService usuarioApiService,
+                          ProjetoApiService projetoApiService) {
         this.authApiService = authApiService;
         this.usuarioApiService = usuarioApiService;
+        this.projetoApiService = projetoApiService;
     }
 
     @GetMapping("/")
@@ -106,6 +110,11 @@ public class AuthController {
             model.addAttribute("usuario", usuario);
         } catch (Exception e) {
             model.addAttribute("usuario", new UsuarioDto(null, null, null, null, null, null, null, null, null, null));
+        }
+        try {
+            model.addAttribute("meusProjetos", projetoApiService.meusProjetos());
+        } catch (Exception e) {
+            model.addAttribute("meusProjetos", java.util.List.of());
         }
         model.addAttribute("menuAtivo", "");
         return "usuarios/meu-perfil";
