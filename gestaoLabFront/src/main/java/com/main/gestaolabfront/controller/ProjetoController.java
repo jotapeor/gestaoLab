@@ -1,7 +1,11 @@
 package com.main.gestaolabfront.controller;
 
 import tools.jackson.databind.ObjectMapper;
+import com.main.gestaolabfront.dto.ApiErrorDto;
+import com.main.gestaolabfront.dto.PaginaResponse;
+import com.main.gestaolabfront.dto.ParticipanteDisponivelDto;
 import com.main.gestaolabfront.dto.ProjetoDetalheDto;
+import com.main.gestaolabfront.dto.ProjetoDto;
 import com.main.gestaolabfront.service.ProjetoApiService;
 import com.main.gestaolabfront.service.UsuarioApiService;
 import jakarta.servlet.http.HttpSession;
@@ -46,10 +50,9 @@ public class ProjetoController {
         if (!isCoordenadorOuProfessor(session)) return "redirect:/acesso-negado";
 
         try {
-            Map<String, Object> resultado = projetoApiService.listar(busca, tipo, orientadorId, null, ativo, page);
-            model.addAttribute("pagina", resultado);
+            model.addAttribute("pagina", projetoApiService.listar(busca, tipo, orientadorId, null, ativo, page));
         } catch (Exception e) {
-            model.addAttribute("pagina", Map.of("conteudo", List.of(), "totalPaginas", 0, "pagina", 0));
+            model.addAttribute("pagina", new PaginaResponse<ProjetoDto>(List.of(), 0, 0, 0L, 0));
         }
 
         if (isCoordenador(session)) {
@@ -76,7 +79,7 @@ public class ProjetoController {
     @GetMapping("/meus")
     public String meusProjetos(HttpSession session, Model model) {
         try {
-            List<Map<String, Object>> projetos = projetoApiService.meusProjetos();
+            List<ProjetoDto> projetos = projetoApiService.meusProjetos();
             model.addAttribute("projetos", projetos);
         } catch (Exception e) {
             model.addAttribute("projetos", List.of());
@@ -217,7 +220,7 @@ public class ProjetoController {
 
             if (podeGerenciar && buscaParticipante != null && !buscaParticipante.isBlank()) {
                 try {
-                    List<Map<String, Object>> disponiveis =
+                    List<ParticipanteDisponivelDto> disponiveis =
                             usuarioApiService.listarParticipantesDisponiveis(buscaParticipante);
                     model.addAttribute("participantesDisponiveis", disponiveis);
                 } catch (Exception e) {
@@ -323,13 +326,11 @@ public class ProjetoController {
         redirectAttributes.addFlashAttribute("formDescricao", descricao);
     }
 
-    @SuppressWarnings("unchecked")
     private String extrairMensagem(String responseBody, String fallback) {
         if (responseBody == null || responseBody.isBlank()) return fallback;
         try {
-            Map<String, Object> map = objectMapper.readValue(responseBody, Map.class);
-            Object msg = map.get("message");
-            return msg != null ? msg.toString() : fallback;
+            ApiErrorDto error = objectMapper.readValue(responseBody, ApiErrorDto.class);
+            return error.message() != null ? error.message() : fallback;
         } catch (Exception e) {
             return fallback;
         }

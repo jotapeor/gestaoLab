@@ -1,7 +1,9 @@
 package com.main.gestaolabfront.service;
 
+import com.main.gestaolabfront.dto.PaginaResponse;
 import com.main.gestaolabfront.dto.ProjetoDetalheDto;
 import com.main.gestaolabfront.dto.ProjetoDto;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -19,9 +21,8 @@ public class ProjetoApiService {
         this.restClient = restClient;
     }
 
-    @SuppressWarnings("unchecked")
-    public Map<String, Object> listar(String busca, String tipo, Long orientadorId,
-                                      Long participanteId, Boolean ativo, int page) {
+    public PaginaResponse<ProjetoDto> listar(String busca, String tipo, Long orientadorId,
+                                             Long participanteId, Boolean ativo, int page) {
         return restClient.get()
                 .uri(b -> b.path("/projetos")
                         .queryParamIfPresent("busca", Optional.ofNullable(busca).filter(s -> !s.isBlank()))
@@ -32,15 +33,14 @@ public class ProjetoApiService {
                         .queryParam("page", page)
                         .build())
                 .retrieve()
-                .body(Map.class);
+                .body(new ParameterizedTypeReference<PaginaResponse<ProjetoDto>>() {});
     }
 
-    @SuppressWarnings("unchecked")
-    public List<Map<String, Object>> meusProjetos() {
+    public List<ProjetoDto> meusProjetos() {
         return restClient.get()
                 .uri("/projetos/meus")
                 .retrieve()
-                .body(List.class);
+                .body(new ParameterizedTypeReference<List<ProjetoDto>>() {});
     }
 
     public ProjetoDetalheDto buscarPorId(Long id) {
@@ -98,29 +98,27 @@ public class ProjetoApiService {
                 .body(ProjetoDetalheDto.class);
     }
 
-    @SuppressWarnings("unchecked")
-    public List<Map<String, Object>> listarPorParticipante(Long participanteId) {
-        Map<String, Object> pagina = restClient.get()
+    public List<ProjetoDto> listarPorParticipante(Long participanteId) {
+        PaginaResponse<ProjetoDto> pagina = restClient.get()
                 .uri(b -> b.path("/projetos")
                         .queryParam("participanteId", participanteId)
                         .queryParam("ativo", true)
                         .queryParam("page", 0)
                         .build())
                 .retrieve()
-                .body(Map.class);
-        return pagina != null ? (List<Map<String, Object>>) pagina.get("conteudo") : List.of();
+                .body(new ParameterizedTypeReference<PaginaResponse<ProjetoDto>>() {});
+        return pagina != null ? pagina.conteudo() : List.of();
     }
 
-    @SuppressWarnings("unchecked")
-    public List<Map<String, Object>> listarPorOrientador(Long orientadorId) {
-        Map<String, Object> pagina = restClient.get()
+    public List<ProjetoDto> listarPorOrientador(Long orientadorId) {
+        PaginaResponse<ProjetoDto> pagina = restClient.get()
                 .uri(b -> b.path("/projetos")
                         .queryParam("orientadorId", orientadorId)
                         .queryParam("ativo", true)
                         .queryParam("page", 0)
                         .build())
                 .retrieve()
-                .body(Map.class);
-        return pagina != null ? (List<Map<String, Object>>) pagina.get("conteudo") : List.of();
+                .body(new ParameterizedTypeReference<PaginaResponse<ProjetoDto>>() {});
+        return pagina != null ? pagina.conteudo() : List.of();
     }
 }

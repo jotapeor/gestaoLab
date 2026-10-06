@@ -1,6 +1,8 @@
 package com.main.gestaolabfront.controller;
 
 import tools.jackson.databind.ObjectMapper;
+import com.main.gestaolabfront.dto.ApiErrorDto;
+import com.main.gestaolabfront.dto.LaboratorioDto;
 import com.main.gestaolabfront.service.LaboratorioApiService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -10,7 +12,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/laboratorios")
@@ -30,7 +31,7 @@ public class LaboratorioController {
                          @RequestParam(required = false) Boolean ativo) {
         if (!isCoordenador(session)) return "redirect:/acesso-negado";
         try {
-            List<Map<String, Object>> lista = laboratorioApiService.listar(nome, ativo);
+            List<LaboratorioDto> lista = laboratorioApiService.listar(nome, ativo);
             model.addAttribute("laboratorios", lista != null ? lista : List.of());
         } catch (HttpClientErrorException.Forbidden e) {
             return "redirect:/acesso-negado";
@@ -85,7 +86,7 @@ public class LaboratorioController {
                              RedirectAttributes redirectAttributes) {
         if (!isCoordenador(session)) return "redirect:/acesso-negado";
         try {
-            Map<String, Object> lab = laboratorioApiService.buscarPorId(id);
+            LaboratorioDto lab = laboratorioApiService.buscarPorId(id);
             model.addAttribute("laboratorio", lab);
             model.addAttribute("edicao", true);
         } catch (Exception e) {
@@ -161,13 +162,11 @@ public class LaboratorioController {
         try { return Integer.parseInt(capacidadeStr.trim()); } catch (NumberFormatException e) { return null; }
     }
 
-    @SuppressWarnings("unchecked")
     private String extrairMensagem(String responseBody, String fallback) {
         if (responseBody == null || responseBody.isBlank()) return fallback;
         try {
-            Map<String, Object> map = objectMapper.readValue(responseBody, Map.class);
-            Object msg = map.get("message");
-            return msg != null ? msg.toString() : fallback;
+            ApiErrorDto error = objectMapper.readValue(responseBody, ApiErrorDto.class);
+            return error.message() != null ? error.message() : fallback;
         } catch (Exception e) {
             return fallback;
         }

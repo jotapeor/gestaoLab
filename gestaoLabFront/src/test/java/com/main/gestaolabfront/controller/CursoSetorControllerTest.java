@@ -2,6 +2,7 @@ package com.main.gestaolabfront.controller;
 
 import com.main.gestaolabfront.config.SessionCheckInterceptor;
 import com.main.gestaolabfront.config.WebConfig;
+import com.main.gestaolabfront.dto.CursoSetorDto;
 import com.main.gestaolabfront.service.CursoSetorApiService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -51,9 +51,8 @@ class CursoSetorControllerTest {
 
     @Test
     void listar_coordenador_retornaOk() throws Exception {
-        when(cursoSetorApiService.listar(any(), any(), any())).thenReturn(List.of(
-                Map.of("id", 1, "nome", "Biologia", "tipo", "CURSO", "ativo", true)
-        ));
+        when(cursoSetorApiService.listar(any(), any(), any()))
+                .thenReturn(List.of(new CursoSetorDto(1L, "Biologia", "CURSO", true, null)));
         mockMvc.perform(get("/cursos-setores")
                         .sessionAttr("token", "jwt-valido")
                         .sessionAttr("perfil", "COORDENADOR")

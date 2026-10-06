@@ -2,7 +2,9 @@ package com.main.gestaolabfront.controller;
 
 import com.main.gestaolabfront.config.SessionCheckInterceptor;
 import com.main.gestaolabfront.config.WebConfig;
+import com.main.gestaolabfront.dto.PaginaResponse;
 import com.main.gestaolabfront.dto.ProjetoDetalheDto;
+import com.main.gestaolabfront.dto.ProjetoDto;
 import com.main.gestaolabfront.service.ProjetoApiService;
 import com.main.gestaolabfront.service.UsuarioApiService;
 import org.junit.jupiter.api.Test;
@@ -17,9 +19,7 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -59,7 +59,7 @@ class ProjetoControllerTest {
     @Test
     void listar_coordenador_retornaOk() throws Exception {
         when(projetoApiService.listar(any(), any(), any(), any(), any(), anyInt()))
-                .thenReturn(paginaMap());
+                .thenReturn(new PaginaResponse<>(List.of(), 0, 10, 0L, 1));
         when(usuarioApiService.listarResponsaveis()).thenReturn(List.of());
         mockMvc.perform(get("/projetos")
                         .sessionAttr("token", "tok")
@@ -73,7 +73,7 @@ class ProjetoControllerTest {
     @Test
     void listar_professor_retornaOk() throws Exception {
         when(projetoApiService.listar(any(), any(), any(), any(), any(), anyInt()))
-                .thenReturn(paginaMap());
+                .thenReturn(new PaginaResponse<>(List.of(), 0, 10, 0L, 1));
         mockMvc.perform(get("/projetos")
                         .sessionAttr("token", "tok")
                         .sessionAttr("perfil", "PROFESSOR")
@@ -312,14 +312,6 @@ class ProjetoControllerTest {
     }
 
     // ---- Helpers ----
-
-    private static Map<String, Object> paginaMap() {
-        Map<String, Object> m = new HashMap<>();
-        m.put("conteudo", List.of());
-        m.put("totalPaginas", 1);
-        m.put("pagina", 0);
-        return m;
-    }
 
     private static ProjetoDetalheDto projetoDetalheDto() {
         return new ProjetoDetalheDto(
