@@ -150,9 +150,7 @@ class ProjetoServiceTest {
 
     @Test
     void adicionarParticipante_sucesso() {
-        when(projetoRepository.findByIdWithParticipantes(10L)).thenReturn(Optional.of(projeto));
         when(usuarioRepository.findById(3L)).thenReturn(Optional.of(aluno));
-        when(projetoRepository.save(any())).thenReturn(projeto);
         Projeto projetoComParticipante = projeto(10L, "Projeto A", professor, true, new ArrayList<>(List.of(aluno)));
         when(projetoRepository.findByIdWithParticipantes(10L)).thenReturn(Optional.of(projeto)).thenReturn(Optional.of(projetoComParticipante));
         ProjetoDetalheResponse resp = service.adicionarParticipante(10L, 3L, autProfessor);
@@ -201,10 +199,9 @@ class ProjetoServiceTest {
     @Test
     void removerParticipante_sucesso() {
         projeto.getUsuarios().add(aluno);
-        when(projetoRepository.findByIdWithParticipantes(10L)).thenReturn(Optional.of(projeto));
-        when(projetoRepository.save(any())).thenReturn(projeto);
         Projeto semParticipante = projeto(10L, "Projeto A", professor, true, new ArrayList<>());
         when(projetoRepository.findByIdWithParticipantes(10L)).thenReturn(Optional.of(projeto)).thenReturn(Optional.of(semParticipante));
+        when(usuarioRepository.findById(3L)).thenReturn(Optional.of(aluno));
         ProjetoDetalheResponse resp = service.removerParticipante(10L, 3L, autProfessor);
         assertThat(resp.participantes()).isEmpty();
     }

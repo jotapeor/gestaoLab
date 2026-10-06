@@ -139,8 +139,8 @@ public class ProjetoService {
             throw new ResponseStatusException(HttpStatusCode.valueOf(409), "O usuário já é participante deste projeto.");
         }
 
-        projeto.getUsuarios().add(usuario);
-        projetoRepository.save(projeto);
+        usuario.adicionarProjeto(projeto);
+        usuarioRepository.save(usuario);
 
         Projeto atualizado = projetoRepository.findByIdWithParticipantes(projetoId).orElseThrow();
         return toDetalheResponse(atualizado);
@@ -158,13 +158,16 @@ public class ProjetoService {
                     "Não é possível remover participantes de um projeto inativo.");
         }
 
-        boolean participava = projeto.getUsuarios().removeIf(u -> u.getId().equals(usuarioId));
+        boolean participava = projeto.getUsuarios().stream().anyMatch(u -> u.getId().equals(usuarioId));
         if (!participava) {
             throw new ResponseStatusException(HttpStatusCode.valueOf(404),
                     "Usuário não é participante deste projeto.");
         }
 
-        projetoRepository.save(projeto);
+        Usuario participante = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatusCode.valueOf(404), "Usuário não encontrado."));
+        participante.removerProjeto(projeto);
+        usuarioRepository.save(participante);
 
         Projeto atualizado = projetoRepository.findByIdWithParticipantes(projetoId).orElseThrow();
         return toDetalheResponse(atualizado);

@@ -167,4 +167,18 @@ public class Usuario {
     public void setProjetos(List<Projeto> projetos) {
         this.projetos = projetos;
     }
+
+    public void adicionarProjeto(Projeto projeto) {
+        if (projetos.stream().noneMatch(p -> p.getId() != null && p.getId().equals(projeto.getId()))) {
+            projetos.add(projeto);
+        }
+        if (projeto.getUsuarios().stream().noneMatch(u -> u.getId() != null && u.getId().equals(this.getId()))) {
+            projeto.getUsuarios().add(this);
+        }
+    }
+
+    public void removerProjeto(Projeto projeto) {
+        projetos.removeIf(p -> p.getId() != null && p.getId().equals(projeto.getId()));
+        projeto.getUsuarios().removeIf(u -> u.getId() != null && u.getId().equals(this.getId()));
+    }
 }
