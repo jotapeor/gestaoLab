@@ -32,7 +32,7 @@
                         <dd>
                             <span class="gl-badge"
                                   th:classappend="${usuario.perfil == 'COORDENADOR'} ? ' gl-badge-warning' : (${usuario.perfil == 'PROFESSOR'} ? ' gl-badge-info' : ' gl-badge-neutral')"
-                                  th:text="${usuario.perfil == 'COORDENADOR'} ? 'Coordenador' : (${usuario.perfil == 'PROFESSOR'} ? 'Professor' : 'Aluno')">-</span>
+                                  th:text="${usuario.perfil == 'COORDENADOR'} ? 'Coordenador' : (${usuario.perfil == 'PROFESSOR'} ? 'Professor' : 'Usuário')">-</span>
                         </dd>
 
                         <dt style="font-weight:600;color:var(--gl-text-secondary);">Curso/Setor</dt>

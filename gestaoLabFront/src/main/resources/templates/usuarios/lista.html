@@ -34,7 +34,7 @@
                                 <option value="">Todos</option>
                                 <option value="COORDENADOR" th:selected="${filtroPerfil == 'COORDENADOR'}">Coordenador</option>
                                 <option value="PROFESSOR" th:selected="${filtroPerfil == 'PROFESSOR'}">Professor</option>
-                                <option value="USUARIO" th:selected="${filtroPerfil == 'USUARIO'}">Aluno</option>
+                                <option value="USUARIO" th:selected="${filtroPerfil == 'USUARIO'}">Usuário</option>
                             </select>
                         </div>
                         <div class="gl-form-group" style="min-width:140px;margin-bottom:0;">
@@ -104,7 +104,7 @@
                                     <td>
                                         <span class="gl-badge"
                                               th:classappend="${u.perfil == 'COORDENADOR'} ? ' gl-badge-warning' : (${u.perfil == 'PROFESSOR'} ? ' gl-badge-info' : ' gl-badge-neutral')"
-                                              th:text="${u.perfil == 'COORDENADOR'} ? 'Coordenador' : (${u.perfil == 'PROFESSOR'} ? 'Professor' : 'Aluno')">-</span>
+                                              th:text="${u.perfil == 'COORDENADOR'} ? 'Coordenador' : (${u.perfil == 'PROFESSOR'} ? 'Professor' : 'Usuário')">-</span>
                                     </td>
                                     <td th:text="${u.cursoSetor != null ? u.cursoSetor.nome : '-'}">-</td>
                                     <td th:text="${u.responsavel != null ? u.responsavel.nome : '-'}">-</td>

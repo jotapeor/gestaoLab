@@ -53,7 +53,7 @@
                             <select id="perfil" name="perfil" class="gl-form-control">
                                 <option value="USUARIO"
                                         th:selected="${formPerfil != null ? formPerfil == 'USUARIO' : (usuario == null or usuario.perfil == 'USUARIO')}">
-                                    Aluno
+                                    Usuário
                                 </option>
                                 <option value="PROFESSOR"
                                         th:selected="${formPerfil != null ? formPerfil == 'PROFESSOR' : usuario?.perfil == 'PROFESSOR'}">
