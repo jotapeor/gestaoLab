@@ -315,9 +315,9 @@ class ProjetoControllerTest {
 
     private static Map<String, Object> paginaMap() {
         Map<String, Object> m = new HashMap<>();
-        m.put("content", List.of());
-        m.put("totalPages", 1);
-        m.put("number", 0);
+        m.put("conteudo", List.of());
+        m.put("totalPaginas", 1);
+        m.put("pagina", 0);
         return m;
     }
 

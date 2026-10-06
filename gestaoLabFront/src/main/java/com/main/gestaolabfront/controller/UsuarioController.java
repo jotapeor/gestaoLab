@@ -52,7 +52,7 @@ public class UsuarioController {
         } catch (HttpClientErrorException.Forbidden e) {
             return "redirect:/acesso-negado";
         } catch (Exception e) {
-            model.addAttribute("pagina", Map.of("content", List.of(), "totalPages", 0, "number", 0));
+            model.addAttribute("pagina", Map.of("conteudo", List.of(), "totalPaginas", 0, "pagina", 0));
             model.addAttribute("isCoordenador", "COORDENADOR".equals(perfilSessao));
         }
         carregarCursosAtivosNoModel(model);

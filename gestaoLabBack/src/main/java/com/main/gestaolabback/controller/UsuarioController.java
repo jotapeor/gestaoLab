@@ -1,6 +1,7 @@
 package com.main.gestaolabback.controller;
 
 import com.main.gestaolabback.dto.MeuPerfilRequest;
+import com.main.gestaolabback.dto.PaginaResponse;
 import com.main.gestaolabback.dto.ParticipanteDisponivelResponse;
 import com.main.gestaolabback.dto.ResponsavelResponse;
 import com.main.gestaolabback.dto.UsuarioAutenticado;
@@ -9,7 +10,6 @@ import com.main.gestaolabback.dto.UsuarioResponse;
 import com.main.gestaolabback.model.PerfilUsuario;
 import com.main.gestaolabback.service.UsuarioService;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,7 +31,7 @@ public class UsuarioController {
 
     @PreAuthorize("hasAnyRole('COORDENADOR', 'PROFESSOR')")
     @GetMapping
-    public ResponseEntity<Page<UsuarioResponse>> listar(
+    public ResponseEntity<PaginaResponse<UsuarioResponse>> listar(
             @AuthenticationPrincipal UsuarioAutenticado autenticado,
             @RequestParam(required = false) String busca,
             @RequestParam(required = false) PerfilUsuario perfil,
@@ -39,7 +39,7 @@ public class UsuarioController {
             @RequestParam(required = false) Boolean ativo,
             @RequestParam(defaultValue = "0") int page) {
         return ResponseEntity.ok(
-                usuarioService.listar(autenticado, busca, perfil, cursoSetorId, ativo, page));
+                PaginaResponse.de(usuarioService.listar(autenticado, busca, perfil, cursoSetorId, ativo, page)));
     }
 
     @PreAuthorize("hasAnyRole('COORDENADOR', 'PROFESSOR')")

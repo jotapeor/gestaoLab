@@ -49,7 +49,7 @@ public class ProjetoController {
             Map<String, Object> resultado = projetoApiService.listar(busca, tipo, orientadorId, null, ativo, page);
             model.addAttribute("pagina", resultado);
         } catch (Exception e) {
-            model.addAttribute("pagina", Map.of("content", List.of(), "totalPages", 0, "number", 0));
+            model.addAttribute("pagina", Map.of("conteudo", List.of(), "totalPaginas", 0, "pagina", 0));
         }
 
         if (isCoordenador(session)) {

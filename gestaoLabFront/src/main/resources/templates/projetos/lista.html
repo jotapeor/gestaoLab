@@ -78,13 +78,13 @@
                     </a>
                 </div>
                 <div class="gl-card-body" style="padding:0;">
-                    <div th:if="${#lists.isEmpty(pagina.content)}"
+                    <div th:if="${#lists.isEmpty(pagina.conteudo)}"
                          style="padding:32px;text-align:center;color:var(--gl-text-muted);">
                         <i class="bi bi-inbox" aria-hidden="true"
                            style="font-size:2rem;display:block;margin-bottom:8px;"></i>
                         Nenhum registro encontrado.
                     </div>
-                    <div th:unless="${#lists.isEmpty(pagina.content)}" style="overflow-x:auto;">
+                    <div th:unless="${#lists.isEmpty(pagina.conteudo)}" style="overflow-x:auto;">
                         <table class="gl-table">
                             <thead>
                                 <tr>
@@ -97,7 +97,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr th:each="p : ${pagina.content}">
+                                <tr th:each="p : ${pagina.conteudo}">
                                     <td th:text="${p.titulo}">-</td>
                                     <td>
                                         <span class="gl-badge gl-badge-info"
@@ -170,12 +170,12 @@
             </div>
 
             <!-- Paginação -->
-            <div th:if="${pagina.totalPages > 1}"
+            <div th:if="${pagina.totalPaginas > 1}"
                  style="display:flex;justify-content:center;gap:6px;margin-top:16px;">
-                <a th:each="pg : ${#numbers.sequence(0, pagina.totalPages - 1)}"
+                <a th:each="pg : ${#numbers.sequence(0, pagina.totalPaginas - 1)}"
                    th:href="@{/projetos(busca=${filtroBusca},tipo=${filtroTipo},orientadorId=${filtroOrientadorId},ativo=${filtroAtivo},page=${pg})}"
                    class="btn btn-sm"
-                   th:classappend="${pg == pagina.number} ? ' btn-primary' : ' btn-outline'"
+                   th:classappend="${pg == pagina.pagina} ? ' btn-primary' : ' btn-outline'"
                    th:text="${pg + 1}">1</a>
             </div>
         </main>

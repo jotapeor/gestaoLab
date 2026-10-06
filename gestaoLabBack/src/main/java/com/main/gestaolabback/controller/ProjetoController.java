@@ -1,5 +1,6 @@
 package com.main.gestaolabback.controller;
 
+import com.main.gestaolabback.dto.PaginaResponse;
 import com.main.gestaolabback.dto.ProjetoDetalheResponse;
 import com.main.gestaolabback.dto.ProjetoRequest;
 import com.main.gestaolabback.dto.ProjetoResponse;
@@ -7,7 +8,6 @@ import com.main.gestaolabback.dto.UsuarioAutenticado;
 import com.main.gestaolabback.model.TipoProjeto;
 import com.main.gestaolabback.service.ProjetoService;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,7 +29,7 @@ public class ProjetoController {
 
     @PreAuthorize("hasAnyRole('COORDENADOR', 'PROFESSOR')")
     @GetMapping
-    public ResponseEntity<Page<ProjetoResponse>> listar(
+    public ResponseEntity<PaginaResponse<ProjetoResponse>> listar(
             @AuthenticationPrincipal UsuarioAutenticado autenticado,
             @RequestParam(required = false) String busca,
             @RequestParam(required = false) TipoProjeto tipo,
@@ -38,7 +38,7 @@ public class ProjetoController {
             @RequestParam(required = false) Boolean ativo,
             @RequestParam(defaultValue = "0") int page) {
         return ResponseEntity.ok(
-                projetoService.listar(autenticado, busca, tipo, orientadorId, participanteId, ativo, page));
+                PaginaResponse.de(projetoService.listar(autenticado, busca, tipo, orientadorId, participanteId, ativo, page)));
     }
 
     @GetMapping("/meus")

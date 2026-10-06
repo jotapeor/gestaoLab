@@ -61,9 +61,9 @@ class UsuarioControllerTest {
 
     private static Map<String, Object> paginaMap() {
         Map<String, Object> m = new HashMap<>();
-        m.put("content", List.of(USUARIO_MAP));
-        m.put("totalPages", 1);
-        m.put("number", 0);
+        m.put("conteudo", List.of(USUARIO_MAP));
+        m.put("totalPaginas", 1);
+        m.put("pagina", 0);
         return m;
     }
 
@@ -279,9 +279,9 @@ class UsuarioControllerTest {
     @Test
     void listar_renderizaListagemCompleta_semErro() throws Exception {
         Map<String, Object> pagina = new HashMap<>();
-        pagina.put("content", List.of(usuarioDtoComData()));
-        pagina.put("totalPages", 1);
-        pagina.put("number", 0);
+        pagina.put("conteudo", List.of(usuarioDtoComData()));
+        pagina.put("totalPaginas", 1);
+        pagina.put("pagina", 0);
         when(usuarioApiService.listar(any(), any(), any(), any(), anyInt())).thenReturn(pagina);
         when(cursoSetorApiService.listar(any(), any(), any())).thenReturn(List.of());
         mockMvc.perform(get("/usuarios")

@@ -108,7 +108,7 @@ public class ProjetoApiService {
                         .build())
                 .retrieve()
                 .body(Map.class);
-        return pagina != null ? (List<Map<String, Object>>) pagina.get("content") : List.of();
+        return pagina != null ? (List<Map<String, Object>>) pagina.get("conteudo") : List.of();
     }
 
     @SuppressWarnings("unchecked")
@@ -121,6 +121,6 @@ public class ProjetoApiService {
                         .build())
                 .retrieve()
                 .body(Map.class);
-        return pagina != null ? (List<Map<String, Object>>) pagina.get("content") : List.of();
+        return pagina != null ? (List<Map<String, Object>>) pagina.get("conteudo") : List.of();
     }
 }

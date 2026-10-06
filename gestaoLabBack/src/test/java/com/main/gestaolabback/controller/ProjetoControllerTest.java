@@ -1,5 +1,6 @@
 package com.main.gestaolabback.controller;
 
+import com.main.gestaolabback.dto.PaginaResponse;
 import com.main.gestaolabback.dto.ProjetoDetalheResponse;
 import com.main.gestaolabback.dto.ProjetoRequest;
 import com.main.gestaolabback.dto.ProjetoResponse;
@@ -100,7 +101,7 @@ class ProjetoControllerTest {
         mockMvc.perform(get("/api/projetos")
                         .header("Authorization", "Bearer " + tokenCoordenador))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].titulo").value("TCC A"));
+                .andExpect(jsonPath("$.conteudo[0].titulo").value("TCC A"));
     }
 
     @Test
@@ -312,6 +313,19 @@ class ProjetoControllerTest {
                         .param("page", "0")
                         .header("Authorization", "Bearer " + tokenCoordenador))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalElements").exists());
+                .andExpect(jsonPath("$.totalElementos").exists());
+    }
+
+    @Test
+    void listar_formatoJsonPaginaResponse() throws Exception {
+        mockMvc.perform(get("/api/projetos")
+                        .param("page", "0")
+                        .header("Authorization", "Bearer " + tokenCoordenador))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.conteudo").isArray())
+                .andExpect(jsonPath("$.pagina").value(0))
+                .andExpect(jsonPath("$.tamanho").isNumber())
+                .andExpect(jsonPath("$.totalElementos").value(1))
+                .andExpect(jsonPath("$.totalPaginas").value(1));
     }
 }
