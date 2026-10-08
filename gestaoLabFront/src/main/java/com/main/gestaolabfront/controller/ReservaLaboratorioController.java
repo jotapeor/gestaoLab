@@ -6,9 +6,13 @@ import com.main.gestaolabfront.dto.ApiErrorDto;
 import com.main.gestaolabfront.dto.DisponibilidadeDto;
 import com.main.gestaolabfront.dto.LaboratorioDto;
 import com.main.gestaolabfront.dto.PaginaResponse;
+import com.main.gestaolabfront.dto.ProjetoDto;
 import com.main.gestaolabfront.dto.ReservaLaboratorioDto;
+import com.main.gestaolabfront.dto.UsuarioDto;
 import com.main.gestaolabfront.service.LaboratorioApiService;
+import com.main.gestaolabfront.service.ProjetoApiService;
 import com.main.gestaolabfront.service.ReservaLaboratorioApiService;
+import com.main.gestaolabfront.service.UsuarioApiService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
@@ -28,13 +32,19 @@ public class ReservaLaboratorioController {
 
     private final ReservaLaboratorioApiService reservaApiService;
     private final LaboratorioApiService laboratorioApiService;
+    private final ProjetoApiService projetoApiService;
+    private final UsuarioApiService usuarioApiService;
     private final ObjectMapper objectMapper;
 
     public ReservaLaboratorioController(ReservaLaboratorioApiService reservaApiService,
                                          LaboratorioApiService laboratorioApiService,
+                                         ProjetoApiService projetoApiService,
+                                         UsuarioApiService usuarioApiService,
                                          ObjectMapper objectMapper) {
         this.reservaApiService = reservaApiService;
         this.laboratorioApiService = laboratorioApiService;
+        this.projetoApiService = projetoApiService;
+        this.usuarioApiService = usuarioApiService;
         this.objectMapper = objectMapper;
     }
 
@@ -78,6 +88,12 @@ public class ReservaLaboratorioController {
             model.addAttribute("laboratorios", laboratorioApiService.listar(null, true));
         } catch (Exception e) {
             model.addAttribute("laboratorios", List.of());
+        }
+        try {
+            List<ProjetoDto> projetos = projetoApiService.meusProjetos();
+            model.addAttribute("projetos", projetos != null ? projetos : List.of());
+        } catch (Exception e) {
+            model.addAttribute("projetos", List.of());
         }
         model.addAttribute("menuAtivo", "reservas");
         model.addAttribute("isCoordenador", isCoordenador(session));
@@ -197,6 +213,31 @@ public class ReservaLaboratorioController {
             return reservaApiService.verificarDisponibilidade(laboratorioId, inicio, fim);
         } catch (Exception e) {
             return new DisponibilidadeDto(false, null, "Erro ao verificar disponibilidade.");
+        }
+    }
+
+    @GetMapping("/projetos-de/{usuarioId}")
+    @ResponseBody
+    public List<ProjetoDto> projetosDe(@PathVariable Long usuarioId, HttpSession session) {
+        if (!isCoordenador(session)) return List.of();
+        try {
+            List<ProjetoDto> lista = projetoApiService.projetosDe(usuarioId);
+            return lista != null ? lista : List.of();
+        } catch (Exception e) {
+            return List.of();
+        }
+    }
+
+    @GetMapping("/buscar-usuarios")
+    @ResponseBody
+    public List<UsuarioDto> buscarUsuarios(@RequestParam(required = false) String q,
+                                            HttpSession session) {
+        if (!isCoordenador(session)) return List.of();
+        try {
+            PaginaResponse<UsuarioDto> pagina = usuarioApiService.listar(q, null, null, true, 0);
+            return pagina != null ? pagina.conteudo() : List.of();
+        } catch (Exception e) {
+            return List.of();
         }
     }
 

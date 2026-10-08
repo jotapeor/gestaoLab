@@ -43,6 +43,13 @@ public class ProjetoApiService {
                 .body(new ParameterizedTypeReference<List<ProjetoDto>>() {});
     }
 
+    public List<ProjetoDto> projetosDe(Long usuarioId) {
+        return restClient.get()
+                .uri("/projetos/usuario/{id}", usuarioId)
+                .retrieve()
+                .body(new ParameterizedTypeReference<List<ProjetoDto>>() {});
+    }
+
     public ProjetoDetalheDto buscarPorId(Long id) {
         return restClient.get()
                 .uri("/projetos/{id}", id)

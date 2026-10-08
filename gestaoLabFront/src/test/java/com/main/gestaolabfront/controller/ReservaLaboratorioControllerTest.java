@@ -6,9 +6,13 @@ import com.main.gestaolabfront.dto.AgendaDto;
 import com.main.gestaolabfront.dto.DisponibilidadeDto;
 import com.main.gestaolabfront.dto.LaboratorioDto;
 import com.main.gestaolabfront.dto.PaginaResponse;
+import com.main.gestaolabfront.dto.ProjetoDto;
 import com.main.gestaolabfront.dto.ReservaLaboratorioDto;
+import com.main.gestaolabfront.dto.UsuarioDto;
 import com.main.gestaolabfront.service.LaboratorioApiService;
+import com.main.gestaolabfront.service.ProjetoApiService;
 import com.main.gestaolabfront.service.ReservaLaboratorioApiService;
+import com.main.gestaolabfront.service.UsuarioApiService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -24,6 +28,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -38,6 +43,8 @@ class ReservaLaboratorioControllerTest {
 
     @MockitoBean private ReservaLaboratorioApiService reservaApiService;
     @MockitoBean private LaboratorioApiService laboratorioApiService;
+    @MockitoBean private ProjetoApiService projetoApiService;
+    @MockitoBean private UsuarioApiService usuarioApiService;
 
     private static final LocalDateTime INICIO = LocalDateTime.of(2026, 11, 10, 9, 0);
     private static final LocalDateTime FIM    = LocalDateTime.of(2026, 11, 10, 11, 0);
@@ -85,6 +92,37 @@ class ReservaLaboratorioControllerTest {
         mockMvc.perform(get("/reservas/nova"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/login"));
+    }
+
+    // item 1: select de projeto renderizado no formulário
+    @Test
+    void novaForm_exibeSelectDeProjeto() throws Exception {
+        when(laboratorioApiService.listar(any(), any())).thenReturn(List.of());
+        when(projetoApiService.meusProjetos()).thenReturn(List.of(
+                new ProjetoDto(1L, "Projeto ABC", "TCC_I", null, null, true, null, 3)));
+
+        mockMvc.perform(get("/reservas/nova")
+                        .sessionAttr("token", "jwt-valido")
+                        .sessionAttr("perfil", "PROFESSOR")
+                        .sessionAttr("primeiroAcesso", "false"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("projetoId")))
+                .andExpect(content().string(containsString("Projeto ABC")));
+    }
+
+    // item 1: coordenador vê o campo de busca de usuário
+    @Test
+    void novaForm_coordenador_exibeBuscaDeUsuario() throws Exception {
+        when(laboratorioApiService.listar(any(), any())).thenReturn(List.of());
+        when(projetoApiService.meusProjetos()).thenReturn(List.of());
+
+        mockMvc.perform(get("/reservas/nova")
+                        .sessionAttr("token", "jwt-valido")
+                        .sessionAttr("perfil", "COORDENADOR")
+                        .sessionAttr("primeiroAcesso", "false"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("usuarioBusca")))
+                .andExpect(content().string(containsString("usuarioId")));
     }
 
     // ---------- salvar ----------
@@ -183,6 +221,22 @@ class ReservaLaboratorioControllerTest {
                 .andExpect(flash().attribute("mensagemSucesso", "Reserva cancelada com sucesso!"));
     }
 
+    // item 2: motivo digitado chega na API
+    @Test
+    void cancelar_motivoEnviadoParaApi() throws Exception {
+        when(reservaApiService.cancelar(eq(5L), eq("Manutenção urgente"))).thenReturn(reservaFake(5L));
+
+        mockMvc.perform(post("/reservas/5/cancelar")
+                        .param("motivo", "Manutenção urgente")
+                        .sessionAttr("token", "jwt-valido")
+                        .sessionAttr("perfil", "COORDENADOR")
+                        .sessionAttr("primeiroAcesso", "false"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/reservas/5"));
+
+        verify(reservaApiService).cancelar(5L, "Manutenção urgente");
+    }
+
     @Test
     void cancelar_erroApi_redirecionaComErro() throws Exception {
         doThrow(HttpClientErrorException.UnprocessableEntity.create(
@@ -219,6 +273,25 @@ class ReservaLaboratorioControllerTest {
                 .andExpect(model().attributeExists("laboratorio", "agenda", "semanaInicio", "semanaFim"));
     }
 
+    // item 4: ocupação renderizada no template da agenda
+    @Test
+    void agenda_exibeOcupacaoPorBloco() throws Exception {
+        AgendaDto.BlocoAgenda bloco = new AgendaDto.BlocoAgenda(
+                1L, INICIO, FIM, "João", "Projeto X", 2);
+        when(laboratorioApiService.buscarPorId(1L))
+                .thenReturn(new LaboratorioDto(1L, "Lab A", null, 2, true, null));
+        when(reservaApiService.agenda(eq(1L), any(), any()))
+                .thenReturn(new AgendaDto(2, List.of(bloco)));
+
+        mockMvc.perform(get("/reservas/agenda/1")
+                        .param("de", "2026-11-10")
+                        .sessionAttr("token", "jwt-valido")
+                        .sessionAttr("perfil", "COORDENADOR")
+                        .sessionAttr("primeiroAcesso", "false"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("2/2")));
+    }
+
     @Test
     void agenda_labNaoEncontrado_redirecionaComErro() throws Exception {
         when(laboratorioApiService.buscarPorId(99L))
@@ -249,6 +322,35 @@ class ReservaLaboratorioControllerTest {
                         .sessionAttr("primeiroAcesso", "false"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.disponivel").value(true));
+    }
+
+    // item 3: busca de usuários (JSON) para coordenador
+    @Test
+    void buscarUsuarios_coordenador_retornaListaJson() throws Exception {
+        UsuarioDto u = new UsuarioDto(5L, "Ana Lima", "2024001", "ana@lab.com",
+                "USUARIO", true, false, null, null, null);
+        when(usuarioApiService.listar(eq("ana"), any(), any(), eq(true), eq(0)))
+                .thenReturn(new PaginaResponse<>(List.of(u), 0, 20, 1L, 1));
+
+        mockMvc.perform(get("/reservas/buscar-usuarios")
+                        .param("q", "ana")
+                        .sessionAttr("token", "jwt-valido")
+                        .sessionAttr("perfil", "COORDENADOR")
+                        .sessionAttr("primeiroAcesso", "false"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].nome").value("Ana Lima"))
+                .andExpect(jsonPath("$[0].id").value(5));
+    }
+
+    @Test
+    void buscarUsuarios_naoCoord_retornaVazio() throws Exception {
+        mockMvc.perform(get("/reservas/buscar-usuarios")
+                        .param("q", "ana")
+                        .sessionAttr("token", "jwt-valido")
+                        .sessionAttr("perfil", "PROFESSOR")
+                        .sessionAttr("primeiroAcesso", "false"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("[]"));
     }
 
     // ---------- helpers ----------

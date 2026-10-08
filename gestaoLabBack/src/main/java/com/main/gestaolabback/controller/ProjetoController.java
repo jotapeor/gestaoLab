@@ -99,6 +99,13 @@ public class ProjetoController {
         return ResponseEntity.ok(projetoService.adicionarParticipante(id, usuarioId, autenticado));
     }
 
+    @PreAuthorize("hasRole('COORDENADOR')")
+    @GetMapping("/usuario/{usuarioId}")
+    public ResponseEntity<List<ProjetoResponse>> projetosDeUsuario(
+            @PathVariable Long usuarioId) {
+        return ResponseEntity.ok(projetoService.projetosAtivosDeUsuario(usuarioId));
+    }
+
     @PreAuthorize("hasAnyRole('COORDENADOR', 'PROFESSOR')")
     @DeleteMapping("/{id}/participantes/{usuarioId}")
     public ResponseEntity<ProjetoDetalheResponse> removerParticipante(

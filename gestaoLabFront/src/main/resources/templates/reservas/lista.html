@@ -80,6 +80,7 @@
                                 <tr>
                                     <th>Laboratório</th>
                                     <th>Usuário</th>
+                                    <th>Projeto / Motivo</th>
                                     <th>Início</th>
                                     <th>Fim</th>
                                     <th>Status</th>
@@ -90,6 +91,17 @@
                                 <tr th:each="r : ${pagina.conteudo}">
                                     <td th:text="${r.laboratorio?.nome}">-</td>
                                     <td th:text="${r.usuario?.nome}">-</td>
+                                    <td>
+                                        <span th:if="${r.projeto != null}"
+                                              th:text="${r.projeto.titulo}"
+                                              style="display:block;font-weight:500;">-</span>
+                                        <span th:if="${r.motivo != null and !#strings.isEmpty(r.motivo)}"
+                                              th:text="${r.motivo}"
+                                              style="display:block;font-size:.8rem;color:var(--gl-text-secondary);
+                                                     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;">-</span>
+                                        <span th:if="${r.projeto == null and (r.motivo == null or #strings.isEmpty(r.motivo))}"
+                                              style="color:var(--gl-text-secondary);">—</span>
+                                    </td>
                                     <td class="gl-mono"
                                         th:text="${r.dataInicio != null ? #temporals.format(r.dataInicio, 'dd/MM/yyyy HH:mm') : '-'}">-</td>
                                     <td class="gl-mono"
