@@ -65,8 +65,13 @@ public class ReservaLaboratorioService {
             StatusReserva status,
             LocalDateTime de, LocalDateTime ate,
             int page) {
-        Long usuarioEfetivo = resolverFiltroUsuario(autenticado, usuarioIdFiltro);
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        if ("PROFESSOR".equals(autenticado.perfil())) {
+            return reservaRepo.findWithFiltersParaProfessor(
+                    autenticado.id(), laboratorioId, status, de, ate, pageable)
+                    .map(ReservaLaboratorioResponse::de);
+        }
+        Long usuarioEfetivo = resolverFiltroUsuario(autenticado, usuarioIdFiltro);
         return reservaRepo.findWithFilters(laboratorioId, usuarioEfetivo, status, de, ate, pageable)
                 .map(ReservaLaboratorioResponse::de);
     }
@@ -304,8 +309,7 @@ public class ReservaLaboratorioService {
     private Long resolverFiltroUsuario(UsuarioAutenticado autenticado, Long usuarioIdFiltro) {
         return switch (autenticado.perfil()) {
             case "USUARIO" -> autenticado.id();
-            case "PROFESSOR" -> autenticado.id();
-            default -> usuarioIdFiltro;
+            default -> usuarioIdFiltro; // COORDENADOR: null = sem restrição de usuário
         };
     }
 

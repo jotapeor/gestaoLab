@@ -36,7 +36,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.springframework.data.domain.PageImpl;
 
 @ExtendWith(MockitoExtension.class)
 class ReservaLaboratorioServiceTest {
@@ -334,6 +337,31 @@ class ReservaLaboratorioServiceTest {
         assertThatThrownBy(() -> service.cancelar(1L, null, autUsuario))
                 .isInstanceOf(ResponseStatusException.class)
                 .satisfies(e -> assertThat(status(e)).isEqualTo(403));
+    }
+
+    // ---------- listar - roteamento por perfil ----------
+
+    @Test
+    void listar_professor_usaQueryParaProfessor() {
+        UsuarioAutenticado autProfessor = new UsuarioAutenticado(2L, "prof@lab.com", "Prof", "PROFESSOR", false);
+        when(reservaRepo.findWithFiltersParaProfessor(eq(2L), isNull(), isNull(), isNull(), isNull(), any()))
+                .thenReturn(new PageImpl<>(List.of()));
+
+        service.listar(autProfessor, null, null, null, null, null, 0);
+
+        verify(reservaRepo).findWithFiltersParaProfessor(eq(2L), isNull(), isNull(), isNull(), isNull(), any());
+        verify(reservaRepo, never()).findWithFilters(any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void listar_usuario_usaQueryComProprioIdEIgnoraFiltroExterno() {
+        when(reservaRepo.findWithFilters(isNull(), eq(10L), isNull(), isNull(), isNull(), any()))
+                .thenReturn(new PageImpl<>(List.of()));
+
+        service.listar(autUsuario, null, 99L, null, null, null, 0);
+
+        verify(reservaRepo).findWithFilters(isNull(), eq(10L), isNull(), isNull(), isNull(), any());
+        verify(reservaRepo, never()).findWithFiltersParaProfessor(any(), any(), any(), any(), any(), any());
     }
 
     // ---------- disponibilidade ----------

@@ -41,6 +41,35 @@ public interface ReservaLaboratorioRepository extends JpaRepository<ReservaLabor
             Pageable pageable
     );
 
+    @Query(value = "SELECT r FROM ReservaLaboratorio r " +
+                   "LEFT JOIN FETCH r.laboratorio " +
+                   "LEFT JOIN FETCH r.usuario " +
+                   "LEFT JOIN FETCH r.projeto " +
+                   "WHERE (r.usuario.id = :professorId " +
+                   "    OR (r.projeto IS NOT NULL AND r.projeto.orientador IS NOT NULL " +
+                   "        AND r.projeto.orientador.id = :professorId)) " +
+                   "AND (:laboratorioId IS NULL OR r.laboratorio.id = :laboratorioId) " +
+                   "AND (:status IS NULL OR r.status = :status) " +
+                   "AND (:de IS NULL OR r.dataInicio >= :de) " +
+                   "AND (:ate IS NULL OR r.dataFim <= :ate) " +
+                   "ORDER BY r.dataInicio DESC",
+           countQuery = "SELECT COUNT(r) FROM ReservaLaboratorio r " +
+                        "WHERE (r.usuario.id = :professorId " +
+                        "    OR (r.projeto IS NOT NULL AND r.projeto.orientador IS NOT NULL " +
+                        "        AND r.projeto.orientador.id = :professorId)) " +
+                        "AND (:laboratorioId IS NULL OR r.laboratorio.id = :laboratorioId) " +
+                        "AND (:status IS NULL OR r.status = :status) " +
+                        "AND (:de IS NULL OR r.dataInicio >= :de) " +
+                        "AND (:ate IS NULL OR r.dataFim <= :ate)")
+    Page<ReservaLaboratorio> findWithFiltersParaProfessor(
+            @Param("professorId") Long professorId,
+            @Param("laboratorioId") Long laboratorioId,
+            @Param("status") StatusReserva status,
+            @Param("de") LocalDateTime de,
+            @Param("ate") LocalDateTime ate,
+            Pageable pageable
+    );
+
     @Query("SELECT r FROM ReservaLaboratorio r " +
            "LEFT JOIN FETCH r.laboratorio LEFT JOIN FETCH r.usuario LEFT JOIN FETCH r.projeto " +
            "LEFT JOIN FETCH r.canceladoPor " +
