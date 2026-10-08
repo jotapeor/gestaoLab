@@ -19,6 +19,7 @@ REGRAS DE GIT
 
 REGRAS DO BANCO (MySQL 8.0, banco gestaolab_db)
 - gestaoLabBack\schema.sql é um dump do MySQL Workbench e é a fonte da verdade da estrutura. NUNCA edite esse arquivo e NUNCA execute comandos no banco.
+- O schema.sql é a estrutura inicial e nunca é atualizado. A estrutura atual do banco = schema.sql + todos os arquivos de gestaoLabBack\sql\ aplicados em ordem numérica. Sempre leia os dois antes de mapear entidades ou criar novas alterações.
 - Se alguma alteração no banco for necessária, crie um arquivo NOVO em gestaoLabBack\sql\ com o próximo número disponível (ex.: 001_descricao.sql), contendo apenas os comandos da alteração, com USE gestaolab_db; no início, sem DROP DATABASE e sem DROP TABLE de tabelas existentes. Eu importo esse arquivo no MySQL Workbench.
 - Não use ddl-auto para criar ou alterar tabelas (exceto H2 nos testes).
 
