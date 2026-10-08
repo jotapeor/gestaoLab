@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>GestãoLab — Detalhe da Reserva</title>
+    <th:block th:replace="~{fragments/layout :: head-content}"></th:block>
+</head>
+<body>
+<div class="gl-sidebar-overlay" id="sidebarOverlay"></div>
+<div class="gl-wrapper">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+    <div class="gl-main">
+        <div th:replace="~{fragments/layout :: topbar('Reserva')}"></div>
+        <main class="gl-content" id="main-content">
+            <div th:replace="~{fragments/layout :: page-header('Detalhe da Reserva', null, ${urlVoltar})}"></div>
+
+            <div class="gl-card fade-in" style="max-width:680px;">
+                <div class="gl-card-header">
+                    <span class="gl-card-title">
+                        <i class="bi bi-calendar2-check" aria-hidden="true"></i>
+                        Reserva <span class="gl-mono" th:text="'#' + ${reserva.id}">-</span>
+                    </span>
+                    <span class="gl-badge"
+                          th:classappend="${reserva.status == 'CONFIRMADA'} ? ' gl-badge-success' : ' gl-badge-danger'"
+                          th:text="${reserva.status == 'CONFIRMADA'} ? 'Confirmada' : 'Cancelada'">-</span>
+                </div>
+                <div class="gl-card-body">
+                    <dl style="display:grid;grid-template-columns:1fr 1fr;gap:12px 24px;">
+                        <div>
+                            <dt style="font-size:.75rem;color:var(--gl-text-secondary);text-transform:uppercase;letter-spacing:.05em;">Laboratório</dt>
+                            <dd th:text="${reserva.laboratorio?.nome}">-</dd>
+                        </div>
+                        <div>
+                            <dt style="font-size:.75rem;color:var(--gl-text-secondary);text-transform:uppercase;letter-spacing:.05em;">Usuário</dt>
+                            <dd th:text="${reserva.usuario?.nome}">-</dd>
+                        </div>
+                        <div>
+                            <dt style="font-size:.75rem;color:var(--gl-text-secondary);text-transform:uppercase;letter-spacing:.05em;">Início</dt>
+                            <dd class="gl-mono"
+                                th:text="${reserva.dataInicio != null ? #temporals.format(reserva.dataInicio, 'dd/MM/yyyy HH:mm') : '-'}">-</dd>
+                        </div>
+                        <div>
+                            <dt style="font-size:.75rem;color:var(--gl-text-secondary);text-transform:uppercase;letter-spacing:.05em;">Fim</dt>
+                            <dd class="gl-mono"
+                                th:text="${reserva.dataFim != null ? #temporals.format(reserva.dataFim, 'dd/MM/yyyy HH:mm') : '-'}">-</dd>
+                        </div>
+                        <div th:if="${reserva.projeto != null}">
+                            <dt style="font-size:.75rem;color:var(--gl-text-secondary);text-transform:uppercase;letter-spacing:.05em;">Projeto</dt>
+                            <dd th:text="${reserva.projeto.titulo}">-</dd>
+                        </div>
+                        <div th:if="${reserva.motivo != null and !#strings.isEmpty(reserva.motivo)}">
+                            <dt style="font-size:.75rem;color:var(--gl-text-secondary);text-transform:uppercase;letter-spacing:.05em;">Motivo</dt>
+                            <dd th:text="${reserva.motivo}">-</dd>
+                        </div>
+                        <div>
+                            <dt style="font-size:.75rem;color:var(--gl-text-secondary);text-transform:uppercase;letter-spacing:.05em;">Registrado em</dt>
+                            <dd class="gl-mono"
+                                th:text="${reserva.dataCriacao != null ? #temporals.format(reserva.dataCriacao, 'dd/MM/yyyy HH:mm') : '-'}">-</dd>
+                        </div>
+                    </dl>
+
+                    <!-- Dados de cancelamento -->
+                    <div th:if="${reserva.status == 'CANCELADA'}"
+                         style="margin-top:20px;padding:12px 16px;border-radius:8px;background:var(--gl-danger-bg);">
+                        <p style="margin:0 0 6px;font-weight:600;color:var(--gl-danger);">
+                            <i class="bi bi-x-circle" aria-hidden="true"></i> Cancelada
+                        </p>
+                        <p th:if="${reserva.canceladoPor != null}" style="margin:0 0 4px;font-size:.875rem;">
+                            Por: <strong th:text="${reserva.canceladoPor.nome}">-</strong>
+                        </p>
+                        <p th:if="${reserva.dataCancelamento != null}" style="margin:0 0 4px;font-size:.875rem;">
+                            Em: <span class="gl-mono"
+                                      th:text="${#temporals.format(reserva.dataCancelamento, 'dd/MM/yyyy HH:mm')}">-</span>
+                        </p>
+                        <p th:if="${reserva.motivoCancelamento != null and !#strings.isEmpty(reserva.motivoCancelamento)}"
+                           style="margin:0;font-size:.875rem;">
+                            Motivo: <span th:text="${reserva.motivoCancelamento}">-</span>
+                        </p>
+                    </div>
+
+                    <!-- Ações -->
+                    <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                        <a th:href="@{/reservas/agenda/{id}(id=${reserva.laboratorio?.id})}"
+                           class="btn btn-outline btn-sm">
+                            <i class="bi bi-calendar3" aria-hidden="true"></i> Ver agenda
+                        </a>
+
+                        <!-- Cancelar: só disponível se CONFIRMADA -->
+                        <th:block th:if="${reserva.status == 'CONFIRMADA'}">
+                            <form th:id="'form-cancelar-' + ${reserva.id}"
+                                  th:action="@{/reservas/{id}/cancelar(id=${reserva.id})}"
+                                  method="post" style="display:inline;">
+                                <input type="hidden" name="motivo" th:id="'motivo-cancelar-' + ${reserva.id}">
+                            </form>
+                            <button type="button" class="btn btn-sm"
+                                    style="background:var(--gl-danger-bg);color:var(--gl-danger);"
+                                    th:attr="data-modal-form='form-cancelar-' + ${reserva.id},
+                                             data-modal-motivo-id='motivo-cancelar-' + ${reserva.id}"
+                                    data-modal-titulo="Cancelar Reserva"
+                                    data-modal-msg="Deseja cancelar esta reserva? Informe o motivo abaixo (opcional)."
+                                    data-modal-confirma="Cancelar"
+                                    data-modal-classe="btn-danger"
+                                    onclick="glAbrirModalComMotivo(this)">
+                                <i class="bi bi-x-circle" aria-hidden="true"></i> Cancelar Reserva
+                            </button>
+                        </th:block>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

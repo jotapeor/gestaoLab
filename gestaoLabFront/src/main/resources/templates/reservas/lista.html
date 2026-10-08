@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>GestãoLab — Reservas</title>
+    <th:block th:replace="~{fragments/layout :: head-content}"></th:block>
+</head>
+<body>
+<div class="gl-sidebar-overlay" id="sidebarOverlay"></div>
+<div class="gl-wrapper">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+    <div class="gl-main">
+        <div th:replace="~{fragments/layout :: topbar('Reservas')}"></div>
+        <main class="gl-content" id="main-content">
+            <div th:replace="~{fragments/layout :: page-header('Reservas de Laboratório', 'Gerencie as reservas do laboratório.', ${urlVoltar})}"></div>
+
+            <!-- Filtros -->
+            <div class="gl-card fade-in" style="margin-bottom:20px;">
+                <div class="gl-card-body">
+                    <form method="get" th:action="@{/reservas}"
+                          style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+                        <div class="gl-form-group" style="min-width:150px;margin-bottom:0;">
+                            <label class="gl-form-label">Laboratório</label>
+                            <select name="laboratorioId" class="gl-form-control">
+                                <option value="">Todos</option>
+                                <option th:each="l : ${laboratorios}"
+                                        th:value="${l.id}"
+                                        th:text="${l.nome}"
+                                        th:selected="${filtroLaboratorioId != null and filtroLaboratorioId == l.id}">-</option>
+                            </select>
+                        </div>
+                        <div class="gl-form-group" style="min-width:120px;margin-bottom:0;">
+                            <label class="gl-form-label">Status</label>
+                            <select name="status" class="gl-form-control">
+                                <option value="">Todos</option>
+                                <option value="CONFIRMADA" th:selected="${filtroStatus == 'CONFIRMADA'}">Confirmada</option>
+                                <option value="CANCELADA"  th:selected="${filtroStatus == 'CANCELADA'}">Cancelada</option>
+                            </select>
+                        </div>
+                        <div class="gl-form-group" style="min-width:130px;margin-bottom:0;">
+                            <label class="gl-form-label">De</label>
+                            <input type="date" name="de" class="gl-form-control"
+                                   th:value="${filtroDe}">
+                        </div>
+                        <div class="gl-form-group" style="min-width:130px;margin-bottom:0;">
+                            <label class="gl-form-label">Até</label>
+                            <input type="date" name="ate" class="gl-form-control"
+                                   th:value="${filtroAte}">
+                        </div>
+                        <div style="display:flex;gap:8px;">
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <i class="bi bi-search" aria-hidden="true"></i> Filtrar
+                            </button>
+                            <a th:href="@{/reservas}" class="btn btn-outline btn-sm">Limpar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tabela -->
+            <div class="gl-card fade-in delay-1">
+                <div class="gl-card-header">
+                    <span class="gl-card-title">
+                        <i class="bi bi-calendar2-check" aria-hidden="true"></i> Lista
+                    </span>
+                    <a th:href="@{/reservas/nova}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-plus-lg" aria-hidden="true"></i> Nova Reserva
+                    </a>
+                </div>
+                <div class="gl-card-body" style="padding:0;">
+                    <div th:if="${#lists.isEmpty(pagina.conteudo)}"
+                         style="padding:32px;text-align:center;color:var(--gl-text-muted);">
+                        <i class="bi bi-inbox" aria-hidden="true"
+                           style="font-size:2rem;display:block;margin-bottom:8px;"></i>
+                        Nenhuma reserva encontrada.
+                    </div>
+                    <div th:unless="${#lists.isEmpty(pagina.conteudo)}" style="overflow-x:auto;">
+                        <table class="gl-table">
+                            <thead>
+                                <tr>
+                                    <th>Laboratório</th>
+                                    <th>Usuário</th>
+                                    <th>Início</th>
+                                    <th>Fim</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="r : ${pagina.conteudo}">
+                                    <td th:text="${r.laboratorio?.nome}">-</td>
+                                    <td th:text="${r.usuario?.nome}">-</td>
+                                    <td class="gl-mono"
+                                        th:text="${r.dataInicio != null ? #temporals.format(r.dataInicio, 'dd/MM/yyyy HH:mm') : '-'}">-</td>
+                                    <td class="gl-mono"
+                                        th:text="${r.dataFim != null ? #temporals.format(r.dataFim, 'HH:mm') : '-'}">-</td>
+                                    <td>
+                                        <span class="gl-badge"
+                                              th:classappend="${r.status == 'CONFIRMADA'} ? ' gl-badge-success' : ' gl-badge-danger'"
+                                              th:text="${r.status == 'CONFIRMADA'} ? 'Confirmada' : 'Cancelada'">-</span>
+                                    </td>
+                                    <td>
+                                        <a th:href="@{/reservas/{id}(id=${r.id})}"
+                                           class="btn btn-outline btn-sm" title="Ver detalhe">
+                                            <i class="bi bi-eye" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paginação -->
+            <div th:if="${pagina.totalPaginas > 1}"
+                 style="display:flex;justify-content:center;gap:6px;margin-top:16px;">
+                <a th:each="pg : ${#numbers.sequence(0, pagina.totalPaginas - 1)}"
+                   th:href="@{/reservas(laboratorioId=${filtroLaboratorioId},status=${filtroStatus},de=${filtroDe},ate=${filtroAte},page=${pg})}"
+                   class="btn btn-sm"
+                   th:classappend="${pg == pagina.pagina} ? ' btn-primary' : ' btn-outline'"
+                   th:text="${pg + 1}">1</a>
+            </div>
+        </main>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
