@@ -109,6 +109,33 @@ class ReservaLaboratorioPersistenceTest {
         assertThat(relida.get().getMotivoCancelamento()).isNull();
     }
 
+    // ---------- motivo de cancelamento ----------
+
+    @Test
+    void motivoCancelamento_persistidoERelido() {
+        Laboratorio lab = criarLaboratorio("Lab Motivo");
+        Usuario aluno = criarUsuario("aluno.motivo@test.com", PerfilUsuario.USUARIO);
+        Usuario coord = criarUsuario("coord.motivo@test.com", PerfilUsuario.COORDENADOR);
+
+        ReservaLaboratorio reserva = criarReserva(lab, aluno, null,
+                LocalDateTime.of(2026, 11, 20, 8, 0), LocalDateTime.of(2026, 11, 20, 10, 0));
+
+        reserva.setStatus(StatusReserva.CANCELADA);
+        reserva.setCanceladoPor(coord);
+        reserva.setDataCancelamento(LocalDateTime.of(2026, 11, 19, 14, 0));
+        reserva.setMotivoCancelamento("Equipamento em manutenção");
+        reservaRepo.save(reserva);
+
+        em.flush();
+        em.clear();
+
+        Optional<ReservaLaboratorio> relida = reservaRepo.findByIdWithDetails(reserva.getId());
+        assertThat(relida).isPresent();
+        assertThat(relida.get().getStatus()).isEqualTo(StatusReserva.CANCELADA);
+        assertThat(relida.get().getMotivoCancelamento()).isEqualTo("Equipamento em manutenção");
+        assertThat(relida.get().getCanceladoPor().getId()).isEqualTo(coord.getId());
+    }
+
     // ---------- professor: visibilidade na listagem ----------
 
     @Test

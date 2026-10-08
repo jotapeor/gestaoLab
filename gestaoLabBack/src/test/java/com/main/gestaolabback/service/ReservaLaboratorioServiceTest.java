@@ -277,8 +277,9 @@ class ReservaLaboratorioServiceTest {
         when(usuarioRepo.findById(10L)).thenReturn(Optional.of(usuarioComum));
         when(reservaRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-        ReservaLaboratorioResponse resp = service.cancelar(1L, new CancelarReservaRequest("motivo"), autUsuario);
+        ReservaLaboratorioResponse resp = service.cancelar(1L, new CancelarReservaRequest("Não vou usar"), autUsuario);
         assertThat(resp.status()).isEqualTo(StatusReserva.CANCELADA);
+        assertThat(resp.motivoCancelamento()).isEqualTo("Não vou usar");
     }
 
     @Test

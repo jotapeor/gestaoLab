@@ -156,8 +156,9 @@ function glFecharModal() {
 
 function glConfirmarModal() {
     var cb = _glModalCallback;
+    _glModalCallback = null;
+    if (cb) cb();      // lê textarea ANTES de glFecharModal limpar o valor
     glFecharModal();
-    if (cb) cb();
 }
 
 function glAbrirModalForm(btn) {
