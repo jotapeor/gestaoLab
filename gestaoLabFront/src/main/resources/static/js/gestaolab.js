@@ -1,3 +1,9 @@
+var _GL_TIPO_PROJETO_LABELS = {
+    TCC_I: 'TCC I', TCC_II: 'TCC II', EXTENSAO: 'Extensão', MONITORIA: 'Monitoria',
+    BOLSISTA: 'Bolsista', PESQUISA: 'Pesquisa', AULA: 'Aula', OUTRO: 'Outro'
+};
+function glTipoProjetoLabel(tipo) { return _GL_TIPO_PROJETO_LABELS[tipo] || tipo || 'Outro'; }
+
 function validarCamposLogin() {
     const email = document.getElementById('email');
     const senha = document.getElementById('senha');

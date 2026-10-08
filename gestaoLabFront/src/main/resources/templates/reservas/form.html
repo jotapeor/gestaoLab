@@ -71,7 +71,7 @@
                                 <option value="">Nenhum</option>
                                 <option th:each="p : ${projetos}"
                                         th:value="${p.id}"
-                                        th:text="${p.titulo + ' (' + p.tipo + ')'}">-</option>
+                                        th:text="${p.titulo + ' (' + p.tipoLabel() + ')'}">-</option>
                             </select>
                         </div>
 
@@ -247,7 +247,7 @@ function popularProjetoSelect(lista) {
     lista.forEach(function(p) {
         var opt = document.createElement('option');
         opt.value = p.id;
-        opt.textContent = p.titulo + ' (' + p.tipo + ')';
+        opt.textContent = p.titulo + ' (' + glTipoProjetoLabel(p.tipo) + ')';
         sel.appendChild(opt);
     });
     onProjetoChange();

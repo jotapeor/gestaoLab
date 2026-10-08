@@ -11,6 +11,6 @@ public record ProjetoDto(
         Boolean ativo,
         LocalDateTime dataCadastro,
         Integer quantidadeParticipantes
-) {
+) implements ComTipoLabel {
     public record OrientadorDto(Long id, String nome) {}
 }

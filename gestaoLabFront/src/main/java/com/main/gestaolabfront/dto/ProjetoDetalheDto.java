@@ -12,7 +12,7 @@ public record ProjetoDetalheDto(
         Boolean ativo,
         LocalDateTime dataCadastro,
         List<ParticipanteDto> participantes
-) {
+) implements ComTipoLabel {
     public record OrientadorDto(Long id, String nome) {}
     public record ParticipanteDto(Long id, String nome, String matricula, String cursoSetor, Boolean ativo) {}
 }
