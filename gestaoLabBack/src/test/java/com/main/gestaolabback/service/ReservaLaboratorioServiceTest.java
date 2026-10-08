@@ -377,6 +377,7 @@ class ReservaLaboratorioServiceTest {
                 AGORA.plusHours(1), AGORA.plusHours(2), autUsuario);
         assertThat(resp.disponivel()).isTrue();
         assertThat(resp.vagasRestantes()).isEqualTo(4); // capacity(5) - peak(1 new) = 4
+        assertThat(resp.mensagem()).contains("vaga(s) restante(s)");
     }
 
     @Test
@@ -390,6 +391,104 @@ class ReservaLaboratorioServiceTest {
                 AGORA.plusHours(1), AGORA.plusHours(2), autUsuario);
         assertThat(resp.disponivel()).isFalse();
         assertThat(resp.vagasRestantes()).isEqualTo(0);
+    }
+
+    // ---------- disponibilidade × criar: mesma lógica (capacidade 2) ----------
+
+    @Test
+    void disponibilidade_capacidade2_semReservas_disponivel1Vaga() {
+        lab.setCapacidade(2);
+        when(laboratorioRepo.findById(5L)).thenReturn(Optional.of(lab));
+        when(reservaRepo.findConfirmadasSobrepostas(eq(5L), any(), any())).thenReturn(List.of());
+
+        DisponibilidadeResponse resp = service.verificarDisponibilidade(5L,
+                AGORA.plusHours(1), AGORA.plusHours(2), autUsuario);
+        assertThat(resp.disponivel()).isTrue();
+        assertThat(resp.vagasRestantes()).isEqualTo(1);
+    }
+
+    @Test
+    void disponibilidade_capacidade2_umaReserva_ultimaVaga() {
+        // BUG corrigido: capacidade=2, 1 existente → pico=2 → vagasRestantes=0 → deve ser disponível
+        lab.setCapacidade(2);
+        when(laboratorioRepo.findById(5L)).thenReturn(Optional.of(lab));
+        ReservaLaboratorio existente = reservaComHorario(AGORA.plusHours(1), AGORA.plusHours(2));
+        when(reservaRepo.findConfirmadasSobrepostas(eq(5L), any(), any())).thenReturn(List.of(existente));
+
+        DisponibilidadeResponse resp = service.verificarDisponibilidade(5L,
+                AGORA.plusHours(1), AGORA.plusHours(2), autUsuario);
+        assertThat(resp.disponivel()).isTrue();
+        assertThat(resp.vagasRestantes()).isEqualTo(0);
+        assertThat(resp.mensagem()).contains("última vaga");
+    }
+
+    @Test
+    void disponibilidade_capacidade2_duasReservas_lotado() {
+        lab.setCapacidade(2);
+        when(laboratorioRepo.findById(5L)).thenReturn(Optional.of(lab));
+        ReservaLaboratorio e1 = reservaComHorario(AGORA.plusHours(1), AGORA.plusHours(2));
+        ReservaLaboratorio e2 = reservaComHorario(AGORA.plusHours(1), AGORA.plusHours(2));
+        when(reservaRepo.findConfirmadasSobrepostas(eq(5L), any(), any())).thenReturn(List.of(e1, e2));
+
+        DisponibilidadeResponse resp = service.verificarDisponibilidade(5L,
+                AGORA.plusHours(1), AGORA.plusHours(2), autUsuario);
+        assertThat(resp.disponivel()).isFalse();
+    }
+
+    @Test
+    void criar_capacidade2_umaReserva_cabe() {
+        // Deve ser possível criar quando capacidade=2 e há 1 reserva existente (última vaga)
+        lab.setCapacidade(2);
+        LocalDateTime inicio = AGORA.plusHours(1);
+        LocalDateTime fim = AGORA.plusHours(2);
+        ReservaLaboratorioRequest req = new ReservaLaboratorioRequest(5L, null, inicio, fim, "Motivo", null);
+        when(usuarioRepo.findById(10L)).thenReturn(Optional.of(usuarioComum));
+        when(laboratorioRepo.findByIdWithLock(5L)).thenReturn(Optional.of(lab));
+        when(reservaRepo.findConfirmadasDoUsuarioSobrepostas(eq(10L), any(), any(), isNull()))
+                .thenReturn(List.of());
+        ReservaLaboratorio existente = reservaComHorario(AGORA.plusHours(1), AGORA.plusHours(2));
+        when(reservaRepo.findConfirmadasSobrepostas(eq(5L), any(), any())).thenReturn(List.of(existente));
+        when(reservaRepo.save(any())).thenAnswer(inv -> {
+            ReservaLaboratorio r = inv.getArgument(0);
+            r.setId(99L);
+            return r;
+        });
+
+        ReservaLaboratorioResponse resp = service.criar(req, autUsuario);
+        assertThat(resp.status()).isEqualTo(StatusReserva.CONFIRMADA);
+    }
+
+    @Test
+    void criar_capacidade2_duasReservas_lanca422() {
+        lab.setCapacidade(2);
+        LocalDateTime inicio = AGORA.plusHours(1);
+        LocalDateTime fim = AGORA.plusHours(2);
+        ReservaLaboratorioRequest req = new ReservaLaboratorioRequest(5L, null, inicio, fim, "Motivo", null);
+        when(usuarioRepo.findById(10L)).thenReturn(Optional.of(usuarioComum));
+        when(laboratorioRepo.findByIdWithLock(5L)).thenReturn(Optional.of(lab));
+        when(reservaRepo.findConfirmadasDoUsuarioSobrepostas(eq(10L), any(), any(), isNull()))
+                .thenReturn(List.of());
+        ReservaLaboratorio e1 = reservaComHorario(AGORA.plusHours(1), AGORA.plusHours(2));
+        ReservaLaboratorio e2 = reservaComHorario(AGORA.plusHours(1), AGORA.plusHours(2));
+        when(reservaRepo.findConfirmadasSobrepostas(eq(5L), any(), any())).thenReturn(List.of(e1, e2));
+
+        assertThatThrownBy(() -> service.criar(req, autUsuario))
+                .isInstanceOf(ResponseStatusException.class)
+                .satisfies(e -> assertThat(status(e)).isEqualTo(422));
+    }
+
+    @Test
+    void disponibilidade_cancelada_naoConta() {
+        // findConfirmadasSobrepostas retorna vazio (canceladas não são CONFIRMADAS)
+        lab.setCapacidade(1);
+        when(laboratorioRepo.findById(5L)).thenReturn(Optional.of(lab));
+        when(reservaRepo.findConfirmadasSobrepostas(eq(5L), any(), any())).thenReturn(List.of());
+
+        DisponibilidadeResponse resp = service.verificarDisponibilidade(5L,
+                AGORA.plusHours(1), AGORA.plusHours(2), autUsuario);
+        assertThat(resp.disponivel()).isTrue();
+        assertThat(resp.vagasRestantes()).isEqualTo(0); // cap(1) - pico(1 new) = 0 → última vaga
+        assertThat(resp.mensagem()).contains("última vaga");
     }
 
     // ---------- helpers ----------

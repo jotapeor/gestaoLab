@@ -152,10 +152,7 @@ public class ReservaLaboratorioService {
         }
 
         if (laboratorio.getCapacidade() != null) {
-            List<ReservaLaboratorio> sobrepostas = reservaRepo.findConfirmadasSobrepostas(
-                    laboratorio.getId(), request.dataInicio(), request.dataFim());
-            int pico = calcularPicoComNova(sobrepostas, request.dataInicio(), request.dataFim());
-            if (pico > laboratorio.getCapacidade()) {
+            if (calcularVagasRestantes(laboratorio, request.dataInicio(), request.dataFim()) < 0) {
                 throw new ResponseStatusException(HttpStatusCode.valueOf(422),
                         "Laboratório lotado neste horário: capacidade de " + laboratorio.getCapacidade() + " pessoas.");
             }
@@ -246,15 +243,17 @@ public class ReservaLaboratorioService {
             return new DisponibilidadeResponse(true, null, "Disponível (sem limite de capacidade).");
         }
 
-        List<ReservaLaboratorio> sobrepostas = reservaRepo.findConfirmadasSobrepostas(laboratorioId, inicio, fim);
-        int pico = calcularPicoComNova(sobrepostas, inicio, fim);
-        int vagas = laboratorio.getCapacidade() - pico;
+        int vagasRestantes = calcularVagasRestantes(laboratorio, inicio, fim);
 
-        if (vagas <= 0) {
+        if (vagasRestantes < 0) {
             return new DisponibilidadeResponse(false, 0,
                     "Laboratório lotado neste horário: capacidade de " + laboratorio.getCapacidade() + " pessoas.");
         }
-        return new DisponibilidadeResponse(true, vagas, "Disponível – " + vagas + " vaga(s) restante(s).");
+        if (vagasRestantes == 0) {
+            return new DisponibilidadeResponse(true, 0, "Disponível – esta é a última vaga.");
+        }
+        return new DisponibilidadeResponse(true, vagasRestantes,
+                "Disponível – " + vagasRestantes + " vaga(s) restante(s) após esta reserva.");
     }
 
     @Transactional(readOnly = true)
@@ -289,6 +288,13 @@ public class ReservaLaboratorioService {
         }).toList();
 
         return new AgendaLaboratorioResponse(laboratorio.getCapacidade(), blocos);
+    }
+
+    private int calcularVagasRestantes(Laboratorio laboratorio, LocalDateTime inicio, LocalDateTime fim) {
+        List<ReservaLaboratorio> sobrepostas = reservaRepo.findConfirmadasSobrepostas(
+                laboratorio.getId(), inicio, fim);
+        int pico = calcularPicoComNova(sobrepostas, inicio, fim);
+        return laboratorio.getCapacidade() - pico;
     }
 
     private int calcularPicoComNova(List<ReservaLaboratorio> existentes,

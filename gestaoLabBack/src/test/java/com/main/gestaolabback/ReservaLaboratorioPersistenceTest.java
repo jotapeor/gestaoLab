@@ -21,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -134,6 +135,28 @@ class ReservaLaboratorioPersistenceTest {
         assertThat(relida.get().getStatus()).isEqualTo(StatusReserva.CANCELADA);
         assertThat(relida.get().getMotivoCancelamento()).isEqualTo("Equipamento em manutenção");
         assertThat(relida.get().getCanceladoPor().getId()).isEqualTo(coord.getId());
+    }
+
+    // ---------- disponibilidade: canceladas não contam ----------
+
+    @Test
+    void findConfirmadasSobrepostas_reservaCancelada_naoRetorna() {
+        Laboratorio lab = criarLaboratorio("Lab Cancelada Disp");
+        Usuario aluno = criarUsuario("aluno.disp.cancel@test.com", PerfilUsuario.USUARIO);
+
+        ReservaLaboratorio cancelada = criarReserva(lab, aluno, null,
+                LocalDateTime.of(2026, 12, 1, 10, 0), LocalDateTime.of(2026, 12, 1, 12, 0));
+        cancelada.setStatus(StatusReserva.CANCELADA);
+        reservaRepo.save(cancelada);
+
+        em.flush();
+        em.clear();
+
+        List<ReservaLaboratorio> sobrepostas = reservaRepo.findConfirmadasSobrepostas(
+                lab.getId(),
+                LocalDateTime.of(2026, 12, 1, 10, 0),
+                LocalDateTime.of(2026, 12, 1, 12, 0));
+        assertThat(sobrepostas).isEmpty();
     }
 
     // ---------- professor: visibilidade na listagem ----------
