@@ -62,14 +62,7 @@
                         <dt style="font-weight:600;color:var(--gl-text-secondary);">Tipo</dt>
                         <dd>
                             <span class="gl-badge gl-badge-info"
-                                  th:text="${projeto.tipo == 'TCC_I' ? 'TCC I' :
-                                             projeto.tipo == 'TCC_II' ? 'TCC II' :
-                                             projeto.tipo == 'EXTENSAO' ? 'Extensão' :
-                                             projeto.tipo == 'MONITORIA' ? 'Monitoria' :
-                                             projeto.tipo == 'BOLSISTA' ? 'Bolsista' :
-                                             projeto.tipo == 'PESQUISA' ? 'Pesquisa' :
-                                             projeto.tipo == 'AULA' ? 'Aula' :
-                                             projeto.tipo != null ? 'Outro' : '-'}">-</span>
+                                  th:text="${projeto.tipoLabel()}">-</span>
                         </dd>
                         <dt style="font-weight:600;color:var(--gl-text-secondary);">Orientador</dt>
                         <dd th:text="${projeto.orientador != null ? projeto.orientador.nome : '-'}">-</dd>

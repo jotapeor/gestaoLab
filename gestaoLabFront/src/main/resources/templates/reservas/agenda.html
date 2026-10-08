@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>GestãoLab — Agenda</title>
+    <th:block th:replace="~{fragments/layout :: head-content}"></th:block>
+    <style>
+        .agenda-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-top: 16px;
+        }
+        .agenda-day {
+            background: var(--gl-surface);
+            border: 1px solid var(--gl-border);
+            border-radius: 8px;
+            padding: 10px 8px;
+            min-height: 120px;
+        }
+        .agenda-day-header {
+            font-size: .75rem;
+            font-weight: 600;
+            color: var(--gl-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            margin-bottom: 8px;
+        }
+        .agenda-day-date {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--gl-text);
+            margin-bottom: 8px;
+        }
+        .agenda-bloco {
+            background: var(--gl-primary);
+            color: #fff;
+            border-radius: 5px;
+            padding: 4px 6px;
+            font-size: .75rem;
+            margin-bottom: 4px;
+        }
+        .agenda-bloco.proprio {
+            background: #0F766E;
+        }
+        .agenda-bloco.outro {
+            background: #64748B;
+        }
+        .agenda-bloco.lotado {
+            background: #FEF3C7;
+            color: #B45309;
+            border: 1px solid #B45309;
+        }
+        @media (max-width: 768px) {
+            .agenda-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="gl-sidebar-overlay" id="sidebarOverlay"></div>
+<div class="gl-wrapper">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+    <div class="gl-main">
+        <div th:replace="~{fragments/layout :: topbar('Agenda')}"></div>
+        <main class="gl-content" id="main-content">
+            <div th:replace="~{fragments/layout :: page-header('Agenda do Laboratório', ${laboratorio.nome}, ${urlVoltar})}"></div>
+
+            <!-- Navegação de semana -->
+            <div class="gl-card fade-in" style="margin-bottom:16px;">
+                <div class="gl-card-body" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                    <a th:href="@{/reservas/agenda/{id}(id=${laboratorio.id}, de=${#temporals.format(semanaInicio.minusDays(7), 'yyyy-MM-dd')})}"
+                       class="btn btn-outline btn-sm">
+                        <i class="bi bi-chevron-left" aria-hidden="true"></i> Semana anterior
+                    </a>
+                    <span style="font-weight:600;">
+                        <span class="gl-mono" th:text="${#temporals.format(semanaInicio, 'dd/MM/yyyy')}">-</span>
+                        &mdash;
+                        <span class="gl-mono" th:text="${#temporals.format(semanaFim, 'dd/MM/yyyy')}">-</span>
+                    </span>
+                    <a th:href="@{/reservas/agenda/{id}(id=${laboratorio.id}, de=${#temporals.format(semanaFim.plusDays(1), 'yyyy-MM-dd')})}"
+                       class="btn btn-outline btn-sm">
+                        Próxima semana <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                    </a>
+                    <a th:href="@{/reservas/agenda/{id}(id=${laboratorio.id})}" class="btn btn-outline btn-sm">
+                        Hoje
+                    </a>
+                    <th:block th:if="${agenda.capacidade != null}">
+                        <span style="margin-left:auto;font-size:.875rem;color:var(--gl-text-secondary);">
+                            Capacidade: <strong class="gl-mono" th:text="${agenda.capacidade}">-</strong> pessoa(s)
+                        </span>
+                    </th:block>
+                </div>
+            </div>
+
+            <!-- Grade de 7 dias -->
+            <div class="agenda-grid fade-in delay-1">
+                <th:block th:each="offset : ${#numbers.sequence(0, 6)}">
+                    <th:block th:with="dia=${semanaInicio.plusDays(offset)}">
+                        <div class="agenda-day">
+                            <div class="agenda-day-header"
+                                 th:text="${#temporals.format(dia, 'EEE', new java.util.Locale('pt','BR'))}">-</div>
+                            <div class="agenda-day-date gl-mono"
+                                 th:text="${#temporals.format(dia, 'dd/MM')}">-</div>
+
+                            <th:block th:each="bloco : ${agenda.blocos}"
+                                      th:if="${bloco.inicio.toLocalDate().equals(dia)}">
+                                <div class="agenda-bloco"
+                                     th:classappend="${agenda.capacidade != null and bloco.ocupacao != null and bloco.ocupacao >= agenda.capacidade} ? ' lotado' : (${bloco.nomeUsuario != null} ? ' proprio' : ' outro')">
+                                    <span class="gl-mono"
+                                          th:text="${#temporals.format(bloco.inicio, 'HH:mm') + '–' + #temporals.format(bloco.fim, 'HH:mm')}">-</span>
+                                    <span th:if="${bloco.ocupacao != null}"
+                                          style="display:block;font-size:.65rem;margin-top:1px;opacity:.9;"
+                                          th:text="${agenda.capacidade != null ? bloco.ocupacao + '/' + agenda.capacidade : bloco.ocupacao}">-</span>
+                                    <br th:if="${bloco.nomeUsuario != null}">
+                                    <span th:if="${bloco.nomeUsuario != null}" th:text="${bloco.nomeUsuario}">-</span>
+                                    <br th:if="${bloco.nomeProjeto != null}">
+                                    <span th:if="${bloco.nomeProjeto != null}"
+                                          style="opacity:.85;" th:text="${bloco.nomeProjeto}">-</span>
+                                </div>
+                            </th:block>
+                        </div>
+                    </th:block>
+                </th:block>
+            </div>
+
+            <!-- Legenda -->
+            <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;font-size:.8rem;color:var(--gl-text-secondary);">
+                <span><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#0F766E;vertical-align:middle;margin-right:4px;"></span>Sua reserva / nome visível</span>
+                <span><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#64748B;vertical-align:middle;margin-right:4px;"></span>Outro usuário</span>
+            </div>
+
+            <div style="margin-top:16px;">
+                <a th:href="@{/reservas/nova}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-lg" aria-hidden="true"></i> Nova Reserva neste Laboratório
+                </a>
+            </div>
+        </main>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

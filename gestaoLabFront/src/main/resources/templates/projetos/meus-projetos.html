@@ -46,13 +46,7 @@
                                     <td th:text="${p.titulo}">-</td>
                                     <td>
                                         <span class="gl-badge gl-badge-info"
-                                              th:text="${p.tipo == 'TCC_I' ? 'TCC I' :
-                                                         p.tipo == 'TCC_II' ? 'TCC II' :
-                                                         p.tipo == 'EXTENSAO' ? 'Extensão' :
-                                                         p.tipo == 'MONITORIA' ? 'Monitoria' :
-                                                         p.tipo == 'BOLSISTA' ? 'Bolsista' :
-                                                         p.tipo == 'PESQUISA' ? 'Pesquisa' :
-                                                         p.tipo == 'AULA' ? 'Aula' : 'Outro'}">-</span>
+                                              th:text="${p.tipoLabel()}">-</span>
                                     </td>
                                     <td th:text="${p.orientador != null ? p.orientador.nome : '-'}">-</td>
                                     <td class="gl-mono" th:text="${p.quantidadeParticipantes}">0</td>

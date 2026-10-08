@@ -1,7 +1,7 @@
 CONTEXTO FIXO DO PROJETO
 Sistema comercial de gestão de laboratório de faculdade, dividido em dois projetos Spring Boot 4.1.1 / Java 25, que seguem a MESMA arquitetura, stack, padrões de pacotes e estilo de código do meu TCC (AgroTrack), usado apenas como referência (NUNCA altere nada nele):
-- TCC back-end: <C:\Users\João Paulo\Documents\tcc\codigo\agroTrackBackEnd>\agroTrackBackEnd  (pacote com.main.frotaBackEnd)
-- TCC front-end: <C:\Users\João Paulo\Documents\tcc\codigo\agroTrackFrontEnd>\agroTrackFrontEnd (pacote com.main.frotaFrontEnd)
+- TCC back-end: C:\Users\João Paulo\Documents\tcc\codigo\agroTrackBackEnd  (pacote com.main.frotaBackEnd)
+- TCC front-end: C:\Users\João Paulo\Documents\tcc\codigo\agroTrackFrontEnd (pacote com.main.frotaFrontEnd)
 
 PROJETOS EM QUE VOCÊ TRABALHA (somente estes):
 - Repositório Git (raiz): C:\Users\João Paulo\Documents\gestaolab
@@ -19,6 +19,7 @@ REGRAS DE GIT
 
 REGRAS DO BANCO (MySQL 8.0, banco gestaolab_db)
 - gestaoLabBack\schema.sql é um dump do MySQL Workbench e é a fonte da verdade da estrutura. NUNCA edite esse arquivo e NUNCA execute comandos no banco.
+- O schema.sql é mantido pelo usuário: depois de importar cada arquivo de gestaoLabBack\sql\, ele reexporta somente a estrutura do banco (Dump Structure Only) no schema.sql. O Claude Code nunca edita esse arquivo; apenas o lê para conhecer a estrutura atual.
 - Se alguma alteração no banco for necessária, crie um arquivo NOVO em gestaoLabBack\sql\ com o próximo número disponível (ex.: 001_descricao.sql), contendo apenas os comandos da alteração, com USE gestaolab_db; no início, sem DROP DATABASE e sem DROP TABLE de tabelas existentes. Eu importo esse arquivo no MySQL Workbench.
 - Não use ddl-auto para criar ou alterar tabelas (exceto H2 nos testes).
 
@@ -40,6 +41,7 @@ NOTAS TÉCNICAS (Spring Boot 4.1.1)
 - Relacionamentos @ManyToMany: sempre gravar pelo lado dono (o que tem @JoinTable) e manter os dois lados sincronizados com métodos auxiliares. Testes de persistência devem fazer flush/clear e reler do banco.
 - Paginação: endpoints paginados retornam sempre PaginaResponse<T> (conteudo, pagina, tamanho, totalElementos, totalPaginas); nunca retornar Page do Spring diretamente.
 - Front: respostas da API sempre desserializadas em DTOs tipados (records), inclusive PaginaResponse<T>; nunca ler respostas como Map ou extrair campos por nome.
+- Data e hora atual: usar sempre o bean java.time.Clock (fuso em app.fuso-horario); nunca chamar LocalDateTime.now() ou LocalDate.now() sem o Clock, para os testes poderem fixar a data.
 
 IDENTIDADE VISUAL
 Do TCC copiamos arquitetura, organização de código e padrões de implementação; a aparência do GestãoLab é própria e NÃO deve reproduzir a do TCC (nem o sidebar escuro, nem o verde, nem o layout de login do AgroTrack).

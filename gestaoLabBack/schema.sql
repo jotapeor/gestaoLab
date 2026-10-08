@@ -32,17 +32,8 @@ CREATE TABLE `curso_setor` (
   `data_cadastro` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id_curso_setor`),
   UNIQUE KEY `uk_curso_setor_nome` (`nome`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `curso_setor`
---
-
-LOCK TABLES `curso_setor` WRITE;
-/*!40000 ALTER TABLE `curso_setor` DISABLE KEYS */;
-/*!40000 ALTER TABLE `curso_setor` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `equipamento`
@@ -72,15 +63,6 @@ CREATE TABLE `equipamento` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `equipamento`
---
-
-LOCK TABLES `equipamento` WRITE;
-/*!40000 ALTER TABLE `equipamento` DISABLE KEYS */;
-/*!40000 ALTER TABLE `equipamento` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `laboratorio`
 --
 
@@ -98,16 +80,6 @@ CREATE TABLE `laboratorio` (
   CONSTRAINT `ck_laboratorio_capacidade` CHECK (((`capacidade` is null) or (`capacidade` > 0)))
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `laboratorio`
---
-
-LOCK TABLES `laboratorio` WRITE;
-/*!40000 ALTER TABLE `laboratorio` DISABLE KEYS */;
-INSERT INTO `laboratorio` VALUES (1,'Laboratório Principal',NULL,NULL,1,'2026-09-22 21:53:22');
-/*!40000 ALTER TABLE `laboratorio` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `material`
@@ -134,15 +106,6 @@ CREATE TABLE `material` (
   CONSTRAINT `ck_material_quantidade` CHECK ((`quantidade_disponivel` >= 0))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `material`
---
-
-LOCK TABLES `material` WRITE;
-/*!40000 ALTER TABLE `material` DISABLE KEYS */;
-/*!40000 ALTER TABLE `material` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `movimentacao_material`
@@ -179,15 +142,6 @@ CREATE TABLE `movimentacao_material` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `movimentacao_material`
---
-
-LOCK TABLES `movimentacao_material` WRITE;
-/*!40000 ALTER TABLE `movimentacao_material` DISABLE KEYS */;
-/*!40000 ALTER TABLE `movimentacao_material` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `ocorrencia_equipamento`
 --
 
@@ -214,15 +168,6 @@ CREATE TABLE `ocorrencia_equipamento` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `ocorrencia_equipamento`
---
-
-LOCK TABLES `ocorrencia_equipamento` WRITE;
-/*!40000 ALTER TABLE `ocorrencia_equipamento` DISABLE KEYS */;
-/*!40000 ALTER TABLE `ocorrencia_equipamento` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `projeto`
 --
 
@@ -240,17 +185,8 @@ CREATE TABLE `projeto` (
   PRIMARY KEY (`id_projeto`),
   KEY `idx_projeto_orientador` (`id_orientador`),
   CONSTRAINT `fk_projeto_orientador` FOREIGN KEY (`id_orientador`) REFERENCES `usuario` (`id_usuario`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `projeto`
---
-
-LOCK TABLES `projeto` WRITE;
-/*!40000 ALTER TABLE `projeto` DISABLE KEYS */;
-/*!40000 ALTER TABLE `projeto` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `reserva_equipamento`
@@ -281,15 +217,6 @@ CREATE TABLE `reserva_equipamento` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `reserva_equipamento`
---
-
-LOCK TABLES `reserva_equipamento` WRITE;
-/*!40000 ALTER TABLE `reserva_equipamento` DISABLE KEYS */;
-/*!40000 ALTER TABLE `reserva_equipamento` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `reserva_laboratorio`
 --
 
@@ -306,25 +233,21 @@ CREATE TABLE `reserva_laboratorio` (
   `motivo` text,
   `status` enum('PENDENTE','CONFIRMADA','CANCELADA','CONCLUIDA') NOT NULL DEFAULT 'CONFIRMADA',
   `data_criacao` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `id_cancelado_por` bigint DEFAULT NULL,
+  `data_cancelamento` datetime DEFAULT NULL,
+  `motivo_cancelamento` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id_reserva`),
   KEY `idx_reserva_lab_periodo` (`id_laboratorio`,`data_inicio`,`data_fim`),
   KEY `idx_reserva_lab_usuario` (`id_usuario`),
   KEY `idx_reserva_lab_projeto` (`id_projeto`),
+  KEY `idx_reserva_lab_cancelado_por` (`id_cancelado_por`),
+  CONSTRAINT `fk_reserva_lab_cancelado_por` FOREIGN KEY (`id_cancelado_por`) REFERENCES `usuario` (`id_usuario`) ON DELETE SET NULL,
   CONSTRAINT `fk_reserva_lab_laboratorio` FOREIGN KEY (`id_laboratorio`) REFERENCES `laboratorio` (`id_laboratorio`) ON DELETE RESTRICT,
   CONSTRAINT `fk_reserva_lab_projeto` FOREIGN KEY (`id_projeto`) REFERENCES `projeto` (`id_projeto`) ON DELETE SET NULL,
   CONSTRAINT `fk_reserva_lab_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON DELETE RESTRICT,
   CONSTRAINT `ck_reserva_lab_periodo` CHECK ((`data_fim` > `data_inicio`))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `reserva_laboratorio`
---
-
-LOCK TABLES `reserva_laboratorio` WRITE;
-/*!40000 ALTER TABLE `reserva_laboratorio` DISABLE KEYS */;
-/*!40000 ALTER TABLE `reserva_laboratorio` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `usuario`
@@ -353,18 +276,8 @@ CREATE TABLE `usuario` (
   KEY `idx_usuario_responsavel` (`id_responsavel`),
   CONSTRAINT `fk_usuario_curso_setor` FOREIGN KEY (`id_curso_setor`) REFERENCES `curso_setor` (`id_curso_setor`) ON DELETE SET NULL,
   CONSTRAINT `fk_usuario_responsavel` FOREIGN KEY (`id_responsavel`) REFERENCES `usuario` (`id_usuario`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `usuario`
---
-
-LOCK TABLES `usuario` WRITE;
-/*!40000 ALTER TABLE `usuario` DISABLE KEYS */;
-INSERT INTO `usuario` VALUES (1,'Administrador',NULL,'admin@gestaolab.local','$2a$10$V94.yc6BXs8lLqdQHv18eOMPBD.hSWtvkj6S6jWie1dRVC7TuUSH6','COORDENADOR',NULL,NULL,1,1,NULL,'2026-09-22 21:53:22');
-/*!40000 ALTER TABLE `usuario` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `usuario_projeto`
@@ -382,15 +295,6 @@ CREATE TABLE `usuario_projeto` (
   CONSTRAINT `fk_usuario_projeto_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `usuario_projeto`
---
-
-LOCK TABLES `usuario_projeto` WRITE;
-/*!40000 ALTER TABLE `usuario_projeto` DISABLE KEYS */;
-/*!40000 ALTER TABLE `usuario_projeto` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `utilizacao_equipamento`
@@ -423,15 +327,6 @@ CREATE TABLE `utilizacao_equipamento` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `utilizacao_equipamento`
---
-
-LOCK TABLES `utilizacao_equipamento` WRITE;
-/*!40000 ALTER TABLE `utilizacao_equipamento` DISABLE KEYS */;
-/*!40000 ALTER TABLE `utilizacao_equipamento` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `utilizacao_laboratorio`
 --
 
@@ -461,15 +356,6 @@ CREATE TABLE `utilizacao_laboratorio` (
   CONSTRAINT `ck_utilizacao_lab_periodo` CHECK (((`data_saida` is null) or (`data_saida` >= `data_entrada`)))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `utilizacao_laboratorio`
---
-
-LOCK TABLES `utilizacao_laboratorio` WRITE;
-/*!40000 ALTER TABLE `utilizacao_laboratorio` DISABLE KEYS */;
-/*!40000 ALTER TABLE `utilizacao_laboratorio` ENABLE KEYS */;
-UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -480,4 +366,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-09-22 22:10:54
+-- Dump completed on 2026-10-07 23:58:34

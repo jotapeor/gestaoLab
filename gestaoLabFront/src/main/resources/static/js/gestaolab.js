@@ -1,3 +1,9 @@
+var _GL_TIPO_PROJETO_LABELS = {
+    TCC_I: 'TCC I', TCC_II: 'TCC II', EXTENSAO: 'Extensão', MONITORIA: 'Monitoria',
+    BOLSISTA: 'Bolsista', PESQUISA: 'Pesquisa', AULA: 'Aula', OUTRO: 'Outro'
+};
+function glTipoProjetoLabel(tipo) { return _GL_TIPO_PROJETO_LABELS[tipo] || tipo || 'Outro'; }
+
 function validarCamposLogin() {
     const email = document.getElementById('email');
     const senha = document.getElementById('senha');
@@ -148,12 +154,17 @@ function glAbrirModal(titulo, mensagem, confirmText, confirmClass, callback) {
 function glFecharModal() {
     document.getElementById('glModalConfirmacao').style.display = 'none';
     _glModalCallback = null;
+    var wrapper = document.getElementById('glModalMotivoWrapper');
+    if (wrapper) { wrapper.style.display = 'none'; }
+    var input = document.getElementById('glModalMotivoInput');
+    if (input) { input.value = ''; }
 }
 
 function glConfirmarModal() {
     var cb = _glModalCallback;
+    _glModalCallback = null;
+    if (cb) cb();      // lê textarea ANTES de glFecharModal limpar o valor
     glFecharModal();
-    if (cb) cb();
 }
 
 function glAbrirModalForm(btn) {
@@ -164,6 +175,25 @@ function glAbrirModalForm(btn) {
         btn.getAttribute('data-modal-confirma') || 'Confirmar',
         btn.getAttribute('data-modal-classe') || 'btn-primary',
         function() { document.getElementById(formId).submit(); }
+    );
+}
+
+function glAbrirModalComMotivo(btn) {
+    var formId = btn.getAttribute('data-modal-form');
+    var motivoId = btn.getAttribute('data-modal-motivo-id');
+    var wrapper = document.getElementById('glModalMotivoWrapper');
+    if (wrapper) { wrapper.style.display = 'block'; }
+    glAbrirModal(
+        btn.getAttribute('data-modal-titulo') || 'Confirmar',
+        btn.getAttribute('data-modal-msg') || 'Deseja confirmar esta ação?',
+        btn.getAttribute('data-modal-confirma') || 'Confirmar',
+        btn.getAttribute('data-modal-classe') || 'btn-primary',
+        function() {
+            var input = document.getElementById('glModalMotivoInput');
+            var target = motivoId ? document.getElementById(motivoId) : null;
+            if (target && input) { target.value = input.value; }
+            document.getElementById(formId).submit();
+        }
     );
 }
 

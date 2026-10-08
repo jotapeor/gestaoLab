@@ -41,4 +41,10 @@ class ErrorPageTest {
                         .sessionAttr("primeiroAcesso", "false"))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    void favicon_acessivelSemSessao() throws Exception {
+        mockMvc.perform(get("/img/favicon.png"))
+                .andExpect(status().isOk());
+    }
 }

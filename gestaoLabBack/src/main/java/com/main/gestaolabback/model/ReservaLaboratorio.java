@@ -39,12 +39,17 @@ public class ReservaLaboratorio {
     @Column(name = "data_criacao")
     private LocalDateTime dataCriacao;
 
-    public ReservaLaboratorio() {
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_cancelado_por")
+    private Usuario canceladoPor;
 
-    @PrePersist
-    private void prePersist() {
-        if (dataCriacao == null) dataCriacao = LocalDateTime.now();
+    @Column(name = "data_cancelamento")
+    private LocalDateTime dataCancelamento;
+
+    @Column(name = "motivo_cancelamento")
+    private String motivoCancelamento;
+
+    public ReservaLaboratorio() {
     }
 
     public Long getId() {
@@ -117,5 +122,29 @@ public class ReservaLaboratorio {
 
     public void setDataCriacao(LocalDateTime dataCriacao) {
         this.dataCriacao = dataCriacao;
+    }
+
+    public Usuario getCanceladoPor() {
+        return canceladoPor;
+    }
+
+    public void setCanceladoPor(Usuario canceladoPor) {
+        this.canceladoPor = canceladoPor;
+    }
+
+    public LocalDateTime getDataCancelamento() {
+        return dataCancelamento;
+    }
+
+    public void setDataCancelamento(LocalDateTime dataCancelamento) {
+        this.dataCancelamento = dataCancelamento;
+    }
+
+    public String getMotivoCancelamento() {
+        return motivoCancelamento;
+    }
+
+    public void setMotivoCancelamento(String motivoCancelamento) {
+        this.motivoCancelamento = motivoCancelamento;
     }
 }

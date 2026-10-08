@@ -65,6 +65,22 @@ public class ProjetoService {
                 .toList();
     }
 
+    public List<ProjetoResponse> projetosAtivosDeUsuario(Long usuarioId) {
+        java.util.Set<Long> seen = new java.util.HashSet<>();
+        java.util.List<Projeto> result = new java.util.ArrayList<>();
+        for (Projeto p : projetoRepository.findMeusByOrientadorId(usuarioId)) {
+            if (seen.add(p.getId())) result.add(p);
+        }
+        for (Projeto p : projetoRepository.findActiveByParticipanteId(usuarioId)) {
+            if (seen.add(p.getId())) result.add(p);
+        }
+        result.sort(java.util.Comparator.comparing(Projeto::getTitulo,
+                String.CASE_INSENSITIVE_ORDER));
+        return result.stream()
+                .map(p -> toResponse(p, projetoRepository.countParticipantes(p.getId())))
+                .toList();
+    }
+
     @Transactional(readOnly = true)
     public ProjetoDetalheResponse buscarPorId(Long id, UsuarioAutenticado autenticado) {
         Projeto projeto = projetoRepository.findByIdWithParticipantes(id)

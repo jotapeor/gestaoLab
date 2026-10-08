@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>GestãoLab — Nova Reserva</title>
+    <th:block th:replace="~{fragments/layout :: head-content}"></th:block>
+</head>
+<body>
+<div class="gl-sidebar-overlay" id="sidebarOverlay"></div>
+<div class="gl-wrapper">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+    <div class="gl-main">
+        <div th:replace="~{fragments/layout :: topbar('Nova Reserva')}"></div>
+        <main class="gl-content" id="main-content">
+            <div th:replace="~{fragments/layout :: page-header('Nova Reserva', null, ${urlVoltar})}"></div>
+
+            <div th:if="${formError}" class="gl-alert gl-alert-danger" role="alert">
+                <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+                <span th:text="${formError}">Erro.</span>
+            </div>
+
+            <div class="gl-card fade-in" style="max-width:640px;">
+                <div class="gl-card-body">
+                    <form th:action="@{/reservas/salvar}" method="post" id="formReserva">
+
+                        <div class="gl-form-group">
+                            <label class="gl-form-label" for="laboratorioId">
+                                Laboratório <span class="required">*</span>
+                            </label>
+                            <select id="laboratorioId" name="laboratorioId" class="gl-form-control" required
+                                    onchange="verificarDisponibilidade()">
+                                <option value="">Selecione...</option>
+                                <option th:each="l : ${laboratorios}"
+                                        th:value="${l.id}"
+                                        th:text="${l.nome + (l.capacidade != null ? ' (cap. ' + l.capacidade + ')' : '')}"
+                                        th:selected="${formLaboratorioId != null and formLaboratorioId == l.id}">-</option>
+                            </select>
+                        </div>
+
+                        <div class="gl-form-row" style="display:flex;gap:12px;">
+                            <div class="gl-form-group" style="flex:1;">
+                                <label class="gl-form-label" for="dataInicio">
+                                    Início <span class="required">*</span>
+                                </label>
+                                <input type="datetime-local" id="dataInicio" name="dataInicio"
+                                       class="gl-form-control gl-mono" required
+                                       th:value="${formDataInicio != null ? #temporals.format(formDataInicio, 'yyyy-MM-dd''T''HH:mm') : ''}"
+                                       onchange="verificarDisponibilidade()">
+                            </div>
+                            <div class="gl-form-group" style="flex:1;">
+                                <label class="gl-form-label" for="dataFim">
+                                    Fim <span class="required">*</span>
+                                </label>
+                                <input type="datetime-local" id="dataFim" name="dataFim"
+                                       class="gl-form-control gl-mono" required
+                                       th:value="${formDataFim != null ? #temporals.format(formDataFim, 'yyyy-MM-dd''T''HH:mm') : ''}"
+                                       onchange="verificarDisponibilidade()">
+                            </div>
+                        </div>
+
+                        <!-- Disponibilidade feedback -->
+                        <div id="disponibilidadeInfo" style="margin-bottom:16px;display:none;">
+                            <p id="disponibilidadeMsg" style="font-size:.875rem;margin:0;padding:8px 12px;border-radius:6px;"></p>
+                        </div>
+
+                        <!-- Projeto (opcional) -->
+                        <div class="gl-form-group">
+                            <label class="gl-form-label" for="projetoId">Projeto (opcional)</label>
+                            <select id="projetoId" name="projetoId" class="gl-form-control"
+                                    onchange="onProjetoChange()">
+                                <option value="">Nenhum</option>
+                                <option th:each="p : ${projetos}"
+                                        th:value="${p.id}"
+                                        th:text="${p.titulo + ' (' + p.tipoLabel() + ')'}">-</option>
+                            </select>
+                        </div>
+
+                        <div class="gl-form-group" id="motivoGroup">
+                            <label class="gl-form-label" for="motivo">
+                                Motivo <span id="motivoObrig" class="required">*</span>
+                            </label>
+                            <textarea id="motivo" name="motivo" class="gl-form-control" rows="3"
+                                      maxlength="500" placeholder="Motivo da reserva (obrigatório se não houver projeto vinculado)"
+                                      th:text="${formMotivo}"></textarea>
+                        </div>
+
+                        <!-- Reservar para outro usuário (COORDENADOR) -->
+                        <div th:if="${isCoordenador}" class="gl-form-group">
+                            <label class="gl-form-label">Reservar para usuário (opcional)</label>
+                            <div style="position:relative;">
+                                <input type="text" id="usuarioBusca" autocomplete="off"
+                                       class="gl-form-control"
+                                       placeholder="Buscar por nome, e-mail ou matrícula..."
+                                       oninput="debouncarBuscaUsuario()">
+                                <div id="usuarioBuscaResultados"
+                                     style="display:none;position:absolute;top:100%;left:0;right:0;
+                                            background:#fff;border:1px solid var(--gl-border);
+                                            border-radius:6px;z-index:100;max-height:200px;
+                                            overflow-y:auto;box-shadow:0 4px 12px rgba(15,23,42,.1);"></div>
+                            </div>
+                            <div id="usuarioSelecionado"
+                                 style="display:none;margin-top:8px;padding:8px 12px;
+                                        background:var(--gl-primary-soft,#E6F4F1);border-radius:6px;
+                                        align-items:center;gap:8px;">
+                                <span id="usuarioSelecionadoNome" style="font-weight:500;flex:1;"></span>
+                                <button type="button" onclick="limparUsuario()"
+                                        style="background:none;border:none;cursor:pointer;
+                                               color:var(--gl-text-secondary);font-size:1.1rem;line-height:1;"
+                                        title="Remover usuário">×</button>
+                            </div>
+                            <input type="hidden" id="usuarioId" name="usuarioId">
+                        </div>
+
+                        <!-- Link para agenda do laboratório selecionado -->
+                        <div id="agendaLink" style="margin-bottom:16px;display:none;">
+                            <a id="agendaLinkHref" href="#" class="btn btn-outline btn-sm">
+                                <i class="bi bi-calendar3" aria-hidden="true"></i> Ver agenda deste laboratório
+                            </a>
+                        </div>
+
+                        <div style="display:flex;gap:10px;margin-top:8px;">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-calendar2-plus" aria-hidden="true"></i> Reservar
+                            </button>
+                            <a th:href="@{/reservas}" class="btn btn-outline">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+<script th:inline="javascript">
+/*<![CDATA[*/
+window._projetosProprios = /*[[${projetos}]]*/ [];
+/*]]>*/
+
+function verificarDisponibilidade() {
+    var labId = document.getElementById('laboratorioId').value;
+    var inicio = document.getElementById('dataInicio').value;
+    var fim = document.getElementById('dataFim').value;
+    var infoDiv = document.getElementById('disponibilidadeInfo');
+    var msg = document.getElementById('disponibilidadeMsg');
+    var agendaDiv = document.getElementById('agendaLink');
+    var agendaHref = document.getElementById('agendaLinkHref');
+
+    if (labId) {
+        agendaDiv.style.display = 'block';
+        agendaHref.href = '/reservas/agenda/' + labId;
+    } else {
+        agendaDiv.style.display = 'none';
+    }
+
+    if (!labId || !inicio || !fim) { infoDiv.style.display = 'none'; return; }
+
+    fetch('/reservas/disponibilidade?laboratorioId=' + labId
+            + '&inicio=' + inicio + ':00'
+            + '&fim=' + fim + ':00')
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+            infoDiv.style.display = 'block';
+            if (d.disponivel) {
+                msg.style.background = 'var(--gl-success-bg)';
+                msg.style.color = 'var(--gl-success)';
+            } else {
+                msg.style.background = 'var(--gl-danger-bg)';
+                msg.style.color = 'var(--gl-danger)';
+            }
+            msg.textContent = d.mensagem || (d.disponivel ? 'Disponível' : 'Indisponível');
+        })
+        .catch(function() { infoDiv.style.display = 'none'; });
+}
+
+function onProjetoChange() {
+    var temProjeto = !!document.getElementById('projetoId').value;
+    var obrig = document.getElementById('motivoObrig');
+    if (obrig) obrig.style.display = temProjeto ? 'none' : '';
+}
+
+/* --- busca de usuário (apenas para COORDENADOR) --- */
+var _buscaTimer = null;
+
+function debouncarBuscaUsuario() {
+    clearTimeout(_buscaTimer);
+    _buscaTimer = setTimeout(executarBuscaUsuario, 300);
+}
+
+function executarBuscaUsuario() {
+    var q = document.getElementById('usuarioBusca').value.trim();
+    var div = document.getElementById('usuarioBuscaResultados');
+    if (!div) return;
+    if (q.length < 2) { div.style.display = 'none'; return; }
+    fetch('/reservas/buscar-usuarios?q=' + encodeURIComponent(q))
+        .then(function(r) { return r.json(); })
+        .then(function(lista) {
+            div.innerHTML = '';
+            if (!lista || !lista.length) {
+                div.innerHTML = '<div style="padding:10px 12px;color:var(--gl-text-secondary);font-size:.875rem;">Nenhum resultado.</div>';
+            } else {
+                lista.forEach(function(u) {
+                    var item = document.createElement('div');
+                    item.style.cssText = 'padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--gl-border);font-size:.875rem;';
+                    item.innerHTML = '<strong>' + escHtml(u.nome) + '</strong>'
+                        + (u.matricula ? ' <span style="color:var(--gl-text-secondary);">' + escHtml(u.matricula) + '</span>' : '')
+                        + '<br><span style="color:var(--gl-text-secondary);">' + escHtml(u.email) + '</span>';
+                    item.addEventListener('mouseover', function() { this.style.background = 'var(--gl-bg)'; });
+                    item.addEventListener('mouseout',  function() { this.style.background = ''; });
+                    item.addEventListener('click', function() { selecionarUsuario(u); });
+                    div.appendChild(item);
+                });
+            }
+            div.style.display = 'block';
+        })
+        .catch(function() { div.style.display = 'none'; });
+}
+
+function selecionarUsuario(u) {
+    document.getElementById('usuarioId').value = u.id;
+    document.getElementById('usuarioBusca').value = '';
+    document.getElementById('usuarioBuscaResultados').style.display = 'none';
+    var sel = document.getElementById('usuarioSelecionado');
+    document.getElementById('usuarioSelecionadoNome').textContent =
+        u.nome + (u.matricula ? ' (' + u.matricula + ')' : '');
+    sel.style.display = 'flex';
+    carregarProjetosDeUsuario(u.id);
+}
+
+function limparUsuario() {
+    document.getElementById('usuarioId').value = '';
+    document.getElementById('usuarioBusca').value = '';
+    document.getElementById('usuarioSelecionado').style.display = 'none';
+    popularProjetoSelect(window._projetosProprios || []);
+}
+
+function carregarProjetosDeUsuario(uid) {
+    fetch('/reservas/projetos-de/' + uid)
+        .then(function(r) { return r.json(); })
+        .then(function(lista) { popularProjetoSelect(lista || []); })
+        .catch(function() {});
+}
+
+function popularProjetoSelect(lista) {
+    var sel = document.getElementById('projetoId');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">Nenhum</option>';
+    lista.forEach(function(p) {
+        var opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = p.titulo + ' (' + glTipoProjetoLabel(p.tipo) + ')';
+        sel.appendChild(opt);
+    });
+    onProjetoChange();
+}
+
+function escHtml(str) {
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(str || ''));
+    return div.innerHTML;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    verificarDisponibilidade();
+    onProjetoChange();
+    /* fecha dropdown ao clicar fora */
+    document.addEventListener('click', function(e) {
+        var busca = document.getElementById('usuarioBusca');
+        var res = document.getElementById('usuarioBuscaResultados');
+        if (busca && res && !busca.contains(e.target) && !res.contains(e.target)) {
+            res.style.display = 'none';
+        }
+    });
+});
+</script>
+</body>
+</html>
