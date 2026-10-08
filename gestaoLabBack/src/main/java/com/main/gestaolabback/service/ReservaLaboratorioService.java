@@ -280,8 +280,12 @@ public class ReservaLaboratorioService {
             boolean podVerNomes = isCoordenador || r.getUsuario().getId().equals(userId);
             String nomeUsuario = podVerNomes ? r.getUsuario().getNome() : null;
             String nomeProjeto = (podVerNomes && r.getProjeto() != null) ? r.getProjeto().getTitulo() : null;
+            int ocupacao = (int) reservas.stream()
+                    .filter(other -> other.getDataInicio().isBefore(r.getDataFim())
+                            && other.getDataFim().isAfter(r.getDataInicio()))
+                    .count();
             return new AgendaLaboratorioResponse.BlocoAgenda(
-                    r.getId(), r.getDataInicio(), r.getDataFim(), nomeUsuario, nomeProjeto);
+                    r.getId(), r.getDataInicio(), r.getDataFim(), nomeUsuario, nomeProjeto, ocupacao);
         }).toList();
 
         return new AgendaLaboratorioResponse(laboratorio.getCapacidade(), blocos);

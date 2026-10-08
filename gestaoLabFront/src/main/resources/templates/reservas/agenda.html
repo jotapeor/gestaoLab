@@ -46,6 +46,11 @@
         .agenda-bloco.outro {
             background: #64748B;
         }
+        .agenda-bloco.lotado {
+            background: #FEF3C7;
+            color: #B45309;
+            border: 1px solid #B45309;
+        }
         @media (max-width: 768px) {
             .agenda-grid { grid-template-columns: 1fr; }
         }
@@ -100,9 +105,12 @@
                             <th:block th:each="bloco : ${agenda.blocos}"
                                       th:if="${bloco.inicio.toLocalDate().equals(dia)}">
                                 <div class="agenda-bloco"
-                                     th:classappend="${bloco.nomeUsuario != null} ? ' proprio' : ' outro'">
+                                     th:classappend="${agenda.capacidade != null and bloco.ocupacao != null and bloco.ocupacao >= agenda.capacidade} ? ' lotado' : (${bloco.nomeUsuario != null} ? ' proprio' : ' outro')">
                                     <span class="gl-mono"
                                           th:text="${#temporals.format(bloco.inicio, 'HH:mm') + '–' + #temporals.format(bloco.fim, 'HH:mm')}">-</span>
+                                    <span th:if="${bloco.ocupacao != null}"
+                                          style="display:block;font-size:.65rem;margin-top:1px;opacity:.9;"
+                                          th:text="${agenda.capacidade != null ? bloco.ocupacao + '/' + agenda.capacidade : bloco.ocupacao}">-</span>
                                     <br th:if="${bloco.nomeUsuario != null}">
                                     <span th:if="${bloco.nomeUsuario != null}" th:text="${bloco.nomeUsuario}">-</span>
                                     <br th:if="${bloco.nomeProjeto != null}">

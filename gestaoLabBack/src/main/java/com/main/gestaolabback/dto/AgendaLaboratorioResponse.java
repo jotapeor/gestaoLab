@@ -12,6 +12,7 @@ public record AgendaLaboratorioResponse(
             LocalDateTime inicio,
             LocalDateTime fim,
             String nomeUsuario,
-            String nomeProjeto
+            String nomeProjeto,
+            int ocupacao
     ) {}
 }

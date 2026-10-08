@@ -9,6 +9,7 @@ public record AgendaDto(Integer capacidade, List<BlocoAgenda> blocos) {
             LocalDateTime inicio,
             LocalDateTime fim,
             String nomeUsuario,
-            String nomeProjeto
+            String nomeProjeto,
+            Integer ocupacao
     ) {}
 }
